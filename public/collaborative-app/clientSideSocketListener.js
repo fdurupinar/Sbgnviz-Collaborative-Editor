@@ -3,7 +3,7 @@
  * Human listens to agent socket and performs menu operations requested by the agent
 */
 
-let modelMerger = require('./model-merge-functions.js');
+let modelMergeFunctions = require('./model-merge-functions.js')();
 
 module.exports =  function(app) {
 
@@ -13,10 +13,10 @@ module.exports =  function(app) {
             let self = this;
 
 
-            app.socket.on('loadFile', function (txtFile, callback) {
+            app.socket.on('loadFile', function (data, callback) {
                 try {
+                    appUtilities.getChiseInstance(data.cyId).getSbgnvizInstance().loadSBGNMLText(data.content);
 
-                    appUtilities.getActiveSbgnvizInstance().loadSBGNMLText(txtFile);
                     if (callback) callback("success");
                 }
                 catch (e) {
@@ -27,13 +27,15 @@ module.exports =  function(app) {
 
             });
 
-            app.socket.on('newFile', function (data, callback) {
-                let cyId = appUtilities.getActiveNetworkId();
-                self.newFile(data, cyId,  callback);
+
+            app.socket.on('cleanAll', function ( data, callback) {
+
+                self.cleanAll(callback);
             });
 
             app.socket.on('runLayout', function (data, callback) {
                 try {
+                    appUtilities.setActiveNetwork(data.cyId);
                     $("#perform-layout").trigger('click');
                     if (callback) callback("success");
                 }
@@ -48,13 +50,13 @@ module.exports =  function(app) {
             app.socket.on('addNode', function (param, callback) {
                 try {
                     //does not trigger cy events
-                    let newNode = appUtilities.getActiveChiseInstance().elementUtilities.addNode(param.position.x, param.position.y, param.data.class);
-                    let cyId = appUtilities.getActiveNetworkId();
+                    let newNode = appUtilities.getChiseInstance(param.cyId).elementUtilities.addNode(param.position.x, param.position.y, param.data.class);
+
 
                     //notifies other clients
 
-                    app.modelManager.addModelNode(newNode.id(), cyId, param, "me");
-                    app.modelManager.initModelNode(newNode, cyId, "me");
+                    app.modelManager.addModelNode(newNode.id(), param.cyId, param, "me");
+                    app.modelManager.initModelNode(newNode, param.cyId, "me");
 
                     if (callback) callback(newNode.id());
                 }
@@ -69,19 +71,19 @@ module.exports =  function(app) {
             app.socket.on('deleteEles', function (data, callback) {
                 try {
                     //unselect all others
-                    appUtilities.getActiveCy().elements().unselect();
+                    appUtilities.getCyInstance(data.cyId).elements().unselect();
 
 
                     //first delete edges
                     data.elementIds.forEach(function (id) {
-                        appUtilities.getActiveCy().getElementById(id).select();
+                        appUtilities.getCyInstance(data.cyId).getElementById(id).select();
                     });
 
 
                     if (data.type === "simple")
-                        appUtilities.getActiveChiseInstance().deleteElesSimple(appUtilities.getActiveCy().elements(':selected'));
+                        appUtilities.getChiseInstance(data.cyId).deleteElesSimple(appUtilities.getCyInstance(data.cyId).elements(':selected'));
                     else
-                        appUtilities.getActiveChiseInstance().deleteNodesSmart(appUtilities.getActiveCy().nodes(':selected'));
+                        appUtilities.getChiseInstance(data.cyId).deleteNodesSmart(appUtilities.getCyInstance(data.cyId).nodes(':selected'));
 
                     if(callback) callback("success");
                 }
@@ -113,11 +115,10 @@ module.exports =  function(app) {
             app.socket.on('addEdge', function (data, callback) {
                 try {
                     //does not trigger cy events
-                    let newEdge = appUtilities.getActiveChiseInstance().elementUtilities.addEdge(source, target, sbgnclass, id, visibility);
-                    let cyId = appUtilities.getActiveNetworkId();
+                    let newEdge = appUtilities.getChiseInstance(data.cyId).elementUtilities.addEdge(source, target, sbgnclass, id, visibility);
 
                     //notifies other clients
-                    app.modelManager.addModelEdge(newNode.id(), cyId, data, "me");
+                    app.modelManager.addModelEdge(newNode.id(), data.cyId, data, "me");
                     // app.modelManager.initModelEdge(newEdge, cyId, "me");
 
                     if (callback) callback(newEdge.id());
@@ -132,15 +133,15 @@ module.exports =  function(app) {
 
             app.socket.on('align', function (data, callback) {
                 try {
-                    let nodes = appUtilities.getActiveCy().collection();
+                    let nodes = appUtilities.getCyInstance(data.cyId).collection();
                     if (data.nodeIds === '*' || data.nodeIds === 'all')
-                        nodes = appUtilities.getActiveCy().nodes();
+                        nodes = appUtilities.getCyInstance(data.cyId).nodes();
                     else
                         data.nodeIds.forEach(function (nodeId) {
-                            nodes.add(appUtilities.getActiveCy().getElementById(nodeId));
+                            nodes.add(appUtilities.getCyInstance(data.cyId).getElementById(nodeId));
                         });
 
-                    appUtilities.getActiveChiseInstance().align(nodes, data.horizontal, data.vertical, appUtilities.getActiveCy().getElementById(data.alignTo));
+                    appUtilities.getChiseInstance(data.cyId).align(nodes, data.horizontal, data.vertical, appUtilities.getCyInstance(data.cyId).getElementById(data.alignTo));
 
                     if (callback) callback("success");
                 }
@@ -154,13 +155,14 @@ module.exports =  function(app) {
             app.socket.on('updateVisibility', function (data, callback) {
                 try {
                     //unselect all others
-                    appUtilities.getActiveCy().elements().unselect();
+                    appUtilities.setActiveNetwork(data.cyId);
+                    appUtilities.getCyInstance(data.cyId).elements().unselect();
 
                     if (data.val === "showAll")
                         $("#show-all").trigger('click');
                     else {
                         data.elementIds.forEach(function (id) {
-                            appUtilities.getActiveCy().getElementById(id).select();
+                            appUtilities.getCyInstance(data.cyId).getElementById(id).select();
                         });
 
                         if (data.val == "show")
@@ -182,9 +184,10 @@ module.exports =  function(app) {
             app.socket.on('searchByLabel', function (data, callback) {
                 try {
                     //unselect all others
-                    appUtilities.getActiveCy().elements().unselect();
 
-                    appUtilities.getActiveChiseInstance().searchByLabel(data.label);
+                    appUtilities.getCyInstance(data.cyId).elements().unselect();
+
+                    appUtilities.getChiseInstance(data.cyId).searchByLabel(data.label);
 
                     if (callback) callback("success");
                 }
@@ -197,14 +200,15 @@ module.exports =  function(app) {
             app.socket.on('updateHighlight', function (data, callback) {
                 try {
                     //unselect all others
-                    appUtilities.getActiveCy().elements().unselect();
+                    appUtilities.getCyInstance(data.cyId).elements().unselect();
+                    appUtilities.setActiveNetwork(data.cyId);
 
                     if (data.val === "remove") {
                         $("#remove-highlights").trigger('click');
                     }
                     else {
                         data.elementIds.forEach(function (id) {
-                            appUtilities.getActiveCy().getElementById(id).select();
+                            appUtilities.getCyInstance(data.cyId).getElementById(id).select();
                         });
 
                         if (data.val === "neighbors")
@@ -226,10 +230,11 @@ module.exports =  function(app) {
                 try {
 
                     //unselect all others
-                    appUtilities.getActiveCy().elements().unselect();
+                    appUtilities.getCyInstance(data.cyId).elements().unselect();
+                    appUtilities.setActiveNetwork(data.cyId);
 
                     data.elementIds.forEach(function (id) {
-                        appUtilities.getActiveCy().getElementById(id).select();
+                        appUtilities.getCyInstance(data.cyId).getElementById(id).select();
                     });
 
                     if (data.val === "collapse")
@@ -250,22 +255,16 @@ module.exports =  function(app) {
             app.socket.on('addCompound', function (data, callback) {
                 try {
                     //unselect all others
-                    appUtilities.getActiveCy().elements().unselect();
+                    appUtilities.getCyInstance(data.cyId).elements().unselect();
 
                     data.elementIds.forEach(function (elId) {
-                        let el = appUtilities.getActiveCy().getElementById(elId);
+                        let el = appUtilities.getCyInstance(data.cyId).getElementById(elId);
                         if(el.isNode())
                             el.select();
                     });
 
-                      appUtilities.getActiveChiseInstance().createCompoundForGivenNodes(appUtilities.getActiveCy().nodes(':selected'), data.val);
+                      appUtilities.getChiseInstance(data.cyId).createCompoundForGivenNodes(appUtilities.getCyInstance(data.cyId).nodes(':selected'), data.val);
 
-
-
-                    // if (data.val === "complex")
-                    //     $("#add-complex-for-selected").trigger('click');
-                    // else
-                    //     $("#add-compartment-for-selected").trigger('click');
 
 
                     if (callback) callback("success");
@@ -280,10 +279,11 @@ module.exports =  function(app) {
 
             app.socket.on('clone', function (data, callback) {
                 try {
-                    appUtilities.getActiveCy().elements().unselect();
+                    appUtilities.getCyInstance(data.cyId).elements().unselect();
+                    appUtilities.setActiveNetwork(data.cyId);
 
                     data.elementIds.forEach(function (nodeId) {
-                        appUtilities.getActiveCy().getElementById(nodeId).select();
+                        appUtilities.getCyInstance(data.cyId).getElementById(nodeId).select();
                     });
 
                     $("#clone-selected").trigger('click');
@@ -298,34 +298,38 @@ module.exports =  function(app) {
                 }
             });
 
-            //Open in another window
+            //Open in another tab
             app.socket.on('openPCQueryWindow', function(data, callback){
-                let loc = window.location.href;
-                if (loc[loc.length - 1] === "#") {
-                    loc = loc.slice(0, -1);
-                }
-                let w = window.open((loc + "_query"), function () {
 
+                let chiseInst = appUtilities.createNewNetwork(); //opens a new tab
+
+                let json = chiseInst.convertSbgnmlTextToJson(data.graph);
+
+                chiseInst.updateGraph(jsonObj, function(){
+                    app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(), appUtilities, "me");
+
+                    appUtilities.setActiveNetwork(data.cyId);
+
+                    $("#perform-layout").trigger('click');
+
+                    if (callback) callback("success");
                 });
 
-                // //because window opening takes a while
-                setTimeout(function () {
-
-                    let json = appUtilities.getActiveChiseInstance().convertSbgnmlTextToJson(data.graph);
-                    w.postMessage(JSON.stringify(json), "*");
-                }, 2000);
 
             });
 
-            app.socket.on("displaySbgn", function(sbgn, callback){
+            app.socket.on("displaySbgn", function(data, callback){
 
-                let jsonObj = appUtilities.getActiveChiseInstance().convertSbgnmlTextToJson(sbgn);
+
+                let jsonObj = appUtilities.getChiseInstance(data.cyId).convertSbgnmlTextToJson(data.sbgn);
 
                 //get another sbgncontainer and display the new SBGN model.
                 app.modelManager.newModel("me", true);
 
-                appUtilities.getActiveChiseInstance().updateGraph(jsonObj, function(){
-                    app.modelManager.initModel(appUtilities.getActiveCy().nodes(), appUtilities.getActiveCy().edges(), appUtilities, "me");
+                appUtilities.getChiseInstance(data.cyId).updateGraph(jsonObj, function(){
+                    app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(), appUtilities, "me");
+
+                    appUtilities.setActiveNetwork(data.cyId);
 
                     $("#perform-layout").trigger('click');
 
@@ -336,11 +340,11 @@ module.exports =  function(app) {
 
             app.socket.on("mergeSbgn", function (data, callback) {
 
-                let newJson = appUtilities.getActiveChiseInstance().convertSbgnmlTextToJson(data.graph);
+                let newJson = appUtilities.getChiseInstance(data.cyId).convertSbgnmlTextToJson(data.graph);
                 if(!data.cyId)
                     data.cyId = appUtilities.getActiveNetworkId();
-                // self.mergeJsonWithCurrent(newJson, data.cyId,  app.modelManager, callback);
-                modelMerger.mergeJsonWithCurrent(data.graph, data.cyId, app.modelManager, callback);
+
+                modelMergeFunctions.mergeJsonWithCurrent(newJson, data.cyId, app.modelManager, callback);
 
             });
 
@@ -348,24 +352,33 @@ module.exports =  function(app) {
 
                 if(!data.cyId)
                     data.cyId = appUtilities.getActiveNetworkId();
-                modelMerger.mergeJsonWithCurrent(data.graph, data.cyId, app.modelManager, callback);
-                // self.mergeJsonWithCurrent(data.graph, data.cyId, app.modelManager, callback);
+                modelMergeFunctions.mergeJsonWithCurrent(data.graph, data.cyId, app.modelManager, callback);
+
             });
         },
 
 
-
-
-        newFile: function(data, cyId,  callback){
+        cleanAll: function( callback){
             try {
-                appUtilities.getActiveCy().remove(appUtilities.getActiveCy().elements());
-                app.modelManager.newModel(cyId, "me"); //do not delete cytoscape, only the model
+
+                let cyIds = app.modelManager.getCyIds();
+
+                cyIds.forEach(function(cyId) {
+                    appUtilities.getCyInstance(cyId).remove(appUtilities.getCyInstance(cyId).elements());
+                    app.modelManager.newModel(cyId, "me"); //do not delete cytoscape, only the model
+
+                });
+
+
+                //TODO: actually closing the tab will be handled later
                 //close all the other tabs
                 app.model.set('_page.doc.images', null);
 
                 app.dynamicResize(); //to clean the canvas
 
                 app.model.set('_page.doc.provenance', null);
+
+
 
                 if (callback) callback("success");
             }

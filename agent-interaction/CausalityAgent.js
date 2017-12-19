@@ -54,7 +54,7 @@ CausalityAgent.prototype.init = function(){
 
 
     //Clean the sbgnviz canvas
-    this.sendRequest('agentNewFileRequest');
+    this.sendRequest('agentCleanAllRequest');
 
 
 

@@ -279,7 +279,7 @@ describe('Agent API Test', function () {
                         let parent = modelManager.getModelNode(node.data.parent, cyId);
                         expect(parent.data.class).to.equal(type);
                         done();
-                    },100);
+                    },500);
                 });
             });
         });
@@ -575,12 +575,12 @@ describe('Agent API Test', function () {
     }
 
     function newFile(cyId){
-        it('agent.newFileRequest', function(done) {
+        it('agent.cleanAllRequest', function(done) {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
                 let jQuery = window.jQuery;
 
-                agent.sendRequest("agentNewFileRequest", {cyId:cyId}, function(){
+                agent.sendRequest("agentCleanAllRequest", {}, function(){
                     setTimeout(function () { //should wait here as well
                         let cy = modelManager.getModelCy(cyId);
                         expect(jQuery.isEmptyObject(window.appUtilities.getActiveCy().nodes) && jQuery.isEmptyObject(window.appUtilities.getActiveCy().edges)).to.equal(true);

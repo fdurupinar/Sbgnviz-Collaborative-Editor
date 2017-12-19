@@ -25,14 +25,15 @@
     "coffeeify": "^2.0.1",
     "compression": "^1.7.1",
     "connect-mongo": "^1.1.0",
-    "cytoscape": "^3.2.5",
+    "cytoscape": "^3.2.7",
     "derby": "^0.9.0",
     "express": "^4.16.2",
     "express-session": "^1.15.6",
     "jquery": "~2.2.4",
     "jquery-expander": "1.7.0",
     "mongodb": "^2.2.33",
-    "onecolor": "*",
+    "mousetrap": "^1.6.1",
+    "onecolor": "^3.0.5",
     "pdf2text": "^1.1.0",
     "pegjs": "^0.10.0",
     "pegjs-import": "^0.2.6",
@@ -46,7 +47,7 @@
     "socket.io": "^1.7.4",
     "sqlite3": "^3.1.13",
     "underscore": "^1.8.3",
-    "ws": "^3.2.0"
+    "ws": "^3.3.3"
   },
   "devDependencies": {
     "@cypress/releaser": "0.2.1",

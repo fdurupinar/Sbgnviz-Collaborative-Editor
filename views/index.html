@@ -2246,9 +2246,9 @@
                     <ul id = "provenance-messages">
                         {{each _page.doc.provenance as #message}}
                             {{if #message.pc}}
-                                <li class = "message"> <b>{{#message.userName}}: </b> <button on-click = "openPCQueryWindow(#message.pc)">PC Query View</button>{{unescaped #message.html}}</li>
+                                <li class = "message" style = "font-size:medium; color:{{_page.doc.users[#message.userId].colorCode}};  padding : 5px"> {{#message.userName}}:  <button class = "btn-mini" on-click = "openPCQueryWindow(#message.pc)">Click to open query in a new tab</button>{{unescaped #message.html}}</li>
                             {{else}}
-                                <li class = "message"> <b>{{#message.userName}}: </b> {{unescaped #message.html}}</li>
+                                <li class = "message" style = "font-size:medium; color:{{_page.doc.users[#message.userId].colorCode}};  padding : 5px"> {{#message.userName}}:  {{unescaped #message.html}}</li>
                             {{/if}}
                         {{/each}}
                     </ul>

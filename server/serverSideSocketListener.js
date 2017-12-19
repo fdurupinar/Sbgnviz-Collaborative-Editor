@@ -542,7 +542,7 @@ module.exports.start = function(io, model, cancerDataOrganizer){
         });
 
         socket.on('agentRunLayoutRequest', function(data, callback){
-            askHuman(data.userId, data.room,  "runLayout", null, function(val){
+            askHuman(data.userId, data.room,  "runLayout", data, function(val){
                 if (callback) callback(val);
             });
         });
@@ -582,7 +582,7 @@ module.exports.start = function(io, model, cancerDataOrganizer){
                     }
                     else  {
                         if(response.statusCode === 200) {
-                            askHuman(data.userId, data.room,  "loadFile", data.content, function(val){
+                            askHuman(data.userId, data.room,  "loadFile", data, function(val){
                                 if (callback) callback(val);
                             });
                         }
@@ -591,15 +591,15 @@ module.exports.start = function(io, model, cancerDataOrganizer){
                 });
             }
             else
-                askHuman(data.userId, data.room,  "loadFile", data.content, function(val){
+                askHuman(data.userId, data.room,  "loadFile", data, function(val){
                     if (callback) callback(val);
                 });
 
             if(callback) callback();
         });
 
-        socket.on('agentNewFileRequest',  function(data, callback){
-            askHuman(data.userId, data.room,  "newFile", data, function(val){
+        socket.on('agentCleanAllRequest',  function(data, callback){
+            askHuman(data.userId, data.room,  "cleanAll", data, function(val){
                 if (callback) callback(val);
             });
         });

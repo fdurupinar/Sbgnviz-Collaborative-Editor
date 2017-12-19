@@ -203,7 +203,8 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
 
             //The socket connection is between the interface and the agent, so we cannot directly emit messages
             //we must ask the client with the browser to do it for us
-            self.askHuman(self.agentId, self.room, "displaySbgn", sbgnModel, function (val) {
+            //TODO: get the cyId from TRIPS
+            self.askHuman(self.agentId, self.room, "displaySbgn", {sbgn: sbgnModel, cyId: 0}, function (val) {
 
                 // self.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
             });
@@ -236,7 +237,7 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
         });
 
         //this will clean the image tabs and sbgn model
-        this.askHuman(this.agentId, this.room, "newFile", function (val) {
+        this.askHuman(this.agentId, this.room, "cleanAll",{},  function (val) {
         });
 
 

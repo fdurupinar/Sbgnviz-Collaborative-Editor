@@ -71,23 +71,34 @@ var PathsBetweenQueryView = Backbone.View.extend({
             $.ajax({
                 url: queryURL,
                 type: 'GET',
+                dataType: 'text',
                 success: function (data) {
 
-                        var loc = window.location.href;
-                        if (loc[loc.length - 1] === "#") {
-                            loc = loc.slice(0, -1);
-                        }
-                        var w = window.open((loc + "_query"), function () {
+                    let chiseInst = appUtilities.createNewNetwork(); //opens a new tab
 
 
-                        });
+                    let jsonObj = chiseInst.convertSbgnmlTextToJson(data);
 
+                    chiseInst.updateGraph(jsonObj, function() {
 
-                    // //because window opening takes a while
-                    setTimeout(function () {
-                        var json = appUtilities.getActiveChiseInstance().convertSbgnmlTextToJson(data);
-                        w.postMessage(JSON.stringify(json), "*");
-                    }, 2000);
+                    });
+
+                    // appUtilities.getChiseInstance(data.cyId).updateGraph(jsonObj, function(){
+                    //     app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(), appUtilities, "me");
+                    //
+                    //     appUtilities.setActiveNetwork(data.cyId);
+                    //
+                    //     $("#perform-layout").trigger('click');
+                    //
+                    //     if (callback) callback("success");
+                    // });
+                    //
+                    //
+                    // // //because window opening takes a while
+                    // setTimeout(function () {
+                    //     var json = appUtilities.getActiveChiseInstance().convertSbgnmlTextToJson(data);
+                    //     w.postMessage(JSON.stringify(json), "*");
+                    // }, 2000);
 
                     appUtilities.getActiveChiseInstance().endSpinner('paths-between-spinner');
                 },
@@ -168,22 +179,17 @@ var PathsByURIQueryView = Backbone.View.extend({
             $.ajax({
                 url: queryURL,
                 type: 'GET',
+                dataType: 'text',
                 success: function (data) {
-                    var loc = window.location.href;
-                    if (loc[loc.length - 1] === "#") {
-                        loc = loc.slice(0, -1);
-                    }
-                    var w = window.open((loc + "_query"), function () {
+                    let chiseInst = appUtilities.createNewNetwork(); //opens a new tab
 
 
+                    let jsonObj = chiseInst.convertSbgnmlTextToJson(data);
+
+                    chiseInst.updateGraph(jsonObj, function() {
 
                     });
 
-                    // //because window opening takes a while
-                    setTimeout(function () {
-                        var json = appUtilities.getActiveChiseInstance().convertSbgnmlTextToJson(data);
-                        w.postMessage(JSON.stringify(json), "*");
-                    }, 2000);
                     appUtilities.getActiveChiseInstance().endSpinner('paths-between-spinner');
 
 

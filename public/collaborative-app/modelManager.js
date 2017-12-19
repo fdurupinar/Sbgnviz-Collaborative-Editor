@@ -169,8 +169,6 @@ class ModelManager{
         return this.model.get('documents.' + this.docId + '.factoid');
     }
 
-
-
     /***
      *
      * @param cmd  {opName, opTarget,  elType, elId, opAttr,param, prevParam}
@@ -267,14 +265,14 @@ class ModelManager{
         //
         // }
         else if (cmd.opName == "init") {
-            this.newModel(cmd.cyId, "me", true);
+            this.newModel(cmd.cyId, null, true);
         }
         else if (cmd.opName == "new") { //delete all
             this.restoreModel( cmd.prevParam, cmd.cyId);
 
         }
         else if (cmd.opName == "merge") {
-            this.newModel(cmd.cyId, "me", true);
+            this.newModel(cmd.cyId, null, true);
             this.restoreModel(cmd.prevParam, cmd.cyId);
         }
 
@@ -287,13 +285,14 @@ class ModelManager{
         let undoInd = this.model.get('documents.' + this.docId + '.undoIndex');
         let cmd = this.model.get('documents.' + this.docId + '.history.' + (undoInd + 1)); // cmd: opName, opTarget, opAttr, elId, param
 
+
         if (cmd.opName == "set") {
             if (cmd.opTarget == "element" && cmd.elType == "node")
                 this.changeModelNodeAttribute(cmd.opAttr, cmd.elId, cmd.cyId, cmd.param, null); //user is null to enable updating in the editor
             else if (cmd.opTarget == "element" && cmd.elType == "edge")
                 this.changeModelEdgeAttribute(cmd.opAttr, cmd.elId, cmd.cyId, cmd.param, null);
             else if (cmd.opTarget == "element group") {
-                this.changeModelElementGroupAttribute(cmd.opAttr, cmd.elId, cmd.cyId, cmd.param);
+                this.changeModelElementGroupAttribute(cmd.opAttr, cmd.elId, cmd.cyId, cmd.param, null);
 
             }
 
@@ -327,13 +326,13 @@ class ModelManager{
         //
         // }
         else if (cmd.opName == "init") {
-            this.restoreModel(cmd.cyId, cmd.param);
+            this.restoreModel(cmd.param, cmd.cyId );
         }
         else if (cmd.opName == "new") { //delete all
             this.newModel(cmd.cyId );
         }
         else if (cmd.opName == "merge") { //delete all
-            this.restoreModel(cmd.cyId, cmd.param);
+            this.restoreModel(cmd.param, cmd.cyId);
         }
 
         undoInd = undoInd < this.model.get('documents.' + this.docId + '.history').length - 1 ? undoInd + 1 : this.model.get('documents.' + this.docId + '.history').length - 1;
@@ -397,6 +396,7 @@ class ModelManager{
                 nodeArr.push(nodes[att]);
         }
 
+        console.log(nodeArr);
         return nodeArr;
     }
 
@@ -498,6 +498,7 @@ class ModelManager{
         if (this.model.get(nodePathStr) != null)
             return "Node cannot be duplicated";
 
+        this.model.pass({user: user}).set(nodePathStr + '.id', nodeId);
         this.model.pass({user: user}).set(nodePathStr + '.data.id', nodeId);
         this.model.pass({user: user}).set(nodePathStr + '.position', param.position);
         this.model.pass({user: user}).set(nodePathStr + '.data', param.data);
@@ -580,7 +581,8 @@ class ModelManager{
         this.addModelNode(compoundId, cyId, compoundAtts, user, true);
 
 
-        this.changeModelElementGroupAttribute("data", elList, paramList, cyId, user, true);
+
+        this.changeModelElementGroupAttribute("data", elList, cyId, paramList,  user, true);
 
 
 
@@ -617,7 +619,7 @@ class ModelManager{
         });
 
         //isolate the compound first, then delete
-        this.changeModelElementGroupAttribute("data.parent", childrenList, prevParentList, cyId,  user, true);
+        this.changeModelElementGroupAttribute("data.parent", childrenList, cyId, prevParentList,   user, true);
         this.deleteModelNode(compoundId, cyId, user, true);
 
 
@@ -639,7 +641,7 @@ class ModelManager{
 
     //attStr: attribute namein the model
     //historyData is for  sbgnStatesAndInfos only
-    changeModelElementGroupAttribute (attStr, elList, paramList, cyId,  user, noHistUpdate) { //historyData){
+    changeModelElementGroupAttribute (attStr, elList, cyId, paramList,   user, noHistUpdate) { //historyData){
         let self = this;
         let prevParamList = [];
 
@@ -983,7 +985,9 @@ class ModelManager{
     restoreModel (modelCy, cyId, user, noHistUpdate) {
         let cyPathStr = this.getModelCyPathStr(cyId);
         let prevParam = this.model.get(cyPathStr);
-        this.model.set(cyPathStr , modelCy);
+        console.log(prevParam);
+        this.model.pass({user: user}).set(cyPathStr , modelCy);
+
 
         // this.setSampleInd(-1, null, true); //to get a new container
 
@@ -1252,7 +1256,7 @@ class ModelManager{
     mergeJsons (cyId, user, noHistUpdate) {
         let cyPathStr = this.getModelCyPathStr(cyId);
         let modelCy = this.model.get(cyPathStr);
-        let prevModelCy = this.model.get('documents.' + this.docId + '.prevCy.' + cyId);
+        let prevModelCy = this.model.get('documents.' + this.docId + '.prevCy.' + cyId); //updated at rollback point
 
         if (!noHistUpdate) {
 

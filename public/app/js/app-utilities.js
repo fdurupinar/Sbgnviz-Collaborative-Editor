@@ -434,6 +434,28 @@ appUtilities.createNewNetwork = function (networkIdParam) {
   return newInst;
 };
 
+//
+// //FUNDA TODO: close will be handled later
+// appUtilities.closeAllButOne = function(){
+//
+//
+//     while(this.networkIdsStack.length > 1){
+//         // active network id is the one that is at the top of the stack
+//         // pop and get it
+//         var activeNetworkId = this.networkIdsStack.pop();
+//
+//         console.log(activeNetworkId);
+//         // remove the chise instance mapped to the actual network id from the chise instances map
+//         this.removeFromChiseInstances(activeNetworkId);
+//
+//         // remove physical html components for networkId
+//         this.removePhysicalNetworkComponents(activeNetworkId);
+//
+//
+//     }
+//
+// }
+
 // close the active network
 appUtilities.closeActiveNetwork = function () {
 
@@ -601,8 +623,8 @@ appUtilities.defaultLayoutProperties = {
   numIter: 2500,
   tile: true,
   animationEasing: 'cubic-bezier(0.17,0.72,0.41,0.98)',
-  animate: 'end',
-  animationDuration: 2000,
+  animate: false, //funda
+  animationDuration: 0,
   randomize: false,
   tilingPaddingVertical: 20,
   tilingPaddingHorizontal: 20,

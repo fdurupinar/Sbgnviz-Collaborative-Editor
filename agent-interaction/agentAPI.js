@@ -261,8 +261,9 @@ Agent.prototype.getEdgeRequest = function(id, cyId, callback){
  * </ul>
  *
  */
-Agent.prototype.sendRequest = function(reqName, param, callback){ //model operations
+Agent.prototype.sendRequest = function(reqName, paramSent, callback){ //model operations
 
+    let param  = paramSent;
     if(!param){
         param = {};
     }
