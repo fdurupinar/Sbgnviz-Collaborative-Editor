@@ -1179,146 +1179,169 @@ function checkVisibility(cyId, selector) {
   });
 }
 
+function createNewNetworkTest () {
+
+  it('createNewNetwork', function () {
+    cy.window().should(function(window){
+
+      // get the initial length of networks
+      var initilNetworksSize = window.appUtilities.networkIdsStack.length;
+
+      // create a new network
+      window.appUtilities.createNewNetwork();
+
+      // expect that number of networks is incremented by one
+      expect(window.appUtilities.networkIdsStack.length, "A new network is created").to.be.equal(initilNetworksSize + 1);
+    });
+  });
+
+}
 
 describe('CWC Test', function(){
 
-    let cyId = 0;
-    addNodeTest(cyId, 'pdNode0', 'macromolecule', 100, 100);
-    addNodeTest(cyId, 'pdNode1', 'process', 100, 200);
-    checkVisibility(cyId, '#pdNode1');
-    addNodeTest(cyId, 'pdNode2', 'macromolecule', 200, 200);
+    // create a new network/tab
+    createNewNetworkTest();
 
-    addEdgeTest(cyId, 'pdEdge', 'pdNode1', 'pdNode2', 'necessary stimulation');
+    // perform tests on both of the networks/tabs
+    for ( let cyId = 0; cyId < 2; cyId++ ) {
 
-    let pdNodeTypes = ['macromolecule', 'complex', 'simple chemical', 'unspecified entity',
-    'nucleic acid feature', 'perturbing agent', 'source and sink', 'phenotype', 'process',
-    'omitted process', 'uncertain process', 'association', 'dissociation', 'tag',
-    'compartment', 'submap', 'and', 'or', 'not'
-    ];
+      addNodeTest(cyId, 'pdNode0', 'macromolecule', 100, 100);
+      addNodeTest(cyId, 'pdNode1', 'process', 100, 200);
+      checkVisibility(cyId, '#pdNode1');
+      addNodeTest(cyId, 'pdNode2', 'macromolecule', 200, 200);
 
-    for (let i = 0; i < pdNodeTypes.length; i++) {
-    let id = 'pdNode' + (i + 3);
-        addNodeTest(cyId, id, pdNodeTypes[i], 300, 200);
+      addEdgeTest(cyId, 'pdEdge', 'pdNode1', 'pdNode2', 'necessary stimulation');
+
+      let pdNodeTypes = ['macromolecule', 'complex', 'simple chemical', 'unspecified entity',
+      'nucleic acid feature', 'perturbing agent', 'source and sink', 'phenotype', 'process',
+      'omitted process', 'uncertain process', 'association', 'dissociation', 'tag',
+      'compartment', 'submap', 'and', 'or', 'not'
+      ];
+
+      for (let i = 0; i < pdNodeTypes.length; i++) {
+      let id = 'pdNode' + (i + 3);
+          addNodeTest(cyId, id, pdNodeTypes[i], 300, 200);
+      }
+
+      resetMapTypeTest(cyId); // Reset the map type here to unknown to allow adding AF elements
+
+      let afNodeTypes = ['biological activity', 'BA plain', 'BA unspecified entity',
+      'BA simple chemical', 'BA macromolecule', 'BA nucleic acid feature',
+      'BA perturbing agent', 'BA complex', 'delay'];
+
+      for (let i = 0; i < afNodeTypes.length; i++) {
+      let id = 'afNode' + i;
+          addNodeTest(cyId, id, afNodeTypes[i], 300, 200);
+      }
+
+      let pdEdgeTypes = ['consumption', 'production', 'modulation', 'stimulation',
+      'catalysis', 'necessary stimulation', 'logic arc', 'equivalence arc'];
+
+      for (let i = 0; i < pdEdgeTypes.length; i++) {
+          let id = 'pdEdge' + i;
+          let src = 'pdNode' + i;
+          let tgt = 'pdNode' + (pdNodeTypes.length - i - 1);
+          addEdgeTest(cyId, id, src, tgt, pdEdgeTypes[i]);
+      }
+
+      let afEdgeTypes = ['unknown influence', 'positive influence', 'negative influence'];
+
+      for (let i = 0; i < afEdgeTypes.length; i++) {
+          let id = 'afEdge' + i;
+          let src = 'afNode' + i;
+          let tgt = 'afNode' + (afNodeTypes.length - i - 1);
+          addEdgeTest(cyId, id, src, tgt, afEdgeTypes[i]);
+      }
+
+      createCompoundTest(cyId, 'complex');
+      cloneElementsTest(cyId);
+      cloneNodeTest(cyId, 'pdNode5');
+
+      expandCollapseTest(cyId, ':parent');
+      deleteElesTest(cyId, '#pdNodeO');
+      deleteNodesSmartTest(cyId, '#pdNode7');
+
+      checkVisibility(cyId, '#pdNode1');
+      // checkVisibility(cyId, '#pdNode1');
+      hideElesTest(cyId, '#pdNode1');
+      showAllElesTest(cyId);
+
+      alignTest(cyId, 'node', 'left');
+      alignTest(cyId, 'node', 'center');
+      alignTest(cyId, 'node', 'none', 'top');
+      alignTest(cyId, 'node', 'none', 'bottom');
+      alignTest(cyId, 'node', 'none', 'middle');
+
+      highlightElesTest(cyId, '[class="macromolecule"]');
+      removeHighlightsTest(cyId);
+      highlightNeighboursTest(cyId, '[class="macromolecule"]');
+      removeHighlightsTest(cyId);
+      highlightProcessesTest(cyId, '[class="macromolecule"]');
+      removeHighlightsTest(cyId);
+
+      changeNodeLabelTest(cyId, '[class="macromolecule"]');
+      resizeNodesTest(cyId, 'w');
+      resizeNodesTest(cyId, 'h');
+
+      changeDataTest(cyId, '[class="macromolecule"]', 'border-color', '#b6f442');
+      changeDataTest(cyId, '[class="macromolecule"]', 'background-color', '#15076d');
+      changeDataTest(cyId, '[class="macromolecule"]', 'border-width', 2, true);
+      changeDataTest(cyId, '[class="macromolecule"]', 'background-opacity', 1, true);
+      changeDataTest(cyId, 'edge', 'width', 3.5, true);
+      changeDataTest(cyId, 'edge', 'cardinality', 3, true, true);
+      changeDataTest(cyId, 'edge', 'line-color', '#b6f442');
+
+      let stateVarObj = {};
+      stateVarObj.clazz = 'state variable';
+      stateVarObj.state = {
+          value: 'val',
+          variable: 'let'
+      };
+      stateVarObj.bbox = {
+          w: 40,
+          h: 20
+      };
+
+      let unitOfInfoObj = {};
+      unitOfInfoObj.clazz = 'unit of information';
+      unitOfInfoObj.label = {
+          text: 'label'
+      };
+      unitOfInfoObj.bbox = {
+          w: 40,
+          h: 20
+      };
+
+      addStateOrInfoboxTest(cyId, 'pdNode3', stateVarObj);
+      addStateOrInfoboxTest(cyId, 'pdNode3', unitOfInfoObj);
+
+      changeStateOrInfoBoxTest(cyId, 'pdNode3', 0, 'updated val', 'value');
+      changeStateOrInfoBoxTest(cyId, 'pdNode3', 0, 'updated let', 'variable');
+      changeStateOrInfoBoxTest(cyId, 'pdNode3', 1, 'updated label');
+
+      removeStateOrInfoBoxTest(cyId, 'pdNode3', 0);
+
+      setMultimerStatusTest(cyId, '[class="macromolecule"]', true);
+      setCloneMarkerStatusTest(cyId, '[class="macromolecule multimer"]', true);
+
+      setMultimerStatusTest(cyId, '[class="macromolecule multimer"]', false);
+      setCloneMarkerStatusTest(cyId, '[class="macromolecule"]', false);
+
+      changeFontPropertiesTest(cyId, '[class="macromolecule"]', {
+      'font-size': '10px',
+      'font-family': 'Arial',
+      'font-weight': 'bolder'
+      });
+
+      addNodeTest(cyId, 'aCompartment', 'compartment', 100, 1000);
+      addNodeTest(cyId, 'mm1', 'macromolecule', 150, 150);
+      addNodeTest(cyId, 'mm2', 'macromolecule', 150, 190);
+      changeParentTest(cyId, '#mm1, #mm2', 'aCompartment', 5, 5);
+
+      addNodeTest(cyId, 'process1', 'process', 50, 50);
+      addNodeTest(cyId, 'process2', 'omitted process', 50, 100);
+      setPortsOrderingTest(cyId, '#process1, #process2', 'T-to-B');
+
     }
-
-    resetMapTypeTest(cyId); // Reset the map type here to unknown to allow adding AF elements
-
-    let afNodeTypes = ['biological activity', 'BA plain', 'BA unspecified entity',
-    'BA simple chemical', 'BA macromolecule', 'BA nucleic acid feature',
-    'BA perturbing agent', 'BA complex', 'delay'];
-
-    for (let i = 0; i < afNodeTypes.length; i++) {
-    let id = 'afNode' + i;
-        addNodeTest(cyId, id, afNodeTypes[i], 300, 200);
-    }
-
-    let pdEdgeTypes = ['consumption', 'production', 'modulation', 'stimulation',
-    'catalysis', 'necessary stimulation', 'logic arc', 'equivalence arc'];
-
-    for (let i = 0; i < pdEdgeTypes.length; i++) {
-        let id = 'pdEdge' + i;
-        let src = 'pdNode' + i;
-        let tgt = 'pdNode' + (pdNodeTypes.length - i - 1);
-        addEdgeTest(cyId, id, src, tgt, pdEdgeTypes[i]);
-    }
-
-    let afEdgeTypes = ['unknown influence', 'positive influence', 'negative influence'];
-
-    for (let i = 0; i < afEdgeTypes.length; i++) {
-        let id = 'afEdge' + i;
-        let src = 'afNode' + i;
-        let tgt = 'afNode' + (afNodeTypes.length - i - 1);
-        addEdgeTest(cyId, id, src, tgt, afEdgeTypes[i]);
-    }
-
-    createCompoundTest(cyId, 'complex');
-    cloneElementsTest(cyId);
-    cloneNodeTest(cyId, 'pdNode5');
-
-    expandCollapseTest(cyId, ':parent');
-    deleteElesTest(cyId, '#pdNodeO');
-    deleteNodesSmartTest(cyId, '#pdNode7');
-
-    checkVisibility(cyId, '#pdNode1');
-    // checkVisibility(cyId, '#pdNode1');
-    hideElesTest(cyId, '#pdNode1');
-    showAllElesTest(cyId);
-
-    alignTest(cyId, 'node', 'left');
-    alignTest(cyId, 'node', 'center');
-    alignTest(cyId, 'node', 'none', 'top');
-    alignTest(cyId, 'node', 'none', 'bottom');
-    alignTest(cyId, 'node', 'none', 'middle');
-
-    highlightElesTest(cyId, '[class="macromolecule"]');
-    removeHighlightsTest(cyId);
-    highlightNeighboursTest(cyId, '[class="macromolecule"]');
-    removeHighlightsTest(cyId);
-    highlightProcessesTest(cyId, '[class="macromolecule"]');
-    removeHighlightsTest(cyId);
-
-    changeNodeLabelTest(cyId, '[class="macromolecule"]');
-    resizeNodesTest(cyId, 'w');
-    resizeNodesTest(cyId, 'h');
-
-    changeDataTest(cyId, '[class="macromolecule"]', 'border-color', '#b6f442');
-    changeDataTest(cyId, '[class="macromolecule"]', 'background-color', '#15076d');
-    changeDataTest(cyId, '[class="macromolecule"]', 'border-width', 2, true);
-    changeDataTest(cyId, '[class="macromolecule"]', 'background-opacity', 1, true);
-    changeDataTest(cyId, 'edge', 'width', 3.5, true);
-    changeDataTest(cyId, 'edge', 'cardinality', 3, true, true);
-    changeDataTest(cyId, 'edge', 'line-color', '#b6f442');
-
-    let stateVarObj = {};
-    stateVarObj.clazz = 'state variable';
-    stateVarObj.state = {
-        value: 'val',
-        variable: 'let'
-    };
-    stateVarObj.bbox = {
-        w: 40,
-        h: 20
-    };
-
-    let unitOfInfoObj = {};
-    unitOfInfoObj.clazz = 'unit of information';
-    unitOfInfoObj.label = {
-        text: 'label'
-    };
-    unitOfInfoObj.bbox = {
-        w: 40,
-        h: 20
-    };
-
-    addStateOrInfoboxTest(cyId, 'pdNode3', stateVarObj);
-    addStateOrInfoboxTest(cyId, 'pdNode3', unitOfInfoObj);
-
-    changeStateOrInfoBoxTest(cyId, 'pdNode3', 0, 'updated val', 'value');
-    changeStateOrInfoBoxTest(cyId, 'pdNode3', 0, 'updated let', 'variable');
-    changeStateOrInfoBoxTest(cyId, 'pdNode3', 1, 'updated label');
-
-    removeStateOrInfoBoxTest(cyId, 'pdNode3', 0);
-
-    setMultimerStatusTest(cyId, '[class="macromolecule"]', true);
-    setCloneMarkerStatusTest(cyId, '[class="macromolecule multimer"]', true);
-
-    setMultimerStatusTest(cyId, '[class="macromolecule multimer"]', false);
-    setCloneMarkerStatusTest(cyId, '[class="macromolecule"]', false);
-
-    changeFontPropertiesTest(cyId, '[class="macromolecule"]', {
-    'font-size': '10px',
-    'font-family': 'Arial',
-    'font-weight': 'bolder'
-    });
-
-    addNodeTest(cyId, 'aCompartment', 'compartment', 100, 1000);
-    addNodeTest(cyId, 'mm1', 'macromolecule', 150, 150);
-    addNodeTest(cyId, 'mm2', 'macromolecule', 150, 190);
-    changeParentTest(cyId, '#mm1, #mm2', 'aCompartment', 5, 5);
-
-    addNodeTest(cyId, 'process1', 'process', 50, 50);
-    addNodeTest(cyId, 'process2', 'omitted process', 50, 100);
-    setPortsOrderingTest(cyId, '#process1, #process2', 'T-to-B');
-
 
 });
