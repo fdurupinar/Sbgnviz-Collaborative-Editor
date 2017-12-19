@@ -12,21 +12,28 @@ describe('modelManager Cytoscape Operations Test', function () {
 
         it('modelManager.addModelNode', function () {
             cy.window().should(function (window) {
+
+                // get the chise instance for cy/tab id
+                let chiseInstance = window.appUtilities.getChiseInstance(cyId);
+
+                // get the associated cy instance
+                let cyInstance = chiseInstance.getCy();
+
                 let modelManager = window.testApp.modelManager;
 
                 modelManager.addModelNode(id, cyId, {position: {x: 100, y: 200} , data: {id: id, class: "macromolecule"}});
 
-                expect(window.appUtilities.getActiveCy().getElementById(id)).to.be.ok;
+                expect(cyInstance.getElementById(id)).to.be.ok;
 
-                expect(modelManager.getModelNodeAttribute("data.id", id, cyId)).to.equal(window.appUtilities.getActiveCy().getElementById(id).data("id"));
-                expect(window.appUtilities.getActiveCy().getElementById(id).data("class")).to.equal("macromolecule");
-                expect(window.appUtilities.getActiveCy().getElementById(id).data("class")).to.equal(modelManager.getModelNodeAttribute("data.class", id, cyId));
+                expect(modelManager.getModelNodeAttribute("data.id", id, cyId)).to.equal(cyInstance.getElementById(id).data("id"));
+                expect(cyInstance.getElementById(id).data("class")).to.equal("macromolecule");
+                expect(cyInstance.getElementById(id).data("class")).to.equal(modelManager.getModelNodeAttribute("data.class", id, cyId));
 
-                expect(window.appUtilities.getActiveCy().getElementById(id).position("x")).to.equal(100);
-                expect(window.appUtilities.getActiveCy().getElementById(id).position("x")).to.equal(modelManager.getModelNodeAttribute("position.x", id, cyId));
+                expect(cyInstance.getElementById(id).position("x")).to.equal(100);
+                expect(cyInstance.getElementById(id).position("x")).to.equal(modelManager.getModelNodeAttribute("position.x", id, cyId));
 
-                expect(window.appUtilities.getActiveCy().getElementById(id).position("y")).to.equal(200);
-                expect(window.appUtilities.getActiveCy().getElementById(id).position("y")).to.equal(modelManager.getModelNodeAttribute("position.y", id, cyId));
+                expect(cyInstance.getElementById(id).position("y")).to.equal(200);
+                expect(cyInstance.getElementById(id).position("y")).to.equal(modelManager.getModelNodeAttribute("position.y", id, cyId));
 
             });
         });
@@ -47,11 +54,18 @@ describe('modelManager Cytoscape Operations Test', function () {
         it('modelManager.initModelNode', function() {
 
             cy.window().should(function (window) {
+
+                // get the chise instance for given cy/tab id
+                let chiseInstance = window.appUtilities.getChiseInstance(cyId);
+
+                // get the associated cy instance
+                let cyInstance = chiseInstance.getCy();
+
                 let modelManager = window.testApp.modelManager;
 
-                modelManager.initModelNode(window.appUtilities.getActiveCy().getElementById(id), cyId, null, true);
+                modelManager.initModelNode(cyInstance.getElementById(id), cyId, null, true);
 
-                var node = window.appUtilities.getActiveCy().getElementById(id);
+                var node = cyInstance.getElementById(id);
                 var modelNode = modelManager.getModelNode(id,cyId);
 
 
@@ -72,25 +86,32 @@ describe('modelManager Cytoscape Operations Test', function () {
 
         it('modelManager.addModelEdge', function (done) {
             cy.window().should(function (window) {
+
+                // get the chise instance for cy/tab id
+                let chiseInstance = window.appUtilities.getChiseInstance(cyId);
+
+                // get the associated cy instance
+                let cyInstance = chiseInstance.getCy();
+
                 let modelManager = window.testApp.modelManager;
                 var id = (id1 + "-"+ id2);
 
                 modelManager.addModelEdge(id, cyId,{data: {id: id, source: id1, target: id2, class: "consumption"}});
 
                 var modelEdge = modelManager.getModelEdge(id, cyId);
-                var edge = window.appUtilities.getActiveCy().getElementById(id);
+                var edge = cyInstance.getElementById(id);
 
-                expect(window.appUtilities.getActiveCy().getElementById(id)).to.be.ok;
+                expect(cyInstance.getElementById(id)).to.be.ok;
 
-                expect(modelManager.getModelEdgeAttribute("data.id", id, cyId)).to.equal(window.appUtilities.getActiveCy().getElementById(id).data("id"));
-                expect(window.appUtilities.getActiveCy().getElementById(id).data("class")).to.equal("consumption");
-                expect(window.appUtilities.getActiveCy().getElementById(id).data("class")).to.equal(modelManager.getModelEdgeAttribute("data.class", id, cyId));
+                expect(modelManager.getModelEdgeAttribute("data.id", id, cyId)).to.equal(cyInstance.getElementById(id).data("id"));
+                expect(cyInstance.getElementById(id).data("class")).to.equal("consumption");
+                expect(cyInstance.getElementById(id).data("class")).to.equal(modelManager.getModelEdgeAttribute("data.class", id, cyId));
 
-                expect(window.appUtilities.getActiveCy().getElementById(id).data("source")).to.equal(id1);
-                expect(window.appUtilities.getActiveCy().getElementById(id).data("source")).to.equal(modelManager.getModelEdgeAttribute("data.source", id, cyId));
+                expect(cyInstance.getElementById(id).data("source")).to.equal(id1);
+                expect(cyInstance.getElementById(id).data("source")).to.equal(modelManager.getModelEdgeAttribute("data.source", id, cyId));
 
-                expect(window.appUtilities.getActiveCy().getElementById(id).data("target")).to.equal(id2);
-                expect(window.appUtilities.getActiveCy().getElementById(id).data("target")).to.equal(modelManager.getModelEdgeAttribute("data.target", id, cyId));
+                expect(cyInstance.getElementById(id).data("target")).to.equal(id2);
+                expect(cyInstance.getElementById(id).data("target")).to.equal(modelManager.getModelEdgeAttribute("data.target", id, cyId));
 
                 done();
             });
@@ -113,11 +134,18 @@ describe('modelManager Cytoscape Operations Test', function () {
         it('modelManager.initModelEdge', function() {
 
             cy.window().should(function (window) {
+
+                // get chise instance for given cy/tab id
+                let chiseInstance = window.appUtilities.getChiseInstance(cyId);
+
+                // get the associated cy instance
+                let cyInstance = chiseInstance.getCy();
+
                 let modelManager = window.testApp.modelManager;
 
-                modelManager.initModelEdge(window.appUtilities.getActiveCy().getElementById(id), cyId, null, true); //no history
+                modelManager.initModelEdge(cyInstance.getElementById(id), cyId, null, true); //no history
 
-                var edge = window.appUtilities.getActiveCy().getElementById(id);
+                var edge = cyInstance.getElementById(id);
                 var modelEdge = modelManager.getModelEdge(id, cyId);
 
 
@@ -136,9 +164,16 @@ describe('modelManager Cytoscape Operations Test', function () {
     function selectModelNode(cyId, id) {
         it('modelManager.selectModelNode', function () {
             cy.window().should(function (window) {
+
+                // get chise instance for given cy/tab id
+                let chiseInstance = window.appUtilities.getChiseInstance(cyId);
+
+                // get the associated cy instance
+                let cyInstance = chiseInstance.getCy();
+
                 let modelManager = window.testApp.modelManager;
                 let userId = window.sessionUserId;
-                var node = window.appUtilities.getActiveCy().getElementById(id);
+                var node = cyInstance.getElementById(id);
                 modelManager.selectModelNode(node, cyId, userId); //we need to specify userId for selection
                 setTimeout(()=>{ //wait a little while to update the UI
                     expect(node.css('overlay-color')).to.equal(modelManager.getModelNodeAttribute("highlightColor", id, cyId));
@@ -153,8 +188,15 @@ describe('modelManager Cytoscape Operations Test', function () {
     function unselectModelNode(cyId, id) {
         it('modelManager.unselectModelNode', function () {
             cy.window().should(function (window) {
+
+                // get chise instance for given cy/tab id
+                let chiseInstance = window.appUtilities.getChiseInstance(cyId);
+
+                // get the associated cy instance
+                let cyInstance = chiseInstance.getCy();
+
                 let modelManager = window.testApp.modelManager;
-                var node = window.appUtilities.getActiveCy().getElementById(id);
+                var node = cyInstance.getElementById(id);
                 modelManager.unselectModelNode(node, cyId); //we need to specify userId for selection
                 expect(modelManager.getModelNodeAttribute("highlightColor", id, cyId)).to.not.ok;
                 setTimeout(()=>{ //wait a little while to update the UI
@@ -169,9 +211,16 @@ describe('modelManager Cytoscape Operations Test', function () {
     function selectModelEdge(cyId, id) {
         it('modelManager.selectModelEdge', function () {
             cy.window().should(function (window) {
+
+                // get chise instance for given cy/tab id
+                let chiseInstance = window.appUtilities.getChiseInstance(cyId);
+
+                // get the associated cy instance
+                let cyInstance = chiseInstance.getCy();
+
                 let modelManager = window.testApp.modelManager;
                 let userId = window.sessionUserId;
-                var edge = window.appUtilities.getActiveCy().getElementById(id);
+                var edge = cyInstance.getElementById(id);
                 modelManager.selectModelEdge(edge, cyId, userId); //we need to specify userId for selection
                 setTimeout(()=>{ //wait a little while to update the UI
                  expect(edge.css('overlay-color')).to.equal(modelManager.getModelEdgeAttribute("highlightColor", id, cyId));
@@ -185,8 +234,15 @@ describe('modelManager Cytoscape Operations Test', function () {
     function unselectModelEdge(cyId, id) {
         it('modelManager.unselectModelEdge', function () {
             cy.window().should(function (window) {
+
+                // get chise instance for given cy/tab id
+                let chiseInstance = window.appUtilities.getChiseInstance(cyId);
+
+                // get the associated cy instance
+                let cyInstance = chiseInstance.getCy();
+
                 let modelManager = window.testApp.modelManager;
-                var edge = window.appUtilities.getActiveCy().getElementById(id);
+                var edge = cyInstance.getElementById(id);
                 modelManager.unselectModelEdge(edge,cyId); //we need to specify userId for selection
                 expect(modelManager.getModelEdgeAttribute("highlightColor", id,cyId)).to.not.ok;
                 setTimeout(()=>{ //wait a little while to update the UI
@@ -201,77 +257,84 @@ describe('modelManager Cytoscape Operations Test', function () {
     function changeModelNodeAttribute(cyId, id) {
         it('modelManager.changeModelNodeAttribute', function () {
             cy.window().should(function (window) {
+
+                // get chise instance for given cy/tab id
+                let chiseInstance = window.appUtilities.getChiseInstance(cyId);
+
+                // get the associated cy instance
+                let cyInstance = chiseInstance.getCy();
+
                 let modelManager = window.testApp.modelManager;
 
                 let pos = {x:300, y:400};
                 modelManager.changeModelNodeAttribute("position", id, cyId, pos);
-                expect(window.appUtilities.getActiveCy().getElementById(id).position().x).to.equal(pos.x);
+                expect(cyInstance.getElementById(id).position().x).to.equal(pos.x);
                 expect(modelManager.getModelNode(id, cyId).position.x).equal(pos.x);
-                expect(window.appUtilities.getActiveCy().getElementById(id).position().y).to.equal(pos.y);
+                expect(cyInstance.getElementById(id).position().y).to.equal(pos.y);
                 expect(modelManager.getModelNode(id, cyId).position.y).to.equal(pos.y);
 
 
                 let nodeClass = "phenotype";
                 modelManager.changeModelNodeAttribute("data.class", id, cyId, nodeClass);
-                expect(window.appUtilities.getActiveCy().getElementById(id).data('class')).to.equal(nodeClass);
+                expect(cyInstance.getElementById(id).data('class')).to.equal(nodeClass);
                 expect(modelManager.getModelNode(id, cyId).data.class).to.equal(nodeClass);
 
 
                 let label = "label2";
                 modelManager.changeModelNodeAttribute("data.label", id,  cyId, label);
-                expect(window.appUtilities.getActiveCy().getElementById(id).data('label')).to.equal(label);
+                expect(cyInstance.getElementById(id).data('label')).to.equal(label);
                 expect(modelManager.getModelNode(id, cyId).data.label).to.equal(label);
 
 
                 let opacity = 0.7;
                 modelManager.changeModelNodeAttribute("data.background-opacity", id, cyId, opacity);
-                expect(window.appUtilities.getActiveCy().getElementById(id).data('background-opacity')).to.equal( opacity);
+                expect(cyInstance.getElementById(id).data('background-opacity')).to.equal( opacity);
                 expect(modelManager.getModelNode(id, cyId).data["background-opacity"]).to.equal( opacity);
 
 
                 let bgColor = '#333343';
                 modelManager.changeModelNodeAttribute("data.background-color", id, cyId, bgColor );
-                expect(window.appUtilities.getActiveCy().getElementById(id).data('background-color')).to.equal(bgColor);
+                expect(cyInstance.getElementById(id).data('background-color')).to.equal(bgColor);
                 expect(modelManager.getModelNode(id, cyId).data["background-color"]).to.equal(bgColor);
 
 
                 let borColor = '#222222';
                 modelManager.changeModelNodeAttribute("data.border-color", id,  cyId, borColor);
-                expect(window.appUtilities.getActiveCy().getElementById(id).data('border-color')).to.equal(borColor);
+                expect(cyInstance.getElementById(id).data('border-color')).to.equal(borColor);
                 expect(modelManager.getModelNode(id, cyId).data["border-color"]).to.equal(borColor);
 
                 let borWidth = "3px";
                 modelManager.changeModelNodeAttribute("data.border-width", id, cyId, borWidth);
-                expect(window.appUtilities.getActiveCy().getElementById(id).data('border-width')).to.equal(borWidth);
+                expect(cyInstance.getElementById(id).data('border-width')).to.equal(borWidth);
                 expect(modelManager.getModelNode(id, cyId).data["border-width"]).to.equal(borWidth);
 
 
                 let fontFamily = "Times";
                 modelManager.changeModelNodeAttribute("data.font-family", id, cyId, fontFamily);
-                expect(window.appUtilities.getActiveCy().getElementById(id).data('font-family')).to.equal(fontFamily);
+                expect(cyInstance.getElementById(id).data('font-family')).to.equal(fontFamily);
                 expect(modelManager.getModelNode(id, cyId).data["font-family"]).to.equal(fontFamily);
 
 
                 let fontWeight = "bold";
                 modelManager.changeModelNodeAttribute("data.font-weight", id, cyId, fontWeight);
-                expect(window.appUtilities.getActiveCy().getElementById(id).data('font-weight')).to.equal(fontWeight);
+                expect(cyInstance.getElementById(id).data('font-weight')).to.equal(fontWeight);
                 expect(modelManager.getModelNode(id, cyId).data["font-weight"]).to.equal(fontWeight);
 
                 let fontSize = 10;
                 modelManager.changeModelNodeAttribute("data.font-size", id, cyId, fontSize);
-                expect(window.appUtilities.getActiveCy().getElementById(id).data('font-size')).to.equal(fontSize);
+                expect(cyInstance.getElementById(id).data('font-size')).to.equal(fontSize);
                 expect(modelManager.getModelNode(id, cyId).data["font-size"]).to.equal(fontSize);
 
 
                 let fontStyle = "normal";
                 modelManager.changeModelNodeAttribute("data.font-style", id, cyId, fontStyle);
-                expect(window.appUtilities.getActiveCy().getElementById(id).data('font-style')).to.equal(fontStyle);
+                expect(cyInstance.getElementById(id).data('font-style')).to.equal(fontStyle);
                 expect(modelManager.getModelNode(id, cyId).data["font-style"]).to.equal(fontStyle);
 
 
                 let cloneMarker = true;
                 modelManager.changeModelNodeAttribute("data.clonemarker", id, cyId, cloneMarker);
-                expect(window.appUtilities.getActiveCy().getElementById(id).data('clonemarker')).to.equal(cloneMarker);
+                expect(cyInstance.getElementById(id).data('clonemarker')).to.equal(cloneMarker);
                 expect(modelManager.getModelNode(id, cyId).data.clonemarker).to.equal(cloneMarker);
 
 
@@ -282,23 +345,23 @@ describe('modelManager Cytoscape Operations Test', function () {
                 modelManager.changeModelNodeAttribute("data.statesandinfos", id, cyId, [stateVarObj, unitOfInfoObj]);
 
 
-                expect(window.appUtilities.getActiveCy().getElementById(id).data('statesandinfos')[0].clazz).to.deep.equal(stateVarObj.clazz);
-                expect(window.appUtilities.getActiveCy().getElementById(id).data('statesandinfos')[1].clazz).to.deep.equal(unitOfInfoObj.clazz);
-                expect(window.appUtilities.getActiveCy().getElementById(id).data('statesandinfos')).to.deep.equal(modelManager.getModelNode(id, cyId).data.statesandinfos);
+                expect(cyInstance.getElementById(id).data('statesandinfos')[0].clazz).to.deep.equal(stateVarObj.clazz);
+                expect(cyInstance.getElementById(id).data('statesandinfos')[1].clazz).to.deep.equal(unitOfInfoObj.clazz);
+                expect(cyInstance.getElementById(id).data('statesandinfos')).to.deep.equal(modelManager.getModelNode(id, cyId).data.statesandinfos);
 
                 let parent = "node2";
                 modelManager.changeModelNodeAttribute("data.parent", id, cyId, parent);
-                expect(window.appUtilities.getActiveCy().getElementById(id).data('parent')).to.equal(parent);
+                expect(cyInstance.getElementById(id).data('parent')).to.equal(parent);
                 expect(modelManager.getModelNode(id, cyId).data.parent).to.equal(parent);
 
                 let bh= 4;
                 modelManager.changeModelNodeAttribute("data.bbox.h", id, cyId, bh);
-                expect(window.appUtilities.getActiveCy().getElementById(id)._private.data.bbox.h).to.equal(bh);
+                expect(cyInstance.getElementById(id)._private.data.bbox.h).to.equal(bh);
                 expect(modelManager.getModelNode(id, cyId).data.bbox.h).to.equal(bh);
 
                 let bw = 5;
                 modelManager.changeModelNodeAttribute("data.bbox.w", id, cyId, bw);
-                expect(window.appUtilities.getActiveCy().getElementById(id)._private.data.bbox.w).to.equal(bw);
+                expect(cyInstance.getElementById(id)._private.data.bbox.w).to.equal(bw);
                 expect(modelManager.getModelNode(id, cyId).data.bbox.w).to.equal(bw);
 
                 //TODO:
@@ -314,28 +377,35 @@ describe('modelManager Cytoscape Operations Test', function () {
     function changeModelEdgeAttribute(cyId, id) {
         it('modelManager.changeModelEdgeAttribute', function () {
             cy.window().should(function (window) {
+
+                // get chise instance for given cy/tab id
+                let chiseInstance = window.appUtilities.getChiseInstance(cyId);
+
+                // get the associated cy instance
+                let cyInstance = chiseInstance.getCy();
+
                 let modelManager = window.testApp.modelManager;
 
                 let edgeClass = "catalysis";
                 modelManager.changeModelEdgeAttribute("data.class", id, cyId, edgeClass);
-                expect(window.appUtilities.getActiveCy().getElementById(id).data('class')).to.equal(edgeClass);
+                expect(cyInstance.getElementById(id).data('class')).to.equal(edgeClass);
                 expect(modelManager.getModelEdge(id, cyId).data.class).to.equal(edgeClass);
 
 
                 let cardinality = 5;
                 modelManager.changeModelEdgeAttribute("data.cardinality", id, cyId, cardinality);
-                expect(window.appUtilities.getActiveCy().getElementById(id).data('cardinality')).to.equal(cardinality);
+                expect(cyInstance.getElementById(id).data('cardinality')).to.equal(cardinality);
                 expect(modelManager.getModelEdge(id, cyId).data.cardinality).to.equal(cardinality);
 
                 let lColor = '#411515';
                 modelManager.changeModelEdgeAttribute("data.line-color", id, cyId, lColor );
-                expect(window.appUtilities.getActiveCy().getElementById(id).data('line-color')).to.equal(lColor);
+                expect(cyInstance.getElementById(id).data('line-color')).to.equal(lColor);
                 expect(modelManager.getModelEdge(id, cyId).data["line-color"]).to.equal(lColor);
 
 
                 let width = "8px";
                 modelManager.changeModelEdgeAttribute("data.width", id, cyId, width);
-                expect(window.appUtilities.getActiveCy().getElementById(id).data('width')).to.equal(width);
+                expect(cyInstance.getElementById(id).data('width')).to.equal(width);
                 expect(modelManager.getModelEdge(id, cyId).data["width"]).to.equal(width);
 
                 //This  doesn't give error but
@@ -382,10 +452,17 @@ describe('modelManager Cytoscape Operations Test', function () {
     function deleteModelNode(cyId, id) {
         it('modelManager.deleteModelNode', function () {
             cy.window().should(function (window) {
+
+                // get chise instance for given cy/tab id
+                let chiseInstance = window.appUtilities.getChiseInstance(cyId);
+
+                // get the associated cy instance
+                let cyInstance = chiseInstance.getCy();
+
                 let modelManager = window.testApp.modelManager;
                 modelManager.deleteModelNode(id, cyId);
                 expect(modelManager.getModelNode(id, cyId)).to.not.ok;
-                expect(window.appUtilities.getActiveCy().getElementById(id).length).to.equal(0);
+                expect(cyInstance.getElementById(id).length).to.equal(0);
             });
 
         });
@@ -394,10 +471,17 @@ describe('modelManager Cytoscape Operations Test', function () {
     function deleteModelEdge(cyId, id) {
         it('modelManager.deleteModelEdge', function () {
             cy.window().should(function (window) {
+
+                // get chise instance for given cy/tab id
+                let chiseInstance = window.appUtilities.getChiseInstance(cyId);
+
+                // get the associated cy instance
+                let cyInstance = chiseInstance.getCy();
+
                 let modelManager = window.testApp.modelManager;
                 modelManager.deleteModelEdge(id, cyId);
                 expect(modelManager.getModelEdge(id, cyId)).to.not.ok;
-                expect(window.appUtilities.getActiveCy().getElementById(id).length).to.equal(0);
+                expect(cyInstance.getElementById(id).length).to.equal(0);
             });
 
         });
