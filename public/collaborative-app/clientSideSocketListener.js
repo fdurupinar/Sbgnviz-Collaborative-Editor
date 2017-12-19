@@ -306,7 +306,7 @@ module.exports =  function(app) {
                 let json = chiseInst.convertSbgnmlTextToJson(data.graph);
 
                 chiseInst.updateGraph(jsonObj, function(){
-                    app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(), appUtilities, "me");
+                    app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(), data.cyId, appUtilities, "me");
 
                     appUtilities.setActiveNetwork(data.cyId);
 
@@ -327,7 +327,7 @@ module.exports =  function(app) {
                 app.modelManager.newModel("me", true);
 
                 appUtilities.getChiseInstance(data.cyId).updateGraph(jsonObj, function(){
-                    app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(), appUtilities, "me");
+                    app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(), data.cyId, appUtilities, "me");
 
                     appUtilities.setActiveNetwork(data.cyId);
 

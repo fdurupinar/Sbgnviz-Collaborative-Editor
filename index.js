@@ -758,19 +758,19 @@ app.proto.listenToModelOperations = function(model){
     });
 
     model.on('change', '_page.doc.pcQuery.*.graph', function(ind, data){
-        let chiseInst = appUtilities.createNewNetwork(); //opens a new tab
-        let cyId = appUtilities.nextNetworkId -1;
-
+        let chiseInst = appUtilities.createNewNetwork();
 
         let jsonObj = chiseInst.convertSbgnmlTextToJson(data);
 
-        chiseInst.updateGraph(jsonObj, function() {
-            self.modelManager.initModel(chiseInst.getCy().nodes(), chiseInst.getCy().edges(), cyId , appUtilities, "me");
-            $("#perform-layout").trigger('click');
+            chiseInst.updateGraph(jsonObj, function() {
+                self.modelManager.initModel(chiseInst.getCy().nodes(), chiseInst.getCy().edges(), chiseInst.cyId, appUtilities, "me");
+                $("#perform-layout").trigger('click');
 
-        });
+            });
 
-    });
+    }); //opens a new tab
+
+
 
     //Sometimes works
     model.on('all', '_page.doc.images', function() {

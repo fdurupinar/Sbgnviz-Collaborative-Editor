@@ -2243,15 +2243,20 @@
                 </div>
 
                 <div id = "provenance-area" class="tab-pane" as = "list">
-                    <ul id = "provenance-messages">
+                    <div id = "provenance-messages">
                         {{each _page.doc.provenance as #message}}
                             {{if #message.pc}}
-                                <li class = "message" style = "font-size:medium; color:{{_page.doc.users[#message.userId].colorCode}};  padding : 5px"> {{#message.userName}}:  <button class = "btn-mini" on-click = "openPCQueryWindow(#message.pc)">Click to open query in a new tab</button>{{unescaped #message.html}}</li>
+                            <!--<li class = "message">-->
+                                {{unescaped #message.html}}
+                                <p></p>
+                                <a href="#" on-click = "openPCQueryWindow(#message.pc)"> Click to open query in a new tab</a>
+
+                                <hr>
                             {{else}}
-                                <li class = "message" style = "font-size:medium; color:{{_page.doc.users[#message.userId].colorCode}};  padding : 5px"> {{#message.userName}}:  {{unescaped #message.html}}</li>
+                                {{unescaped #message.html}}
                             {{/if}}
                         {{/each}}
-                    </ul>
+                    </div>
                 </div>
 
                 <div id ="command-history-area" class="tab-pane" as = "list">
@@ -2277,7 +2282,7 @@
 
         <!--TODO: Close this-->
         <!--<button id = "connect-causality-agent" class = "btn  btn-mini" on-click = "connectCausalityAgent()">CA</button>-->
-        <button id = "test-image-tab" class = "btn  btn-mini" on-click = "testImageTab()">Test image tab</button>
+        <!--<button id = "test-image-tab" class = "btn  btn-mini" on-click = "testImageTab()">Test image tab</button>-->
 
         <chat-user:>
             <div class="user" style = background:{{_page.doc.users[#pUserId].colorCode}}>

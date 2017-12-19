@@ -528,6 +528,16 @@ input[type="file"] {
 }
 
 
+.user{
+    font-size: medium;
+    margin: 5px 5px 5px 5px;
+    padding: 5px;
+    border-radius: 10%;
+    word-wrap: break-word;
+
+}
+
+
 #provenance-area{
     padding: 5px;
     height: 95%;
@@ -540,4 +550,5 @@ input[type="file"] {
     /*font-size: small;*/
     padding: 10px;
     margin-left: 10px;
+    font-size: medium;
 }
