@@ -1179,22 +1179,106 @@ function checkVisibility(cyId, selector) {
   });
 }
 
+// Test if creating new network works as expected
 function createNewNetworkTest () {
 
   it('createNewNetwork', function () {
     cy.window().should(function(window){
 
       // get the initial length of networks
-      var initilNetworksSize = window.appUtilities.networkIdsStack.length;
+      let initilNetworksSize = window.appUtilities.networkIdsStack.length;
+
+      // get the id of the network to be created
+      let networkId = window.appUtilities.nextNetworkId;
+
+      // get the selector of new network panel
+      let panelSelector = window.appUtilities.getNetworkPanelSelector(networkId);
+
+      // get the selector of new tab
+      let tabSelector = window.appUtilities.getNetworkTabSelector(networkId);
 
       // create a new network
       window.appUtilities.createNewNetwork();
+
+      // Cypress enables jQuery access by Cypress.$ (Please see: https://docs.cypress.io/api/utilities/$.html#)
+
+      // expect that the panel for the new network is created
+      expect(Cypress.$(panelSelector), "Panel for the new network is created").to.be.ok;
+
+      // expect that the tab for the new network is created
+      expect(Cypress.$(tabSelector), "Tab for the new network is created").to.be.ok;
 
       // expect that number of networks is incremented by one
       expect(window.appUtilities.networkIdsStack.length, "A new network is created").to.be.equal(initilNetworksSize + 1);
     });
   });
 
+}
+
+// Test if choosing a network tab programatically works as expected
+function chooseNetworkTabTest (networkId) {
+
+  it('chooseNetworkTab', function () {
+
+    cy.window().should(function(window){
+
+      // get the selector of panel for the network id
+      let panelSelector = window.appUtilities.getNetworkPanelSelector(networkId);
+
+      // get the selector of tab for the network id
+      let tabSelector = window.appUtilities.getNetworkTabSelector(networkId);
+
+      // programatically choose the tab with given id
+      window.appUtilities.chooseNetworkTab(networkId);
+
+      // expect that the tab that new active network id is equal to the given network id
+      expect(window.appUtilities.getActiveNetworkId(), "New active network id is updated as expected after choose tab operation").to.be.equal(networkId);
+
+      // expect that the panel for the choosen tab has the class 'active'
+      expect(Cypress.$(panelSelector).hasClass('active'), "Panel for the tab that is just choosen is active").to.be.ok;
+
+      // expect that the choosen tab has the class 'active'
+      expect(Cypress.$(tabSelector).hasClass('active'), "The tab that is just choosen is active").to.be.ok;
+
+    });
+
+  });
+}
+
+// Test if the active network can be closed as expected
+function closeActiveNetworkTest () {
+
+  it('closeActiveNetwork', function () {
+
+    cy.window().should(function(window){
+
+      // get the active network id
+      let activeNetworkId = window.appUtilities.getActiveNetworkId();
+
+      // get the selector of panel for the active network id
+      let activePanelSelector = window.appUtilities.getNetworkPanelSelector(activeNetworkId);
+
+      // get the selector of tab for the active network id
+      let activeTabSelector = window.appUtilities.getNetworkTabSelector(activeNetworkId);
+
+      // close the active network
+      window.appUtilities.closeActiveNetwork();
+
+      // expect that old active network id is no more included in network ids stack
+      expect(window.appUtilities.networkIdsStack.indexOf(activeNetworkId), "Old active network is removed from networks list").to.be.equal(-1);
+
+      // expect that active network id is updated
+      expect(window.appUtilities.getActiveNetworkId(), "Active network id is updated after closing the active tab").not.to.be.equal(activeNetworkId);
+
+      // expect that the old active panel is no more exists
+      expect(Cypress.$(activePanelSelector).length, "Panel for the closed network no more exists").to.be.equal(0);
+
+      // expect that the old active tab no more exists
+      expect(Cypress.$(activeTabSelector).length, "Tab for the closed network no more exists").to.be.equal(0);
+
+    });
+
+  });
 }
 
 describe('CWC Test', function(){
@@ -1344,4 +1428,10 @@ describe('CWC Test', function(){
 
     }
 
+    // tests for switching between the tabs
+    chooseNetworkTabTest(0);
+    chooseNetworkTabTest(1);
+
+    // test for closing active network
+    closeActiveNetworkTest();
 });
