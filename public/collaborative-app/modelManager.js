@@ -1105,7 +1105,7 @@ class ModelManager{
 
         nodePath.set('id', node.id());
 
-        node._private.data.annotationsView = null;
+        // node._private.data.annotationsView = null;
 
         let interactionCount = nodePath.get('interactionCount');
 
@@ -1180,7 +1180,7 @@ class ModelManager{
 
         edgePath.set('id', edge.id());
 
-        edge._private.data.annotationsView = null;
+        // edge._private.data.annotationsView = null;
 
         //make this initially unselected
         //edgePath.set('highlightColor', null);

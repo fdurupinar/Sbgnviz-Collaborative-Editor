@@ -16,11 +16,11 @@ describe('modelManager Cytoscape Operations Test', function () {
 
     }
 
-    function addModelNode(cyId, id) {
+    function addModelNode(cyId, id, delay) {
 
         let testName = extendTestNameWithNetworkId('modelManager.addModelNode', cyId);
 
-        it(testName, function () {
+        it(testName, function (done) {
             cy.window().should(function (window) {
 
                 // get the chise instance for cy/tab id
@@ -33,18 +33,23 @@ describe('modelManager Cytoscape Operations Test', function () {
 
                 modelManager.addModelNode(id, cyId, {position: {x: 100, y: 200} , data: {id: id, class: "macromolecule"}});
 
-                expect(cyInstance.getElementById(id)).to.be.ok;
+                setTimeout(function() {
+                    expect(cyInstance.getElementById(id)).to.be.ok;
 
-                expect(modelManager.getModelNodeAttribute("data.id", id, cyId)).to.equal(cyInstance.getElementById(id).data("id"));
-                expect(cyInstance.getElementById(id).data("class")).to.equal("macromolecule");
-                expect(cyInstance.getElementById(id).data("class")).to.equal(modelManager.getModelNodeAttribute("data.class", id, cyId));
+                    expect(modelManager.getModelNodeAttribute("data.id", id, cyId)).to.equal(cyInstance.getElementById(id).data("id"));
+                    expect(cyInstance.getElementById(id).data("class")).to.equal("macromolecule");
+                    expect(cyInstance.getElementById(id).data("class")).to.equal(modelManager.getModelNodeAttribute("data.class", id, cyId));
 
-                expect(cyInstance.getElementById(id).position("x")).to.equal(100);
-                expect(cyInstance.getElementById(id).position("x")).to.equal(modelManager.getModelNodeAttribute("position.x", id, cyId));
+                    expect(cyInstance.getElementById(id).position("x")).to.equal(100);
+                    expect(cyInstance.getElementById(id).position("x")).to.equal(modelManager.getModelNodeAttribute("position.x", id, cyId));
 
-                expect(cyInstance.getElementById(id).position("y")).to.equal(200);
-                expect(cyInstance.getElementById(id).position("y")).to.equal(modelManager.getModelNodeAttribute("position.y", id, cyId));
+                    expect(cyInstance.getElementById(id).position("y")).to.equal(200);
+                    expect(cyInstance.getElementById(id).position("y")).to.equal(modelManager.getModelNodeAttribute("position.y", id, cyId));
 
+                    done();
+
+
+                }, delay); //wait for the updates to take place
             });
         });
     }
@@ -63,11 +68,11 @@ describe('modelManager Cytoscape Operations Test', function () {
         });
     }
 
-    function initModelNode(cyId, id){
+    function initModelNode(cyId, id, timeout){
 
         let testName = extendTestNameWithNetworkId('modelManager.initModelNode', cyId);
 
-        it(testName, function() {
+        it(testName, function(done) {
 
             cy.window().should(function (window) {
 
@@ -81,24 +86,31 @@ describe('modelManager Cytoscape Operations Test', function () {
 
                 modelManager.initModelNode(cyInstance.getElementById(id), cyId, null, true);
 
-                var node = cyInstance.getElementById(id);
-                var modelNode = modelManager.getModelNode(id,cyId);
+                setTimeout(function() {
 
 
-                for (var att in modelNode.data) {
-                    expect(modelNode.data[att]).to.equal(node.data(att));
-                }
+                    var node = cyInstance.getElementById(id);
+                    var modelNode = modelManager.getModelNode(id,cyId);
 
 
-                for (var att in node.data) {
-                    expect(modelNode.data[att]).to.equal(node.data(att));
-                }
+                    for (var att in modelNode.data) {
+                        expect(modelNode.data[att]).to.equal(node.data(att));
+                    }
+
+
+                    for (var att in node.data) {
+                        expect(modelNode.data[att]).to.equal(node.data(att));
+                    }
+
+
+                    done();
+                }, timeout); //wait for the updates to take place
             });
         });
     }
 
 
-    function addModelEdge(cyId, id1, id2) {
+    function addModelEdge(cyId, id1, id2, timeout) {
 
         let testName = extendTestNameWithNetworkId('modelManager.addModelEdge', cyId);
 
@@ -116,22 +128,26 @@ describe('modelManager Cytoscape Operations Test', function () {
 
                 modelManager.addModelEdge(id, cyId,{data: {id: id, source: id1, target: id2, class: "consumption"}});
 
-                var modelEdge = modelManager.getModelEdge(id, cyId);
-                var edge = cyInstance.getElementById(id);
+                setTimeout(function() {
+                    var modelEdge = modelManager.getModelEdge(id, cyId);
+                    var edge = cyInstance.getElementById(id);
 
-                expect(cyInstance.getElementById(id)).to.be.ok;
+                    expect(cyInstance.getElementById(id)).to.be.ok;
 
-                expect(modelManager.getModelEdgeAttribute("data.id", id, cyId)).to.equal(cyInstance.getElementById(id).data("id"));
-                expect(cyInstance.getElementById(id).data("class")).to.equal("consumption");
-                expect(cyInstance.getElementById(id).data("class")).to.equal(modelManager.getModelEdgeAttribute("data.class", id, cyId));
+                    expect(modelManager.getModelEdgeAttribute("data.id", id, cyId)).to.equal(cyInstance.getElementById(id).data("id"));
+                    expect(cyInstance.getElementById(id).data("class")).to.equal("consumption");
+                    expect(cyInstance.getElementById(id).data("class")).to.equal(modelManager.getModelEdgeAttribute("data.class", id, cyId));
 
-                expect(cyInstance.getElementById(id).data("source")).to.equal(id1);
-                expect(cyInstance.getElementById(id).data("source")).to.equal(modelManager.getModelEdgeAttribute("data.source", id, cyId));
+                    expect(cyInstance.getElementById(id).data("source")).to.equal(id1);
+                    expect(cyInstance.getElementById(id).data("source")).to.equal(modelManager.getModelEdgeAttribute("data.source", id, cyId));
 
-                expect(cyInstance.getElementById(id).data("target")).to.equal(id2);
-                expect(cyInstance.getElementById(id).data("target")).to.equal(modelManager.getModelEdgeAttribute("data.target", id, cyId));
+                    expect(cyInstance.getElementById(id).data("target")).to.equal(id2);
+                    expect(cyInstance.getElementById(id).data("target")).to.equal(modelManager.getModelEdgeAttribute("data.target", id, cyId));
 
-                done();
+                    done();
+                }, timeout) ; //wait for the updates to take place
+
+
             });
         });
     }
@@ -151,11 +167,11 @@ describe('modelManager Cytoscape Operations Test', function () {
         });
     }
 
-    function initModelEdge(cyId, id){
+    function initModelEdge(cyId, id, timeout){
 
         let testName = extendTestNameWithNetworkId('modelManager.initModelEdge', cyId);
 
-        it(testName, function() {
+        it(testName, function(done) {
 
             cy.window().should(function (window) {
 
@@ -169,18 +185,23 @@ describe('modelManager Cytoscape Operations Test', function () {
 
                 modelManager.initModelEdge(cyInstance.getElementById(id), cyId, null, true); //no history
 
-                var edge = cyInstance.getElementById(id);
-                var modelEdge = modelManager.getModelEdge(id, cyId);
+                setTimeout(function() {
+
+                    var edge = cyInstance.getElementById(id);
+                    var modelEdge = modelManager.getModelEdge(id, cyId);
 
 
-                for (var att in modelEdge.data) {
-                    expect(modelEdge.data[att]).to.equal(edge.data(att));
-                }
+                    for (var att in modelEdge.data) {
+                        expect(modelEdge.data[att]).to.equal(edge.data(att));
+                    }
 
 
-                for (var att in edge.data) {
-                    expect(modelEdge.data[att]).to.equal(edge.data(att));
-                }
+                    for (var att in edge.data) {
+                        expect(modelEdge.data[att]).to.equal(edge.data(att));
+                    }
+
+                done();
+                }, timeout);  //wait for the updates to take place
             });
         });
     }
@@ -204,7 +225,6 @@ describe('modelManager Cytoscape Operations Test', function () {
                 modelManager.selectModelNode(node, cyId, userId); //we need to specify userId for selection
                 setTimeout(()=>{ //wait a little while to update the UI
                     expect(node.css('overlay-color')).to.equal(modelManager.getModelNodeAttribute("highlightColor", id, cyId));
-                    // done();
                 }, 100);
 
             });
@@ -212,7 +232,7 @@ describe('modelManager Cytoscape Operations Test', function () {
         });
     }
 
-    function unselectModelNode(cyId, id) {
+    function unselectModelNode(cyId, id, timeout) {
 
         let testName = extendTestNameWithNetworkId('modelManager.unselectModelNode', cyId);
 
@@ -231,14 +251,14 @@ describe('modelManager Cytoscape Operations Test', function () {
                 expect(modelManager.getModelNodeAttribute("highlightColor", id, cyId)).to.not.ok;
                 setTimeout(()=>{ //wait a little while to update the UI
                     expect(node.css('overlay-color')).to.not.ok;
-                }, 100);
+                }, timeout);
 
             });
 
         });
     }
 
-    function selectModelEdge(cyId, id) {
+    function selectModelEdge(cyId, id, timeout) {
 
         let testName = extendTestNameWithNetworkId('modelManager.selectModelEdge', cyId);
 
@@ -257,14 +277,14 @@ describe('modelManager Cytoscape Operations Test', function () {
                 modelManager.selectModelEdge(edge, cyId, userId); //we need to specify userId for selection
                 setTimeout(()=>{ //wait a little while to update the UI
                  expect(edge.css('overlay-color')).to.equal(modelManager.getModelEdgeAttribute("highlightColor", id, cyId));
-                }, 100);
+                }, timeout);
 
             });
 
         });
     }
 
-    function unselectModelEdge(cyId, id) {
+    function unselectModelEdge(cyId, id, timeout) {
 
         let testName = extendTestNameWithNetworkId('modelManager.unselectModelEdge', cyId);
 
@@ -283,7 +303,7 @@ describe('modelManager Cytoscape Operations Test', function () {
                 expect(modelManager.getModelEdgeAttribute("highlightColor", id,cyId)).to.not.ok;
                 setTimeout(()=>{ //wait a little while to update the UI
                     expect(edge.css('overlay-color')).to.not.ok;
-                }, 100);
+                }, timeout);
 
             });
 
@@ -491,11 +511,11 @@ describe('modelManager Cytoscape Operations Test', function () {
         });
     }
 
-    function deleteModelNode(cyId, id) {
+    function deleteModelNode(cyId, id, timeout) {
 
         let testName = extendTestNameWithNetworkId('modelManager.deleteModelNode', cyId);
 
-        it(testName, function () {
+        it(testName, function (done) {
             cy.window().should(function (window) {
 
                 // get chise instance for given cy/tab id
@@ -506,14 +526,18 @@ describe('modelManager Cytoscape Operations Test', function () {
 
                 let modelManager = window.testApp.modelManager;
                 modelManager.deleteModelNode(id, cyId);
-                expect(modelManager.getModelNode(id, cyId)).to.not.ok;
-                expect(cyInstance.getElementById(id).length).to.equal(0);
+
+                setTimeout(function(){
+                    expect(modelManager.getModelNode(id, cyId)).to.not.ok;
+                    expect(cyInstance.getElementById(id).length).to.equal(0);
+                    done();
+                },timeout);
             });
 
         });
     }
 
-    function deleteModelEdge(cyId, id) {
+    function deleteModelEdge(cyId, id, timeout) {
 
         let testName = extendTestNameWithNetworkId('modelManager.deleteModelEdge', cyId);
 
@@ -528,14 +552,17 @@ describe('modelManager Cytoscape Operations Test', function () {
 
                 let modelManager = window.testApp.modelManager;
                 modelManager.deleteModelEdge(id, cyId);
-                expect(modelManager.getModelEdge(id, cyId)).to.not.ok;
-                expect(cyInstance.getElementById(id).length).to.equal(0);
+                setTimeout(function(){
+                    expect(modelManager.getModelEdge(id, cyId)).to.not.ok;
+                    expect(cyInstance.getElementById(id).length).to.equal(0);
+                done();
+            },timeout);
             });
 
         });
     }
 
-    function undoDeleteModelNode(cyId, id){
+    function undoDeleteModelNode(cyId, id, timeout){
 
         let testName = extendTestNameWithNetworkId('modelManager.undoDeleteModeNode', cyId);
 
@@ -543,12 +570,14 @@ describe('modelManager Cytoscape Operations Test', function () {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
                 modelManager.undoCommand();
-                expect(modelManager.getModelNode(id, cyId)).to.be.ok;
+                setTimeout(function(){
+                    expect(modelManager.getModelNode(id, cyId)).to.be.ok;
+                }, timeout);
             });
         });
     }
 
-    function redoDeleteModelNode(cyId, id){
+    function redoDeleteModelNode(cyId, id, timeout){
 
         let testName = extendTestNameWithNetworkId('modelManager.redoDeleteModelNode', cyId);
 
@@ -556,12 +585,15 @@ describe('modelManager Cytoscape Operations Test', function () {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
                 modelManager.redoCommand();
-                expect(modelManager.getModelNode(id, cyId)).to.not.ok;
+                setTimeout(function(){
+                    expect(modelManager.getModelNode(id, cyId)).to.not.ok;
+                }, timeout);
+
             });
         });
     }
 
-    function undoDeleteModelEdge(cyId, id){
+    function undoDeleteModelEdge(cyId, id, timeout){
 
         let testName = extendTestNameWithNetworkId('modelManager.undoDeleteModeEdge', cyId);
 
@@ -569,12 +601,14 @@ describe('modelManager Cytoscape Operations Test', function () {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
                 modelManager.undoCommand();
-                expect(modelManager.getModelEdge(id, cyId)).to.be.ok;
+                setTimeout(function(){
+                    expect(modelManager.getModelEdge(id, cyId)).to.be.ok;
+                }, timeout);
             });
         });
     }
 
-    function redoDeleteModelEdge(cyId, id){
+    function redoDeleteModelEdge(cyId, id, timeout){
 
         let testName = extendTestNameWithNetworkId('modelManager.redoDeleteModelEdge', cyId);
 
@@ -582,7 +616,9 @@ describe('modelManager Cytoscape Operations Test', function () {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
                 modelManager.redoCommand();
-                expect(modelManager.getModelEdge(id, cyId)).to.not.ok;
+                setTimeout(function() {
+                    expect(modelManager.getModelEdge(id, cyId)).to.not.ok;
+                }, timeout);
             });
         });
     }
@@ -611,7 +647,8 @@ describe('modelManager Cytoscape Operations Test', function () {
     // but currently we are not able to access it from here.
     // If another open/close file operation is done in chiseUserOps.js then the
     // array that is traversed here should be updated accordingly.
-    initialNetworkIds.forEach( function (cyId) {
+    // initialNetworkIds.forEach( function (cyId) {
+let cyId = 0;
 
       addModelNode(cyId, "node1");
       initModelNode(cyId, "node1");
@@ -635,18 +672,57 @@ describe('modelManager Cytoscape Operations Test', function () {
 
       selectModelEdge(cyId, "node1-node2");
       unselectModelEdge(cyId, "node1-node2");
-
+      //
       changeModelNodeAttribute(cyId, "node1");
       changeModelEdgeAttribute(cyId, "node1-node2");
 
       deleteModelNode(cyId, "node1");
       undoDeleteModelNode(cyId, "node1");
       redoDeleteModelNode(cyId, "node1");
-
+      //
       deleteModelEdge(cyId, "node1-node2");
       undoDeleteModelEdge(cyId, "node1-node2");
       redoDeleteModelEdge(cyId, "node1-node2");
+    cyId = 2;
 
-    });
+    setTimeout(function(){
+        addModelNode(cyId, "node1");
+        initModelNode(cyId, "node1");
+        getModelNode(cyId, "node1");
+
+        addModelNode(cyId, "node2");
+        initModelNode(cyId, "node2");
+
+        addModelNode(cyId, "node3");
+        initModelNode(cyId, "node3");
+
+        addModelNode(cyId, "node4");
+        initModelNode(cyId, "node4");
+
+
+        addModelEdge(cyId, "node1","node2");
+        initModelEdge(cyId, "node1-node2");
+
+        selectModelNode(cyId, "node1");
+        unselectModelNode(cyId, "node1");
+
+        selectModelEdge(cyId, "node1-node2");
+        unselectModelEdge(cyId, "node1-node2");
+        //
+        changeModelNodeAttribute(cyId, "node1");
+        changeModelEdgeAttribute(cyId, "node1-node2");
+
+        deleteModelNode(cyId, "node1");
+        undoDeleteModelNode(cyId, "node1");
+        redoDeleteModelNode(cyId, "node1");
+        //
+        deleteModelEdge(cyId, "node1-node2");
+        undoDeleteModelEdge(cyId, "node1-node2");
+        redoDeleteModelEdge(cyId, "node1-node2");
+    }, 100);
+
+
+
+    // });
 
 });
