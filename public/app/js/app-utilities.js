@@ -452,7 +452,7 @@ appUtilities.closeOtherNetworks = function (networkId) {
   var activeNetworkId = this.getActiveNetworkId();
 
   // if networkId is not defined use the active one by default
-  if ( networkId === undefined) {
+  if ( networkId === undefined ) {
     networkId = activeNetworkId;
   }
 
