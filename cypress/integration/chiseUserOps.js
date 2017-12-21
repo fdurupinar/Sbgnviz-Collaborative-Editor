@@ -1,6 +1,17 @@
+// Seperating the test names by the network ids would be useful to figure out the
+// details of bugs. Therefore, we need to extend the test names with the network ids
+// where network id matters and used.
+function extendTestNameWithNetworkId (message, networkId) {
+
+  return message + ' for network#' + networkId;
+
+}
+
 function addNodeTest(cyId, id, className, posX, posY) {
 
-  it('chise.addNode()', function () {
+  let testName = extendTestNameWithNetworkId('chise.addNode()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given tab/cy id
@@ -38,7 +49,9 @@ function addNodeTest(cyId, id, className, posX, posY) {
 
 function addEdgeTest(cyId, id, src, tgt, className) {
 
-  it('chise.addEdge()', function () {
+  let testName = extendTestNameWithNetworkId('chise.addEdge()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given tab/cy id
@@ -73,7 +86,9 @@ function addEdgeTest(cyId, id, src, tgt, className) {
 
 function createCompoundTest(cyId, compoundType) {
 
-  it('chise.createCompoundForGivenNodes()', function () {
+  let testName = extendTestNameWithNetworkId('chise.createCompoundForGivenNodes()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -120,7 +135,9 @@ function createCompoundTest(cyId, compoundType) {
 
 function cloneElementsTest(cyId) {
 
-  it('chise.cloneElements()', function () {
+  let testName = extendTestNameWithNetworkId('chise.cloneElements()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for cy/tab id
@@ -143,7 +160,9 @@ function cloneElementsTest(cyId) {
 
 function cloneNodeTest(cyId, id) {
 
-  it('chise.cloneElements()', function () {
+  let testName = extendTestNameWithNetworkId('chise.cloneElements()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -176,7 +195,9 @@ function cloneNodeTest(cyId, id) {
 
 function expandCollapseTest(cyId, selector) {
 
-  it('chise.collapseNodes() and chise.expandNodes()', function () {
+  let testName = extendTestNameWithNetworkId('chise.collapseNodes() and chise.expandNodes()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for cy/tab id
@@ -224,7 +245,9 @@ function expandCollapseTest(cyId, selector) {
 
 function deleteElesTest(cyId, selector) {
 
-  it('chise.deleteElesSimple()', function () {
+  let testName = extendTestNameWithNetworkId('chise.deleteElesSimple()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -266,7 +289,9 @@ function deleteElesTest(cyId, selector) {
 
 function deleteNodesSmartTest(cyId, selector) {
 
-  it('chise.deleteElesSmart()', function () {
+  let testName = extendTestNameWithNetworkId('chise.deleteElesSmart()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -317,7 +342,9 @@ function deleteNodesSmartTest(cyId, selector) {
 
 function hideElesTest(cyId, selector) {
 
-  it('chise.hideNodesSmart()', function () {
+  let testName = extendTestNameWithNetworkId('chise.hideNodesSmart()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -366,7 +393,9 @@ function hideElesTest(cyId, selector) {
 
 function showAllElesTest(cyId) {
 
-  it('chise.showAll()', function () {
+  let testName = extendTestNameWithNetworkId('chise.showAll()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -396,7 +425,9 @@ function showAllElesTest(cyId) {
 
 function alignTest (cyId, selector, horizontal, vertical, alignToId) {
 
-  it('chise.align()', function () {
+  let testName = extendTestNameWithNetworkId('chise.align()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for cy/tab id
@@ -468,7 +499,9 @@ function alignTest (cyId, selector, horizontal, vertical, alignToId) {
 
 function highlightElesTest(cyId, selector) {
 
-  it('chise.highlightEles()', function () {
+  let testName = extendTestNameWithNetworkId('chise.highlightEles()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -508,7 +541,9 @@ function highlightElesTest(cyId, selector) {
 
 function removeHighlightsTest(cyId) {
 
-  it('chise.removeHighlights()', function () {
+  let testName = extendTestNameWithNetworkId('chise.removeHighlights()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -543,7 +578,9 @@ function removeHighlightsTest(cyId) {
 
 function highlightProcessesTest(cyId, selector) {
 
-  it('chise.highlightProcesses()', function () {
+  let testName = extendTestNameWithNetworkId('chise.highlightProcesses()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -586,7 +623,9 @@ function highlightProcessesTest(cyId, selector) {
 
 function highlightNeighboursTest (cyId, selector) {
 
-  it('chise.highlightNeighbours()', function () {
+  let testName = extendTestNameWithNetworkId('chise.highlightNeighbours()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get chise instance for the given cy/tab id
@@ -628,7 +667,9 @@ function highlightNeighboursTest (cyId, selector) {
 
 function changeNodeLabelTest(cyId, selector) {
 
-  it('chise.changeNodeLabel()', function () {
+  let testName = extendTestNameWithNetworkId('chise.changeNodeLabel()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for given cy/tab id
@@ -660,7 +701,9 @@ function changeNodeLabelTest(cyId, selector) {
 
 function resizeNodesTest(cyId, dimension) {
 
-  it('chise.resizeNodes()', function () {
+  let testName = extendTestNameWithNetworkId('chise.resizeNodes()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for given cy/tab id
@@ -705,7 +748,9 @@ function resizeNodesTest(cyId, dimension) {
 
 function changeDataTest(cyId, selector, name, testVal, parseFloatOnCompare, omitStyle) {
 
-  it('chise.changeData()', function () {
+  let testName = extendTestNameWithNetworkId('chise.changeData()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for given cy/tab id
@@ -766,7 +811,9 @@ function changeDataTest(cyId, selector, name, testVal, parseFloatOnCompare, omit
 
 function addStateOrInfoboxTest (cyId, id, obj) {
 
-  it('chise.addStateOrInfoBox()', function () {
+  let testName = extendTestNameWithNetworkId('chise.addStateOrInfoBox()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given tab/cy id
@@ -834,7 +881,9 @@ function addStateOrInfoboxTest (cyId, id, obj) {
 
 function changeStateOrInfoBoxTest (cyId, id, index, value, type) {
 
-  it('chise.changeStateOrInfoBox()', function () {
+  let testName = extendTestNameWithNetworkId('chise.changeStateOrInfoBox()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -885,7 +934,9 @@ function changeStateOrInfoBoxTest (cyId, id, index, value, type) {
 
 function removeStateOrInfoBoxTest (cyId, id, index) {
 
-  it('chise.removeStateOrInfoBox()', function () {
+  let testName = extendTestNameWithNetworkId('chise.removeStateOrInfoBox()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -919,7 +970,9 @@ function removeStateOrInfoBoxTest (cyId, id, index) {
 
 function setMultimerStatusTest (cyId, selector, status) {
 
-  it('chise.setMultimerStatus()', function () {
+  let testName = extendTestNameWithNetworkId('chise.setMultimerStatus()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -957,7 +1010,9 @@ function setMultimerStatusTest (cyId, selector, status) {
 
 function setCloneMarkerStatusTest (cyId, selector, status) {
 
-  it('chise.setCloneMarkerStatus()', function () {
+  let testName = extendTestNameWithNetworkId('chise.setCloneMarkerStatus()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -995,7 +1050,9 @@ function setCloneMarkerStatusTest (cyId, selector, status) {
 
 function changeFontPropertiesTest (cyId, selector, data) {
 
-  it('chise.changeFontProperties()', function () {
+  let testName = extendTestNameWithNetworkId('chise.changeFontProperties()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for given cy/tab id
@@ -1041,7 +1098,9 @@ function changeFontPropertiesTest (cyId, selector, data) {
 
 function changeParentTest(cyId, selector, newParentId, posDiffX, posDiffY) {
 
-  it('chise.changeParentTest()', function () {
+  let testName = extendTestNameWithNetworkId('chise.changeParentTest()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -1112,7 +1171,9 @@ function changeParentTest(cyId, selector, newParentId, posDiffX, posDiffY) {
 
 function setPortsOrderingTest(cyId, selector, ordering) {
 
-  it('chise.setPortsOrdering()', function () {
+  let testName = extendTestNameWithNetworkId('chise.setPortsOrdering()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -1147,7 +1208,9 @@ function setPortsOrderingTest(cyId, selector, ordering) {
 
 function resetMapTypeTest(cyId) {
 
-  it('chise.resetMapType()', function () {
+  let testName = extendTestNameWithNetworkId('chise.resetMapType()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -1164,7 +1227,9 @@ function resetMapTypeTest(cyId) {
 
 function checkVisibility(cyId, selector) {
 
-  it('checkVisibility', function () {
+  let testName = extendTestNameWithNetworkId('checkVisibility', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for given cy/tab id

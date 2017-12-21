@@ -7,10 +7,20 @@ const testData = require('../testData/globalTestData.js');
 
 describe('modelManager Cytoscape Operations Test', function () {
 
+    // Seperating the test names by the network ids would be useful to figure out the
+    // details of bugs. Therefore, we need to extend the test names with the network ids
+    // where network id matters and used.
+    function extendTestNameWithNetworkId (message, networkId) {
+
+      return message + ' for network#' + networkId;
+
+    }
 
     function addModelNode(cyId, id) {
 
-        it('modelManager.addModelNode', function () {
+        let testName = extendTestNameWithNetworkId('modelManager.addModelNode', cyId);
+
+        it(testName, function () {
             cy.window().should(function (window) {
 
                 // get the chise instance for cy/tab id
@@ -40,7 +50,10 @@ describe('modelManager Cytoscape Operations Test', function () {
     }
 
     function getModelNode(cyId, id) {
-        it('modelManager.getModelNode', function () {
+
+        let testName = extendTestNameWithNetworkId('modelManager.getModelNode', cyId);
+
+        it(testName, function () {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
                 let modelNode = modelManager.getModelNode(id, cyId);
@@ -51,7 +64,10 @@ describe('modelManager Cytoscape Operations Test', function () {
     }
 
     function initModelNode(cyId, id){
-        it('modelManager.initModelNode', function() {
+
+        let testName = extendTestNameWithNetworkId('modelManager.initModelNode', cyId);
+
+        it(testName, function() {
 
             cy.window().should(function (window) {
 
@@ -84,7 +100,9 @@ describe('modelManager Cytoscape Operations Test', function () {
 
     function addModelEdge(cyId, id1, id2) {
 
-        it('modelManager.addModelEdge', function (done) {
+        let testName = extendTestNameWithNetworkId('modelManager.addModelEdge', cyId);
+
+        it(testName, function (done) {
             cy.window().should(function (window) {
 
                 // get the chise instance for cy/tab id
@@ -120,7 +138,10 @@ describe('modelManager Cytoscape Operations Test', function () {
 
 
     function getModelEdge(cyId, id) {
-        it('modelManager.getModelEdge', function () {
+
+        let testName = extendTestNameWithNetworkId('modelManager.getModelEdge', cyId);
+
+        it(testName, function () {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
                 let modelEdge = modelManager.getModelEdge(id, cyId);
@@ -131,7 +152,10 @@ describe('modelManager Cytoscape Operations Test', function () {
     }
 
     function initModelEdge(cyId, id){
-        it('modelManager.initModelEdge', function() {
+
+        let testName = extendTestNameWithNetworkId('modelManager.initModelEdge', cyId);
+
+        it(testName, function() {
 
             cy.window().should(function (window) {
 
@@ -162,7 +186,10 @@ describe('modelManager Cytoscape Operations Test', function () {
     }
 
     function selectModelNode(cyId, id) {
-        it('modelManager.selectModelNode', function () {
+
+        let testName = extendTestNameWithNetworkId('modelManager.selectModelNode', cyId);
+
+        it(testName, function () {
             cy.window().should(function (window) {
 
                 // get chise instance for given cy/tab id
@@ -186,7 +213,10 @@ describe('modelManager Cytoscape Operations Test', function () {
     }
 
     function unselectModelNode(cyId, id) {
-        it('modelManager.unselectModelNode', function () {
+
+        let testName = extendTestNameWithNetworkId('modelManager.unselectModelNode', cyId);
+
+        it(testName, function () {
             cy.window().should(function (window) {
 
                 // get chise instance for given cy/tab id
@@ -209,7 +239,10 @@ describe('modelManager Cytoscape Operations Test', function () {
     }
 
     function selectModelEdge(cyId, id) {
-        it('modelManager.selectModelEdge', function () {
+
+        let testName = extendTestNameWithNetworkId('modelManager.selectModelEdge', cyId);
+
+        it(testName, function () {
             cy.window().should(function (window) {
 
                 // get chise instance for given cy/tab id
@@ -232,7 +265,10 @@ describe('modelManager Cytoscape Operations Test', function () {
     }
 
     function unselectModelEdge(cyId, id) {
-        it('modelManager.unselectModelEdge', function () {
+
+        let testName = extendTestNameWithNetworkId('modelManager.unselectModelEdge', cyId);
+
+        it(testName, function () {
             cy.window().should(function (window) {
 
                 // get chise instance for given cy/tab id
@@ -255,7 +291,10 @@ describe('modelManager Cytoscape Operations Test', function () {
     }
 
     function changeModelNodeAttribute(cyId, id) {
-        it('modelManager.changeModelNodeAttribute', function () {
+
+        let testName = extendTestNameWithNetworkId('modelManager.unselectModelEdge', cyId);
+
+        it(testName, function () {
             cy.window().should(function (window) {
 
                 // get chise instance for given cy/tab id
@@ -375,7 +414,10 @@ describe('modelManager Cytoscape Operations Test', function () {
     }
 
     function changeModelEdgeAttribute(cyId, id) {
-        it('modelManager.changeModelEdgeAttribute', function () {
+
+        let testName = extendTestNameWithNetworkId('modelManager.changeModelEdgeAttribute', cyId);
+
+        it(testName, function () {
             cy.window().should(function (window) {
 
                 // get chise instance for given cy/tab id
@@ -450,7 +492,10 @@ describe('modelManager Cytoscape Operations Test', function () {
     }
 
     function deleteModelNode(cyId, id) {
-        it('modelManager.deleteModelNode', function () {
+
+        let testName = extendTestNameWithNetworkId('modelManager.deleteModelNode', cyId);
+
+        it(testName, function () {
             cy.window().should(function (window) {
 
                 // get chise instance for given cy/tab id
@@ -469,7 +514,10 @@ describe('modelManager Cytoscape Operations Test', function () {
     }
 
     function deleteModelEdge(cyId, id) {
-        it('modelManager.deleteModelEdge', function () {
+
+        let testName = extendTestNameWithNetworkId('modelManager.deleteModelEdge', cyId);
+
+        it(testName, function () {
             cy.window().should(function (window) {
 
                 // get chise instance for given cy/tab id
@@ -488,7 +536,10 @@ describe('modelManager Cytoscape Operations Test', function () {
     }
 
     function undoDeleteModelNode(cyId, id){
-        it('modelManager.undoDeleteModeNode', function () {
+
+        let testName = extendTestNameWithNetworkId('modelManager.undoDeleteModeNode', cyId);
+
+        it(testName, function () {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
                 modelManager.undoCommand();
@@ -498,7 +549,10 @@ describe('modelManager Cytoscape Operations Test', function () {
     }
 
     function redoDeleteModelNode(cyId, id){
-        it('modelManager.redoDeleteModelNode', function () {
+
+        let testName = extendTestNameWithNetworkId('modelManager.redoDeleteModelNode', cyId);
+
+        it(testName, function () {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
                 modelManager.redoCommand();
@@ -508,7 +562,10 @@ describe('modelManager Cytoscape Operations Test', function () {
     }
 
     function undoDeleteModelEdge(cyId, id){
-        it('modelManager.undoDeleteModeEdge', function () {
+
+        let testName = extendTestNameWithNetworkId('modelManager.undoDeleteModeEdge', cyId);
+
+        it(testName, function () {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
                 modelManager.undoCommand();
@@ -518,7 +575,10 @@ describe('modelManager Cytoscape Operations Test', function () {
     }
 
     function redoDeleteModelEdge(cyId, id){
-        it('modelManager.redoDeleteModelEdge', function () {
+
+        let testName = extendTestNameWithNetworkId('modelManager.redoDeleteModelEdge', cyId);
+
+        it(testName, function () {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
                 modelManager.redoCommand();
