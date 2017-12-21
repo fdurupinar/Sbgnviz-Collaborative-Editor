@@ -373,17 +373,12 @@ module.exports =  function(app) {
 
                 appUtilities.closeOtherNetworks(0);
 
-                //TODO: actually closing the tab will be handled later
-                //close all the other tabs
                 app.model.set('_page.doc.images', null);
 
                 app.dynamicResize(); //to clean the canvas
 
                 app.model.set('_page.doc.provenance', null);
 
-
-
-                console.log(appUtilities.getActiveNetworkId());
                 if (callback) callback("success");
             }
             catch (e) {
