@@ -527,40 +527,66 @@ describe('modelManager Cytoscape Operations Test', function () {
         });
     }
 
+    // inital expected network ids to traverse
+    var initialNetworkIds = [0, 2];
 
-    let cyId = 0;
-    addModelNode(cyId, "node1");
-    initModelNode(cyId, "node1");
-    getModelNode(cyId, "node1");
+    // Check if the list of existing network ids are as expected at the begining
+    function networkIdsTest () {
 
-    addModelNode(cyId, "node2");
-    initModelNode(cyId, "node2");
+      it('networkIdsTest', function () {
 
-    addModelNode(cyId, "node3");
-    initModelNode(cyId, "node3");
+          cy.window().should(function (window) {
 
-    addModelNode(cyId, "node4");
-    initModelNode(cyId, "node4");
+            // expect that actual networkIdsStack is deep equal to our initial expected network ids
+            expect(window.appUtilities.networkIdsStack, "Network id stack is as expected before the model manager tests").to.deep.equal(initialNetworkIds);
+
+          });
+      });
+    }
+
+    networkIdsTest();
+
+    // Perform the tests for the all existing open networks,
+    // traversing window.appUtilities.networkIdsStack would be a safer way
+    // but currently we are not able to access it from here.
+    // If another open/close file operation is done in chiseUserOps.js then the
+    // array that is traversed here should be updated accordingly.
+    initialNetworkIds.forEach( function (cyId) {
+
+      addModelNode(cyId, "node1");
+      initModelNode(cyId, "node1");
+      getModelNode(cyId, "node1");
+
+      addModelNode(cyId, "node2");
+      initModelNode(cyId, "node2");
+
+      addModelNode(cyId, "node3");
+      initModelNode(cyId, "node3");
+
+      addModelNode(cyId, "node4");
+      initModelNode(cyId, "node4");
 
 
-    addModelEdge(cyId, "node1","node2");
-    initModelEdge(cyId, "node1-node2");
+      addModelEdge(cyId, "node1","node2");
+      initModelEdge(cyId, "node1-node2");
 
-    selectModelNode(cyId, "node1");
-    unselectModelNode(cyId, "node1");
+      selectModelNode(cyId, "node1");
+      unselectModelNode(cyId, "node1");
 
-    selectModelEdge(cyId, "node1-node2");
-    unselectModelEdge(cyId, "node1-node2");
+      selectModelEdge(cyId, "node1-node2");
+      unselectModelEdge(cyId, "node1-node2");
 
-    changeModelNodeAttribute(cyId, "node1");
-    changeModelEdgeAttribute(cyId, "node1-node2");
+      changeModelNodeAttribute(cyId, "node1");
+      changeModelEdgeAttribute(cyId, "node1-node2");
 
-    deleteModelNode(cyId, "node1");
-    undoDeleteModelNode(cyId, "node1");
-    redoDeleteModelNode(cyId, "node1");
+      deleteModelNode(cyId, "node1");
+      undoDeleteModelNode(cyId, "node1");
+      redoDeleteModelNode(cyId, "node1");
 
-    deleteModelEdge(cyId, "node1-node2");
-    undoDeleteModelEdge(cyId, "node1-node2");
-    redoDeleteModelEdge(cyId, "node1-node2");
+      deleteModelEdge(cyId, "node1-node2");
+      undoDeleteModelEdge(cyId, "node1-node2");
+      redoDeleteModelEdge(cyId, "node1-node2");
+
+    });
 
 });

@@ -1281,13 +1281,35 @@ function closeActiveNetworkTest () {
   });
 }
 
+// inital expected network ids to traverse
+var initialNetworkIds = [0, 1];
+
+function networkIdsTest () {
+
+  it('networkIdsTest', function () {
+
+      cy.window().should(function (window) {
+
+        // expect that actual networkIdsStack is deep equal to our initial expected network ids
+        expect(window.appUtilities.networkIdsStack, "Network id stack is as expected before the chise user tests").to.deep.equal(initialNetworkIds);
+
+      });
+  });
+}
+
 describe('CWC Test', function(){
 
     // create a new network/tab
     createNewNetworkTest();
 
-    // perform tests on both of the networks/tabs
-    for ( let cyId = 0; cyId < 2; cyId++ ) {
+    networkIdsTest();
+
+    // Perform the tests for the all existing open networks,
+    // traversing window.appUtilities.networkIdsStack would be a safer way
+    // but currently we are not able to access it from here.
+    // If another open/close file operation is done in before then the
+    // array that is traversed here should be updated accordingly.
+    initialNetworkIds.forEach( function( cyId ) {
 
       addNodeTest(cyId, 'pdNode0', 'macromolecule', 100, 100);
       addNodeTest(cyId, 'pdNode1', 'process', 100, 200);
@@ -1434,4 +1456,7 @@ describe('CWC Test', function(){
 
     // test for closing active network
     closeActiveNetworkTest();
+
+    // create another network
+    createNewNetworkTest();
 });
