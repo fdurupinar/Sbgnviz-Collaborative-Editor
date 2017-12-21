@@ -1448,7 +1448,7 @@ describe('CWC Test', function(){
       addNodeTest(cyId, 'process2', 'omitted process', 50, 100);
       setPortsOrderingTest(cyId, '#process1, #process2', 'T-to-B');
 
-    }
+    });
 
     // tests for switching between the tabs
     chooseNetworkTabTest(0);
