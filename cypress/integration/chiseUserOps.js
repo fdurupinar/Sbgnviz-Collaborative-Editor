@@ -1,6 +1,17 @@
+// Seperating the test names by the network ids would be useful to figure out the
+// details of bugs. Therefore, we need to extend the test names with the network ids
+// where network id matters and used.
+function extendTestNameWithNetworkId (message, networkId) {
+
+  return message + ' for network#' + networkId;
+
+}
+
 function addNodeTest(cyId, id, className, posX, posY) {
 
-  it('chise.addNode()', function () {
+  let testName = extendTestNameWithNetworkId('chise.addNode()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given tab/cy id
@@ -38,7 +49,9 @@ function addNodeTest(cyId, id, className, posX, posY) {
 
 function addEdgeTest(cyId, id, src, tgt, className) {
 
-  it('chise.addEdge()', function () {
+  let testName = extendTestNameWithNetworkId('chise.addEdge()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given tab/cy id
@@ -73,7 +86,9 @@ function addEdgeTest(cyId, id, src, tgt, className) {
 
 function createCompoundTest(cyId, compoundType) {
 
-  it('chise.createCompoundForGivenNodes()', function () {
+  let testName = extendTestNameWithNetworkId('chise.createCompoundForGivenNodes()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -120,7 +135,9 @@ function createCompoundTest(cyId, compoundType) {
 
 function cloneElementsTest(cyId) {
 
-  it('chise.cloneElements()', function () {
+  let testName = extendTestNameWithNetworkId('chise.cloneElements()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for cy/tab id
@@ -143,7 +160,9 @@ function cloneElementsTest(cyId) {
 
 function cloneNodeTest(cyId, id) {
 
-  it('chise.cloneElements()', function () {
+  let testName = extendTestNameWithNetworkId('chise.cloneElements()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -176,7 +195,9 @@ function cloneNodeTest(cyId, id) {
 
 function expandCollapseTest(cyId, selector) {
 
-  it('chise.collapseNodes() and chise.expandNodes()', function () {
+  let testName = extendTestNameWithNetworkId('chise.collapseNodes() and chise.expandNodes()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for cy/tab id
@@ -224,7 +245,9 @@ function expandCollapseTest(cyId, selector) {
 
 function deleteElesTest(cyId, selector) {
 
-  it('chise.deleteElesSimple()', function () {
+  let testName = extendTestNameWithNetworkId('chise.deleteElesSimple()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -266,7 +289,9 @@ function deleteElesTest(cyId, selector) {
 
 function deleteNodesSmartTest(cyId, selector) {
 
-  it('chise.deleteElesSmart()', function () {
+  let testName = extendTestNameWithNetworkId('chise.deleteElesSmart()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -317,7 +342,9 @@ function deleteNodesSmartTest(cyId, selector) {
 
 function hideElesTest(cyId, selector) {
 
-  it('chise.hideNodesSmart()', function () {
+  let testName = extendTestNameWithNetworkId('chise.hideNodesSmart()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -366,7 +393,9 @@ function hideElesTest(cyId, selector) {
 
 function showAllElesTest(cyId) {
 
-  it('chise.showAll()', function () {
+  let testName = extendTestNameWithNetworkId('chise.showAll()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -396,7 +425,9 @@ function showAllElesTest(cyId) {
 
 function alignTest (cyId, selector, horizontal, vertical, alignToId) {
 
-  it('chise.align()', function () {
+  let testName = extendTestNameWithNetworkId('chise.align()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for cy/tab id
@@ -468,7 +499,9 @@ function alignTest (cyId, selector, horizontal, vertical, alignToId) {
 
 function highlightElesTest(cyId, selector) {
 
-  it('chise.highlightEles()', function () {
+  let testName = extendTestNameWithNetworkId('chise.highlightEles()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -508,7 +541,9 @@ function highlightElesTest(cyId, selector) {
 
 function removeHighlightsTest(cyId) {
 
-  it('chise.removeHighlights()', function () {
+  let testName = extendTestNameWithNetworkId('chise.removeHighlights()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -543,7 +578,9 @@ function removeHighlightsTest(cyId) {
 
 function highlightProcessesTest(cyId, selector) {
 
-  it('chise.highlightProcesses()', function () {
+  let testName = extendTestNameWithNetworkId('chise.highlightProcesses()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -586,7 +623,9 @@ function highlightProcessesTest(cyId, selector) {
 
 function highlightNeighboursTest (cyId, selector) {
 
-  it('chise.highlightNeighbours()', function () {
+  let testName = extendTestNameWithNetworkId('chise.highlightNeighbours()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get chise instance for the given cy/tab id
@@ -628,7 +667,9 @@ function highlightNeighboursTest (cyId, selector) {
 
 function changeNodeLabelTest(cyId, selector) {
 
-  it('chise.changeNodeLabel()', function () {
+  let testName = extendTestNameWithNetworkId('chise.changeNodeLabel()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for given cy/tab id
@@ -660,7 +701,9 @@ function changeNodeLabelTest(cyId, selector) {
 
 function resizeNodesTest(cyId, dimension) {
 
-  it('chise.resizeNodes()', function () {
+  let testName = extendTestNameWithNetworkId('chise.resizeNodes()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for given cy/tab id
@@ -705,7 +748,9 @@ function resizeNodesTest(cyId, dimension) {
 
 function changeDataTest(cyId, selector, name, testVal, parseFloatOnCompare, omitStyle) {
 
-  it('chise.changeData()', function () {
+  let testName = extendTestNameWithNetworkId('chise.changeData()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for given cy/tab id
@@ -766,7 +811,9 @@ function changeDataTest(cyId, selector, name, testVal, parseFloatOnCompare, omit
 
 function addStateOrInfoboxTest (cyId, id, obj) {
 
-  it('chise.addStateOrInfoBox()', function () {
+  let testName = extendTestNameWithNetworkId('chise.addStateOrInfoBox()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given tab/cy id
@@ -834,7 +881,9 @@ function addStateOrInfoboxTest (cyId, id, obj) {
 
 function changeStateOrInfoBoxTest (cyId, id, index, value, type) {
 
-  it('chise.changeStateOrInfoBox()', function () {
+  let testName = extendTestNameWithNetworkId('chise.changeStateOrInfoBox()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -885,7 +934,9 @@ function changeStateOrInfoBoxTest (cyId, id, index, value, type) {
 
 function removeStateOrInfoBoxTest (cyId, id, index) {
 
-  it('chise.removeStateOrInfoBox()', function () {
+  let testName = extendTestNameWithNetworkId('chise.removeStateOrInfoBox()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -919,7 +970,9 @@ function removeStateOrInfoBoxTest (cyId, id, index) {
 
 function setMultimerStatusTest (cyId, selector, status) {
 
-  it('chise.setMultimerStatus()', function () {
+  let testName = extendTestNameWithNetworkId('chise.setMultimerStatus()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -957,7 +1010,9 @@ function setMultimerStatusTest (cyId, selector, status) {
 
 function setCloneMarkerStatusTest (cyId, selector, status) {
 
-  it('chise.setCloneMarkerStatus()', function () {
+  let testName = extendTestNameWithNetworkId('chise.setCloneMarkerStatus()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -995,7 +1050,9 @@ function setCloneMarkerStatusTest (cyId, selector, status) {
 
 function changeFontPropertiesTest (cyId, selector, data) {
 
-  it('chise.changeFontProperties()', function () {
+  let testName = extendTestNameWithNetworkId('chise.changeFontProperties()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for given cy/tab id
@@ -1041,7 +1098,9 @@ function changeFontPropertiesTest (cyId, selector, data) {
 
 function changeParentTest(cyId, selector, newParentId, posDiffX, posDiffY) {
 
-  it('chise.changeParentTest()', function () {
+  let testName = extendTestNameWithNetworkId('chise.changeParentTest()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -1112,7 +1171,9 @@ function changeParentTest(cyId, selector, newParentId, posDiffX, posDiffY) {
 
 function setPortsOrderingTest(cyId, selector, ordering) {
 
-  it('chise.setPortsOrdering()', function () {
+  let testName = extendTestNameWithNetworkId('chise.setPortsOrdering()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -1147,7 +1208,9 @@ function setPortsOrderingTest(cyId, selector, ordering) {
 
 function resetMapTypeTest(cyId) {
 
-  it('chise.resetMapType()', function () {
+  let testName = extendTestNameWithNetworkId('chise.resetMapType()', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for the given cy/tab id
@@ -1164,7 +1227,9 @@ function resetMapTypeTest(cyId) {
 
 function checkVisibility(cyId, selector) {
 
-  it('checkVisibility', function () {
+  let testName = extendTestNameWithNetworkId('checkVisibility', cyId);
+
+  it(testName, function () {
     cy.window().should(function(window){
 
       // get the chise instance for given cy/tab id
@@ -1179,146 +1244,284 @@ function checkVisibility(cyId, selector) {
   });
 }
 
+// Test if creating new network works as expected
+function createNewNetworkTest () {
+
+  it('createNewNetwork', function () {
+    cy.window().should(function(window){
+
+      // get the initial length of networks
+      let initilNetworksSize = window.appUtilities.networkIdsStack.length;
+
+      // get the id of the network to be created
+      let networkId = window.appUtilities.nextNetworkId;
+
+      // get the selector of new network panel
+      let panelSelector = window.appUtilities.getNetworkPanelSelector(networkId);
+
+      // get the selector of new tab
+      let tabSelector = window.appUtilities.getNetworkTabSelector(networkId);
+
+      // create a new network
+      window.appUtilities.createNewNetwork();
+
+      // Cypress enables jQuery access by Cypress.$ (Please see: https://docs.cypress.io/api/utilities/$.html#)
+
+      // expect that the panel for the new network is created
+      expect(Cypress.$(panelSelector), "Panel for the new network is created").to.be.ok;
+
+      // expect that the tab for the new network is created
+      expect(Cypress.$(tabSelector), "Tab for the new network is created").to.be.ok;
+
+      // expect that number of networks is incremented by one
+      expect(window.appUtilities.networkIdsStack.length, "A new network is created").to.be.equal(initilNetworksSize + 1);
+    });
+  });
+
+}
+
+// Test if choosing a network tab programatically works as expected
+function chooseNetworkTabTest (networkId) {
+
+  it('chooseNetworkTab', function () {
+
+    cy.window().should(function(window){
+
+      // get the selector of panel for the network id
+      let panelSelector = window.appUtilities.getNetworkPanelSelector(networkId);
+
+      // get the selector of tab for the network id
+      let tabSelector = window.appUtilities.getNetworkTabSelector(networkId);
+
+      // programatically choose the tab with given id
+      window.appUtilities.chooseNetworkTab(networkId);
+
+      // expect that the tab that new active network id is equal to the given network id
+      expect(window.appUtilities.getActiveNetworkId(), "New active network id is updated as expected after choose tab operation").to.be.equal(networkId);
+
+      // expect that the panel for the choosen tab has the class 'active'
+      expect(Cypress.$(panelSelector).hasClass('active'), "Panel for the tab that is just choosen is active").to.be.ok;
+
+      // expect that the choosen tab has the class 'active'
+      expect(Cypress.$(tabSelector).hasClass('active'), "The tab that is just choosen is active").to.be.ok;
+
+    });
+
+  });
+}
+
+// Test if the active network can be closed as expected
+function closeActiveNetworkTest () {
+
+  it('closeActiveNetwork', function () {
+
+    cy.window().should(function(window){
+
+      // get the active network id
+      let activeNetworkId = window.appUtilities.getActiveNetworkId();
+
+      // get the selector of panel for the active network id
+      let activePanelSelector = window.appUtilities.getNetworkPanelSelector(activeNetworkId);
+
+      // get the selector of tab for the active network id
+      let activeTabSelector = window.appUtilities.getNetworkTabSelector(activeNetworkId);
+
+      // close the active network
+      window.appUtilities.closeActiveNetwork();
+
+      // expect that old active network id is no more included in network ids stack
+      expect(window.appUtilities.networkIdsStack.indexOf(activeNetworkId), "Old active network is removed from networks list").to.be.equal(-1);
+
+      // expect that active network id is updated
+      expect(window.appUtilities.getActiveNetworkId(), "Active network id is updated after closing the active tab").not.to.be.equal(activeNetworkId);
+
+      // expect that the old active panel is no more exists
+      expect(Cypress.$(activePanelSelector).length, "Panel for the closed network no more exists").to.be.equal(0);
+
+      // expect that the old active tab no more exists
+      expect(Cypress.$(activeTabSelector).length, "Tab for the closed network no more exists").to.be.equal(0);
+
+    });
+
+  });
+}
+
+// inital expected network ids to traverse
+var initialNetworkIds = [0, 1];
+
+function networkIdsTest () {
+
+  it('networkIdsTest', function () {
+
+      cy.window().should(function (window) {
+
+        // expect that actual networkIdsStack is deep equal to our initial expected network ids
+        expect(window.appUtilities.networkIdsStack, "Network id stack is as expected before the chise user tests").to.deep.equal(initialNetworkIds);
+
+      });
+  });
+}
 
 describe('CWC Test', function(){
 
-    let cyId = 0;
-    addNodeTest(cyId, 'pdNode0', 'macromolecule', 100, 100);
-    addNodeTest(cyId, 'pdNode1', 'process', 100, 200);
-    checkVisibility(cyId, '#pdNode1');
-    addNodeTest(cyId, 'pdNode2', 'macromolecule', 200, 200);
+    // create a new network/tab
+    createNewNetworkTest();
 
-    addEdgeTest(cyId, 'pdEdge', 'pdNode1', 'pdNode2', 'necessary stimulation');
+    networkIdsTest();
 
-    let pdNodeTypes = ['macromolecule', 'complex', 'simple chemical', 'unspecified entity',
-    'nucleic acid feature', 'perturbing agent', 'source and sink', 'phenotype', 'process',
-    'omitted process', 'uncertain process', 'association', 'dissociation', 'tag',
-    'compartment', 'submap', 'and', 'or', 'not'
-    ];
+    // Perform the tests for the all existing open networks,
+    // traversing window.appUtilities.networkIdsStack would be a safer way
+    // but currently we are not able to access it from here.
+    // If another open/close file operation is done in before then the
+    // array that is traversed here should be updated accordingly.
+    initialNetworkIds.forEach( function( cyId ) {
 
-    for (let i = 0; i < pdNodeTypes.length; i++) {
-    let id = 'pdNode' + (i + 3);
-        addNodeTest(cyId, id, pdNodeTypes[i], 300, 200);
-    }
+      addNodeTest(cyId, 'pdNode0', 'macromolecule', 100, 100);
+      addNodeTest(cyId, 'pdNode1', 'process', 100, 200);
+      checkVisibility(cyId, '#pdNode1');
+      addNodeTest(cyId, 'pdNode2', 'macromolecule', 200, 200);
 
-    resetMapTypeTest(cyId); // Reset the map type here to unknown to allow adding AF elements
+      addEdgeTest(cyId, 'pdEdge', 'pdNode1', 'pdNode2', 'necessary stimulation');
 
-    let afNodeTypes = ['biological activity', 'BA plain', 'BA unspecified entity',
-    'BA simple chemical', 'BA macromolecule', 'BA nucleic acid feature',
-    'BA perturbing agent', 'BA complex', 'delay'];
+      let pdNodeTypes = ['macromolecule', 'complex', 'simple chemical', 'unspecified entity',
+      'nucleic acid feature', 'perturbing agent', 'source and sink', 'phenotype', 'process',
+      'omitted process', 'uncertain process', 'association', 'dissociation', 'tag',
+      'compartment', 'submap', 'and', 'or', 'not'
+      ];
 
-    for (let i = 0; i < afNodeTypes.length; i++) {
-    let id = 'afNode' + i;
-        addNodeTest(cyId, id, afNodeTypes[i], 300, 200);
-    }
+      for (let i = 0; i < pdNodeTypes.length; i++) {
+      let id = 'pdNode' + (i + 3);
+          addNodeTest(cyId, id, pdNodeTypes[i], 300, 200);
+      }
 
-    let pdEdgeTypes = ['consumption', 'production', 'modulation', 'stimulation',
-    'catalysis', 'necessary stimulation', 'logic arc', 'equivalence arc'];
+      resetMapTypeTest(cyId); // Reset the map type here to unknown to allow adding AF elements
 
-    for (let i = 0; i < pdEdgeTypes.length; i++) {
-        let id = 'pdEdge' + i;
-        let src = 'pdNode' + i;
-        let tgt = 'pdNode' + (pdNodeTypes.length - i - 1);
-        addEdgeTest(cyId, id, src, tgt, pdEdgeTypes[i]);
-    }
+      let afNodeTypes = ['biological activity', 'BA plain', 'BA unspecified entity',
+      'BA simple chemical', 'BA macromolecule', 'BA nucleic acid feature',
+      'BA perturbing agent', 'BA complex', 'delay'];
 
-    let afEdgeTypes = ['unknown influence', 'positive influence', 'negative influence'];
+      for (let i = 0; i < afNodeTypes.length; i++) {
+      let id = 'afNode' + i;
+          addNodeTest(cyId, id, afNodeTypes[i], 300, 200);
+      }
 
-    for (let i = 0; i < afEdgeTypes.length; i++) {
-        let id = 'afEdge' + i;
-        let src = 'afNode' + i;
-        let tgt = 'afNode' + (afNodeTypes.length - i - 1);
-        addEdgeTest(cyId, id, src, tgt, afEdgeTypes[i]);
-    }
+      let pdEdgeTypes = ['consumption', 'production', 'modulation', 'stimulation',
+      'catalysis', 'necessary stimulation', 'logic arc', 'equivalence arc'];
 
-    createCompoundTest(cyId, 'complex');
-    cloneElementsTest(cyId);
-    cloneNodeTest(cyId, 'pdNode5');
+      for (let i = 0; i < pdEdgeTypes.length; i++) {
+          let id = 'pdEdge' + i;
+          let src = 'pdNode' + i;
+          let tgt = 'pdNode' + (pdNodeTypes.length - i - 1);
+          addEdgeTest(cyId, id, src, tgt, pdEdgeTypes[i]);
+      }
 
-    expandCollapseTest(cyId, ':parent');
-    deleteElesTest(cyId, '#pdNodeO');
-    deleteNodesSmartTest(cyId, '#pdNode7');
+      let afEdgeTypes = ['unknown influence', 'positive influence', 'negative influence'];
 
-    checkVisibility(cyId, '#pdNode1');
-    // checkVisibility(cyId, '#pdNode1');
-    hideElesTest(cyId, '#pdNode1');
-    showAllElesTest(cyId);
+      for (let i = 0; i < afEdgeTypes.length; i++) {
+          let id = 'afEdge' + i;
+          let src = 'afNode' + i;
+          let tgt = 'afNode' + (afNodeTypes.length - i - 1);
+          addEdgeTest(cyId, id, src, tgt, afEdgeTypes[i]);
+      }
 
-    alignTest(cyId, 'node', 'left');
-    alignTest(cyId, 'node', 'center');
-    alignTest(cyId, 'node', 'none', 'top');
-    alignTest(cyId, 'node', 'none', 'bottom');
-    alignTest(cyId, 'node', 'none', 'middle');
+      createCompoundTest(cyId, 'complex');
+      cloneElementsTest(cyId);
+      cloneNodeTest(cyId, 'pdNode5');
 
-    highlightElesTest(cyId, '[class="macromolecule"]');
-    removeHighlightsTest(cyId);
-    highlightNeighboursTest(cyId, '[class="macromolecule"]');
-    removeHighlightsTest(cyId);
-    highlightProcessesTest(cyId, '[class="macromolecule"]');
-    removeHighlightsTest(cyId);
+      expandCollapseTest(cyId, ':parent');
+      deleteElesTest(cyId, '#pdNodeO');
+      deleteNodesSmartTest(cyId, '#pdNode7');
 
-    changeNodeLabelTest(cyId, '[class="macromolecule"]');
-    resizeNodesTest(cyId, 'w');
-    resizeNodesTest(cyId, 'h');
+      checkVisibility(cyId, '#pdNode1');
+      // checkVisibility(cyId, '#pdNode1');
+      hideElesTest(cyId, '#pdNode1');
+      showAllElesTest(cyId);
 
-    changeDataTest(cyId, '[class="macromolecule"]', 'border-color', '#b6f442');
-    changeDataTest(cyId, '[class="macromolecule"]', 'background-color', '#15076d');
-    changeDataTest(cyId, '[class="macromolecule"]', 'border-width', 2, true);
-    changeDataTest(cyId, '[class="macromolecule"]', 'background-opacity', 1, true);
-    changeDataTest(cyId, 'edge', 'width', 3.5, true);
-    changeDataTest(cyId, 'edge', 'cardinality', 3, true, true);
-    changeDataTest(cyId, 'edge', 'line-color', '#b6f442');
+      alignTest(cyId, 'node', 'left');
+      alignTest(cyId, 'node', 'center');
+      alignTest(cyId, 'node', 'none', 'top');
+      alignTest(cyId, 'node', 'none', 'bottom');
+      alignTest(cyId, 'node', 'none', 'middle');
 
-    let stateVarObj = {};
-    stateVarObj.clazz = 'state variable';
-    stateVarObj.state = {
-        value: 'val',
-        variable: 'let'
-    };
-    stateVarObj.bbox = {
-        w: 40,
-        h: 20
-    };
+      highlightElesTest(cyId, '[class="macromolecule"]');
+      removeHighlightsTest(cyId);
+      highlightNeighboursTest(cyId, '[class="macromolecule"]');
+      removeHighlightsTest(cyId);
+      highlightProcessesTest(cyId, '[class="macromolecule"]');
+      removeHighlightsTest(cyId);
 
-    let unitOfInfoObj = {};
-    unitOfInfoObj.clazz = 'unit of information';
-    unitOfInfoObj.label = {
-        text: 'label'
-    };
-    unitOfInfoObj.bbox = {
-        w: 40,
-        h: 20
-    };
+      changeNodeLabelTest(cyId, '[class="macromolecule"]');
+      resizeNodesTest(cyId, 'w');
+      resizeNodesTest(cyId, 'h');
 
-    addStateOrInfoboxTest(cyId, 'pdNode3', stateVarObj);
-    addStateOrInfoboxTest(cyId, 'pdNode3', unitOfInfoObj);
+      changeDataTest(cyId, '[class="macromolecule"]', 'border-color', '#b6f442');
+      changeDataTest(cyId, '[class="macromolecule"]', 'background-color', '#15076d');
+      changeDataTest(cyId, '[class="macromolecule"]', 'border-width', 2, true);
+      changeDataTest(cyId, '[class="macromolecule"]', 'background-opacity', 1, true);
+      changeDataTest(cyId, 'edge', 'width', 3.5, true);
+      changeDataTest(cyId, 'edge', 'cardinality', 3, true, true);
+      changeDataTest(cyId, 'edge', 'line-color', '#b6f442');
 
-    changeStateOrInfoBoxTest(cyId, 'pdNode3', 0, 'updated val', 'value');
-    changeStateOrInfoBoxTest(cyId, 'pdNode3', 0, 'updated let', 'variable');
-    changeStateOrInfoBoxTest(cyId, 'pdNode3', 1, 'updated label');
+      let stateVarObj = {};
+      stateVarObj.clazz = 'state variable';
+      stateVarObj.state = {
+          value: 'val',
+          variable: 'let'
+      };
+      stateVarObj.bbox = {
+          w: 40,
+          h: 20
+      };
 
-    removeStateOrInfoBoxTest(cyId, 'pdNode3', 0);
+      let unitOfInfoObj = {};
+      unitOfInfoObj.clazz = 'unit of information';
+      unitOfInfoObj.label = {
+          text: 'label'
+      };
+      unitOfInfoObj.bbox = {
+          w: 40,
+          h: 20
+      };
 
-    setMultimerStatusTest(cyId, '[class="macromolecule"]', true);
-    setCloneMarkerStatusTest(cyId, '[class="macromolecule multimer"]', true);
+      addStateOrInfoboxTest(cyId, 'pdNode3', stateVarObj);
+      addStateOrInfoboxTest(cyId, 'pdNode3', unitOfInfoObj);
 
-    setMultimerStatusTest(cyId, '[class="macromolecule multimer"]', false);
-    setCloneMarkerStatusTest(cyId, '[class="macromolecule"]', false);
+      changeStateOrInfoBoxTest(cyId, 'pdNode3', 0, 'updated val', 'value');
+      changeStateOrInfoBoxTest(cyId, 'pdNode3', 0, 'updated let', 'variable');
+      changeStateOrInfoBoxTest(cyId, 'pdNode3', 1, 'updated label');
 
-    changeFontPropertiesTest(cyId, '[class="macromolecule"]', {
-    'font-size': '10px',
-    'font-family': 'Arial',
-    'font-weight': 'bolder'
+      removeStateOrInfoBoxTest(cyId, 'pdNode3', 0);
+
+      setMultimerStatusTest(cyId, '[class="macromolecule"]', true);
+      setCloneMarkerStatusTest(cyId, '[class="macromolecule multimer"]', true);
+
+      setMultimerStatusTest(cyId, '[class="macromolecule multimer"]', false);
+      setCloneMarkerStatusTest(cyId, '[class="macromolecule"]', false);
+
+      changeFontPropertiesTest(cyId, '[class="macromolecule"]', {
+      'font-size': '10px',
+      'font-family': 'Arial',
+      'font-weight': 'bolder'
+      });
+
+      addNodeTest(cyId, 'aCompartment', 'compartment', 100, 1000);
+      addNodeTest(cyId, 'mm1', 'macromolecule', 150, 150);
+      addNodeTest(cyId, 'mm2', 'macromolecule', 150, 190);
+      changeParentTest(cyId, '#mm1, #mm2', 'aCompartment', 5, 5);
+
+      addNodeTest(cyId, 'process1', 'process', 50, 50);
+      addNodeTest(cyId, 'process2', 'omitted process', 50, 100);
+      setPortsOrderingTest(cyId, '#process1, #process2', 'T-to-B');
+
     });
 
-    addNodeTest(cyId, 'aCompartment', 'compartment', 100, 1000);
-    addNodeTest(cyId, 'mm1', 'macromolecule', 150, 150);
-    addNodeTest(cyId, 'mm2', 'macromolecule', 150, 190);
-    changeParentTest(cyId, '#mm1, #mm2', 'aCompartment', 5, 5);
+    // tests for switching between the tabs
+    chooseNetworkTabTest(0);
+    chooseNetworkTabTest(1);
 
-    addNodeTest(cyId, 'process1', 'process', 50, 50);
-    addNodeTest(cyId, 'process2', 'omitted process', 50, 100);
-    setPortsOrderingTest(cyId, '#process1, #process2', 'T-to-B');
+    // test for closing active network
+    closeActiveNetworkTest();
 
-
+    // create another network
+    createNewNetworkTest();
 });
