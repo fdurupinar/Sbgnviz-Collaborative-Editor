@@ -621,8 +621,7 @@ describe('modelManager Cytoscape Operations Test', function () {
     // but currently we are not able to access it from here.
     // If another open/close file operation is done in chiseUserOps.js then the
     // array that is traversed here should be updated accordingly.
-    // initialNetworkIds.forEach( function (cyId) {
-let cyId = 0;
+    initialNetworkIds.forEach( function (cyId) {
 
       addModelNode(cyId, "node1");
       initModelNode(cyId, "node1");
@@ -646,57 +645,19 @@ let cyId = 0;
 
       selectModelEdge(cyId, "node1-node2");
       unselectModelEdge(cyId, "node1-node2");
-      //
+
       changeModelNodeAttribute(cyId, "node1");
       changeModelEdgeAttribute(cyId, "node1-node2");
 
       deleteModelNode(cyId, "node1");
       undoDeleteModelNode(cyId, "node1");
       redoDeleteModelNode(cyId, "node1");
-      //
+
       deleteModelEdge(cyId, "node1-node2");
       undoDeleteModelEdge(cyId, "node1-node2");
       redoDeleteModelEdge(cyId, "node1-node2");
-    cyId = 2;
 
 
-    // setTimeout(function(){
-        addModelNode(cyId, "node1");
-        initModelNode(cyId, "node1");
-        getModelNode(cyId, "node1");
-
-        addModelNode(cyId, "node2");
-        initModelNode(cyId, "node2");
-
-        addModelNode(cyId, "node3");
-        initModelNode(cyId, "node3");
-
-        addModelNode(cyId, "node4");
-        initModelNode(cyId, "node4");
-
-
-        addModelEdge(cyId, "node1","node2");
-        initModelEdge(cyId, "node1-node2");
-
-        selectModelNode(cyId, "node1");
-        unselectModelNode(cyId, "node1");
-
-        selectModelEdge(cyId, "node1-node2");
-        unselectModelEdge(cyId, "node1-node2");
-        //
-        changeModelNodeAttribute(cyId, "node1");
-        changeModelEdgeAttribute(cyId, "node1-node2");
-
-        deleteModelNode(cyId, "node1");
-        undoDeleteModelNode(cyId, "node1");
-        redoDeleteModelNode(cyId, "node1");
-        //
-        deleteModelEdge(cyId, "node1-node2");
-        undoDeleteModelEdge(cyId, "node1-node2");
-        redoDeleteModelEdge(cyId, "node1-node2");
-    // }, 100);
-
-
-
+    });
 
 });
