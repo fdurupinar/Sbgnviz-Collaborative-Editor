@@ -17,7 +17,7 @@ describe('modelManager Cytoscape Operations Test', function () {
     }
 
 
-    function addModelNode(cyId, id, delay) {
+    function addModelNode(cyId, id) {
 
         let testName = extendTestNameWithNetworkId('modelManager.addModelNode', cyId);
 
@@ -34,7 +34,7 @@ describe('modelManager Cytoscape Operations Test', function () {
 
                 modelManager.addModelNode(id, cyId, {position: {x: 100, y: 200} , data: {id: id, class: "macromolecule"}});
 
-                    expect(cyInstance.getElementById(id)).to.be.ok;
+                    expect(cyInstance.getElementById(id).data).to.be.ok;
 
                     expect(modelManager.getModelNodeAttribute("data.id", id, cyId)).to.equal(cyInstance.getElementById(id).data("id"));
                     expect(cyInstance.getElementById(id).data("class")).to.equal("macromolecule");
@@ -550,7 +550,11 @@ describe('modelManager Cytoscape Operations Test', function () {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
                 modelManager.undoCommand();
-                    expect(modelManager.getModelNode(id, cyId)).to.be.ok;
+
+                let chiseInstance = window.appUtilities.getChiseInstance(cyId);
+                let cyInstance = chiseInstance.getCy();
+                expect(modelManager.getModelNode(id, cyId)).to.be.ok;
+                expect(cyInstance.getElementById(id).length).to.equal(1);
             });
         });
     }
@@ -564,6 +568,9 @@ describe('modelManager Cytoscape Operations Test', function () {
                 let modelManager = window.testApp.modelManager;
                 modelManager.redoCommand();
                     expect(modelManager.getModelNode(id, cyId)).to.not.ok;
+                let chiseInstance = window.appUtilities.getChiseInstance(cyId);
+                let cyInstance = chiseInstance.getCy();
+                expect(cyInstance.getElementById(id).length).to.equal(0);
 
             });
         });
@@ -658,8 +665,9 @@ describe('modelManager Cytoscape Operations Test', function () {
             undoDeleteModelNode(cyId, "node1");
             redoDeleteModelNode(cyId, "node1");
 
+            deleteModelEdge(cyId, "node1-node2");
+
             if(cyId !== 0) {
-                deleteModelEdge(cyId, "node1-node2");
                 undoDeleteModelEdge(cyId, "node1-node2");
                 redoDeleteModelEdge(cyId, "node1-node2");
             }
