@@ -1893,6 +1893,7 @@
                         <li class = "tab-link"><a data-toggle="tab" href="#sbgn-inspector">Inspector</a></li>
                         <!--<li class = "tab-link"><a data-toggle="tab" href="#command-history-area">Operations</a></li>-->
                         <li class = "tab-link"><a data-toggle="tab" href="#factoid-area">Factoid</a></li>
+                        <li class = "tab-link"><a data-toggle="tab" href="#visualization-test-area">VTest</a></li>
 
                     </ul>
                 </div>
@@ -2053,6 +2054,7 @@
                     </div>
                 </div>
 
+
                 <div id = "factoid-area" class = "tab-pane">
 
                     <div id= "factoid-input-container">
@@ -2113,6 +2115,13 @@
 
                     </div>
 
+                </div>
+
+                <div id ="visualization-test-area"  class="tab-pane  fade in active">
+                    <button id = "move-node-top" class = "btn  btn-mini" on-click ="moveNode('top')">Move selected to top </button>
+                    <button id = "move-node-bottom" class = "btn  btn-mini" on-click ="moveNode('bottom')">Move selected to bottom </button>
+                    <button id = "move-node-left" class = "btn  btn-mini" on-click ="moveNode('left')">Move selected to left</button>
+                    <button id = "move-node-right" class = "btn  btn-mini" on-click ="moveNode('right')">Move selected to right</button>
                 </div>
 
                 <div id ="chat-area"  class="tab-pane  fade in active">
@@ -2281,6 +2290,7 @@
         <audio id="notificationAudio" src="resources/chatSound.wav" preload="auto"></audio>
 
         <!--TODO: Close this-->
+        <button id = "connect-visualization-agent" class = "btn-mini" on-click = "connectVisAgent()">VisA</button>
         <!--<button id = "connect-causality-agent" class = "btn  btn-mini" on-click = "connectCausalityAgent()">CA</button>-->
         <!--<button id = "test-image-tab" class = "btn  btn-mini" on-click = "testImageTab()">Test image tab</button>-->
 

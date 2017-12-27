@@ -121,7 +121,7 @@
     margin: auto;
     border: 1px solid #ddd;
     height: var(--canvas-height);
-    width: 400px;
+    width: 500px;
     overflow: hidden;
     border-radius: 0.25em;
     /*padding-left: 2px;*/

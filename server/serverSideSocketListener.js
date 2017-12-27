@@ -640,6 +640,13 @@ module.exports.start = function(io, model, cancerDataOrganizer){
             });
         });
 
+        socket.on('agentChangeLockStateRequest', function(data, callback) {
+            askHuman(data.userId, data.room,  "changeLockState", data, function(val){
+                if(callback) callback(val);
+            });
+        });
+
+
         socket.on('agentGetNodeRequest',function(data, callback){
             try {
                 let node = modelManagerList[data.room].getModelNode(data.id, data.cyId);

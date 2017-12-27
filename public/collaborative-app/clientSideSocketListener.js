@@ -298,6 +298,21 @@ module.exports =  function(app) {
                 }
             });
 
+
+            app.socket.on("changeLockState", function(data, callback){
+                if(!data.cyId)
+                    data.cyId = appUtilities.getActiveNetworkId();
+
+
+                if(data.lock)
+                    appUtilities.getCyInstance(data.cyId).getElementById(data.id).lock();
+                else
+                    appUtilities.getCyInstance(data.cyId).getElementById(data.id).unlock();
+
+
+
+            })
+
             //Open in another tab
             app.socket.on('openPCQueryWindow', function(data, callback){
 
@@ -355,6 +370,9 @@ module.exports =  function(app) {
                 modelMergeFunctions.mergeJsonWithCurrent(data.graph, data.cyId, app.modelManager, callback);
 
             });
+
+
+
         },
 
 

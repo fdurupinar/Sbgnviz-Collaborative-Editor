@@ -181,7 +181,7 @@ Agent.prototype.loadChatHistory= function (callback) {
  */
 Agent.prototype.getNodeList = function(cyId){
 
-    return this.pageDoc.cy.cyId.nodes;
+    return this.pageDoc.cy[cyId].nodes;
 };
 
 
@@ -191,7 +191,7 @@ Agent.prototype.getNodeList = function(cyId){
  * @returns {Object} Edge list in the shared model
  */
 Agent.prototype.getEdgeList = function(cyId){
-    return this.pageDoc.cy.cyId.edges;
+    return this.pageDoc.cy[cyId].edges;
 };
 
 /**

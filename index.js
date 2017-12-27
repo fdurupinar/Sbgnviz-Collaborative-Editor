@@ -7,12 +7,11 @@
 let app = module.exports = require('derby').createApp('cwc', __filename);
 app.loadViews(__dirname + '/views');
 
-let oneColor = require('onecolor');
-
 const ONE_DAY = 1000 * 60 * 60 * 24;
 const ONE_HOUR = 1000 * 60 * 60;
 const ONE_MINUTE = 1000 * 60;
 const BobId = "Bob123";
+
 
 let docReady = false;
 
@@ -858,6 +857,31 @@ app.proto.resetConversationOnTrips = function(){
 
 app.proto.connectCausalityAgent = function(){
     this.socket.emit('connectToCausalityAgentRequest');
+};
+
+app.proto.connectVisAgent = function(){
+    let self = this;
+    let VisAgent = require('./agent-interaction/VisAgent.js');
+    this.visA = new VisAgent("VisAgent123")
+
+    self.visA.connectToServer("http://localhost:3000/", function(){
+        self.visA.loadModel(function () {
+            self.visA.loadChatHistory(function () {
+            });
+        });
+    });
+};
+
+app.proto.moveNode = function(location){
+
+    if(appUtilities.getActiveCy().nodes(":selected").length <= 0)
+        return;
+
+    if(this.visA == null)
+        this.connectVisAgent();
+
+    let nodeName =  appUtilities.getActiveCy().nodes(":selected")[0].data("label");
+    this.visA.moveNode(nodeName, location);
 };
 
 
