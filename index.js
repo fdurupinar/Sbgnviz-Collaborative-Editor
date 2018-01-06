@@ -246,6 +246,8 @@ app.proto.create = function (model) {
 
             // console.log("Connection requested " + noTrips + " " + op);
             self.connectTripsAgent();
+
+            self.connectVisAgent();
         }
     }, 500); // wait a little while for the server to update user list and handle disconnections
 
@@ -867,22 +869,23 @@ app.proto.connectVisAgent = function(){
     self.visA.connectToServer("http://localhost:3000/", function(){
         self.visA.loadModel(function () {
             self.visA.loadChatHistory(function () {
+                self.visA.init(); //connects to trips
             });
         });
     });
 };
 
-app.proto.moveNode = function(location){
-
-    if(appUtilities.getActiveCy().nodes(":selected").length <= 0)
-        return;
-
-    if(this.visA == null)
-        this.connectVisAgent();
-
-    let nodeName =  appUtilities.getActiveCy().nodes(":selected")[0].data("label");
-    this.visA.moveNode(nodeName, location);
-};
+// app.proto.moveNode = function(location){
+//
+//     if(appUtilities.getActiveCy().nodes(":selected").length <= 0)
+//         return;
+//
+//     if(this.visA == null)
+//         this.connectVisAgent();
+//
+//     let nodeName =  appUtilities.getActiveCy().nodes(":selected")[0].data("label");
+//     this.visA.moveNode(nodeName, location);
+// };
 
 
 app.proto.connectTripsAgent = function(){

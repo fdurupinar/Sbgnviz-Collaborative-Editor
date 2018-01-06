@@ -12,6 +12,7 @@ module.exports =  function(app) {
         listen: function () {
             let self = this;
 
+            self.listenToVisAgentRequests();
 
             app.socket.on('loadFile', function (data, callback) {
                 try {
@@ -26,6 +27,9 @@ module.exports =  function(app) {
                 }
 
             });
+
+
+
 
 
             app.socket.on('cleanAll', function ( data, callback) {
@@ -372,6 +376,23 @@ module.exports =  function(app) {
             });
 
 
+
+        },
+
+
+        listenToVisAgentRequests: function () {
+
+
+            app.socket.on('moveGene', function ( data, callback) {
+
+                app.visA.moveNode(data);
+            });
+
+
+            app.socket.on('moveGeneStream', function ( data, callback) {
+
+                app.visA.moveNodeStream(data);
+            });
 
         },
 

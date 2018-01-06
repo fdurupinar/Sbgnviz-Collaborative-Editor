@@ -42,6 +42,7 @@ TripsGeneralInterfaceAgent.prototype.listenToMessages = function(callback){
 
         if(data.userId != self.agentId) {
 
+
             self.relayMessage(data.comment);
 
         }

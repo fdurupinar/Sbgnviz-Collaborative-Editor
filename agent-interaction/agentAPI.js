@@ -63,13 +63,11 @@ Agent.prototype.connectToServer = function (url,  callback) {
         if (self.room == ""  || self.room == null) {
 
             self.socket.emit("agentCurrentRoomRequest", function (room) {
-                console.log(room);
                     self.room = room; //select the latest room
                 resolve("success");
             });
         }
         else {
-            console.log(self.room);
             resolve("success");
         }
     });
@@ -175,6 +173,7 @@ Agent.prototype.loadChatHistory= function (callback) {
 
     });
 }
+
 /**
  *
  * @returns {Object} Node list in the shared model
@@ -271,8 +270,6 @@ Agent.prototype.sendRequest = function(reqName, paramSent, callback){ //model op
     param.userId = this.agentId;
 
     this.socket.emit(reqName, param, function(data){
-
-        console.log(param);
         if(callback)
             callback(data);
         else

@@ -42,7 +42,8 @@ module.exports.start = function(io, model, cancerDataOrganizer){
     let humanList = [];
     let pnnlArr  = [];
     let tripsGeneralInterfaceInstance;
-    let tripsCausalityInterfaceInstance;
+
+    let tripsVisualizationInterfaceInstance;
 
     let request = require('request'); //REST call over http/https
 
@@ -796,7 +797,9 @@ module.exports.start = function(io, model, cancerDataOrganizer){
         socket.on('agentPageDocRequest', function(data, callback){ //from computer agent
             try {
 
+
                 let pageDoc = modelManagerList[data.room].getPageDoc();
+
                 callback(pageDoc);
 
             }
@@ -846,15 +849,15 @@ module.exports.start = function(io, model, cancerDataOrganizer){
                     tripsGeneralInterfaceInstance.updateListeners(socket);
                 }
             }
-            else {
+            else if(param.isVisualizationAgent){
                 console.log("trips causality module connection " + socket.id + " room: " + socket.room);
 
-                if(!tripsCausalityInterfaceInstance || !tripsCausalityInterfaceInstance.isConnectedToTrips()) {
-                    let TripsCausalityInterfaceModule = require('./trips/TripsCausalityInterfaceModule.js');
-                    tripsCausalityInterfaceInstance = new TripsCausalityInterfaceModule(param.userId, param.userName, socket, model);
+                if(!tripsVisualizationInterfaceInstance || !tripsVisualizationInterfaceInstance.isConnectedToTrips()) {
+                    let tripsVisualizationInterfaceModule = require('./trips/TripsVisualizationInterfaceModule.js');
+                    tripsVisualizationInterfaceInstance = new tripsVisualizationInterfaceModule(param.userId, param.userName, socket, model, askHuman);
                 }
                 else {
-                    tripsCausalityInterfaceInstance.updateWebSocket(socket);
+                    tripsVisualizationInterfaceInstance.updateWebSocket(socket);
                 }
             }
         });
