@@ -35,6 +35,9 @@
     /*float: left;*/
 }
 
+#canvas-tab-area .ui-icon-gripsmall-diagonal-se {
+  z-index: 1000 !important;
+}
 
 #canvas-tabs{
     position: absolute;
@@ -62,7 +65,13 @@
 #network-panels-container {
     margin: auto;
     border:none;
+    height: var(--canvas-height);
+    width: var(--canvas-width);
+}
 
+.network-panel {
+    height: var(--canvas-height);
+    width: var(--canvas-width);
 }
 
 #sbgn-inspector-and-canvas {

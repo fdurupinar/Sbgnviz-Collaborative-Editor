@@ -850,6 +850,12 @@ appUtilities.dynamicResize = function () {
     $("#network-panels-container, .network-panel").height(windowHeight * 0.85);
     $("#sbgn-inspector").height(windowHeight * 0.85);
   }
+
+  // CWC change
+  // when dynamic resize is called from newt side it should be called from CWC specific part as well
+  // this change will not be needed when the related PR (https://github.com/iVis-at-Bilkent/newt/pull/222) is merged
+  // to Newt and the updated version of Newt is being used
+  $(document).trigger('newtAfterDynamicResize');
 };
 /*
 appUtilities.nodeQtipFunction = function (node) {

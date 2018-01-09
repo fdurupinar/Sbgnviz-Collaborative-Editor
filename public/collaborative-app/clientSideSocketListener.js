@@ -99,7 +99,7 @@ module.exports =  function(app) {
 
                     let status = app.modelManager.addImage(data);
                     let images = app.modelManager.getImages();
-                    app.dynamicResize(images);
+                    app.dynamicResize();
 
                     if (callback) callback(status);
 
