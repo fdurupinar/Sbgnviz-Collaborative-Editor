@@ -155,6 +155,14 @@ class ModelManager{
         }
     }
 
+    setLayoutProperties(properties){
+        this.model.set('documents.' + this.docId + '.layoutProperties', properties);
+    }
+
+    getLayoutProperties(){
+        return this.model.get('documents.' + this.docId + '.layoutProperties');
+    }
+
     updateFactoidModel(factoidModel, user, noHistUpdate){
         this.model.pass({user:user}).set('documents.' + this.docId + '.factoid', factoidModel);
 
@@ -748,8 +756,6 @@ class ModelManager{
                 });
             }
         }
-
-
 
         return "success";
 

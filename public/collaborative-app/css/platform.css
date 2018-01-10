@@ -132,7 +132,7 @@ if PR(https://github.com/iVis-at-Bilkent/newt/pull/223) is merged*/
     margin: auto;
     border: 1px solid #ddd;
     height: var(--canvas-height);
-    width: 400px;
+    width: 500px;
     overflow: hidden;
     border-radius: 0.25em;
     /*padding-left: 2px;*/
@@ -393,9 +393,8 @@ input[type="file"] {
     margin-bottom: 5px;
     /*padding:  10px;*/
 
-
-
 }
+
 
 
 .td{
@@ -562,4 +561,11 @@ input[type="file"] {
     padding: 10px;
     margin-left: 10px;
     font-size: medium;
+}
+
+.visTable{
+    margin: 10px;
+}
+.visTable td{
+    padding: 10px;
 }

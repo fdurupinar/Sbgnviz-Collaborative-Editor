@@ -552,11 +552,14 @@ describe('modelManager Cytoscape Operations Test', function () {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
                 modelManager.undoCommand();
+                setTimeout(function() {
+
 
                 let chiseInstance = window.appUtilities.getChiseInstance(cyId);
                 let cyInstance = chiseInstance.getCy();
                 expect(modelManager.getModelNode(id, cyId)).to.be.ok;
                 expect(cyInstance.getElementById(id).length).to.equal(1);
+
 
             });
         });
@@ -571,10 +574,13 @@ describe('modelManager Cytoscape Operations Test', function () {
                 let modelManager = window.testApp.modelManager;
                 modelManager.redoCommand();
 
+
+
                     expect(modelManager.getModelNode(id, cyId)).to.not.ok;
-                let chiseInstance = window.appUtilities.getChiseInstance(cyId);
-                let cyInstance = chiseInstance.getCy();
-                expect(cyInstance.getElementById(id).length).to.equal(0);
+                    let chiseInstance = window.appUtilities.getChiseInstance(cyId);
+                    let cyInstance = chiseInstance.getCy();
+                    expect(cyInstance.getElementById(id).length).to.equal(0);
+                },100);
 
             });
         });
@@ -590,8 +596,10 @@ describe('modelManager Cytoscape Operations Test', function () {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
                 modelManager.undoCommand();
+
                 expect(modelManager.getModelEdge(id, cyId)).to.be.ok;
                 expect(window.appUtilities.getCyInstance(cyId).getElementById(id).length, 'undoDeleteModelEdge cy length test').to.be.equal(1);
+
             });
         });
     }
@@ -604,8 +612,10 @@ describe('modelManager Cytoscape Operations Test', function () {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
                 modelManager.redoCommand();
+
                 expect(modelManager.getModelEdge(id, cyId)).to.not.ok;
                 expect(window.appUtilities.getCyInstance(cyId).getElementById(id).length).to.be.equal(0);
+
             });
 
 
@@ -674,10 +684,10 @@ describe('modelManager Cytoscape Operations Test', function () {
 
             deleteModelEdge(cyId, "node1-node2");
 
-            if(cyId !== 0) {
+            // if(cyId !== 0) {
                 undoDeleteModelEdge(cyId, "node1-node2");
                 redoDeleteModelEdge(cyId, "node1-node2");
-            }
+            // }
 
 
     });

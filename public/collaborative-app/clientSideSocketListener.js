@@ -12,6 +12,7 @@ module.exports =  function(app) {
         listen: function () {
             let self = this;
 
+            self.listenToVisAgentRequests();
 
             app.socket.on('loadFile', function (data, callback) {
                 try {
@@ -26,6 +27,9 @@ module.exports =  function(app) {
                 }
 
             });
+
+
+
 
 
             app.socket.on('cleanAll', function ( data, callback) {
@@ -298,6 +302,8 @@ module.exports =  function(app) {
                 }
             });
 
+
+
             //Open in another tab
             app.socket.on('openPCQueryWindow', function(data, callback){
 
@@ -355,6 +361,40 @@ module.exports =  function(app) {
                 modelMergeFunctions.mergeJsonWithCurrent(data.graph, data.cyId, app.modelManager, callback);
 
             });
+
+
+
+        },
+
+
+        listenToVisAgentRequests: function () {
+
+
+            app.socket.on('moveGene', function ( data, callback) {
+
+                app.visA.moveNode(data);
+            });
+
+
+            app.socket.on('moveGeneStream', function ( data, callback) {
+
+                app.visA.moveNodeStream(data);
+            });
+
+            app.socket.on("changeLockState", function(data, callback){
+                if(!data.cyId)
+                    data.cyId = appUtilities.getActiveNetworkId();
+
+
+                if(data.lock)
+                    appUtilities.getCyInstance(data.cyId).getElementById(data.id).lock();
+                else
+                    appUtilities.getCyInstance(data.cyId).getElementById(data.id).unlock();
+
+
+
+            });
+
         },
 
 

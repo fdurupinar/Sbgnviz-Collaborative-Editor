@@ -1483,6 +1483,7 @@ describe('CWC Test', function(){
           h: 20
       };
 
+
       addStateOrInfoboxTest(cyId, 'pdNode3', stateVarObj);
       addStateOrInfoboxTest(cyId, 'pdNode3', unitOfInfoObj);
 

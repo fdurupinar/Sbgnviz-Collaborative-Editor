@@ -7,12 +7,11 @@
 let app = module.exports = require('derby').createApp('cwc', __filename);
 app.loadViews(__dirname + '/views');
 
-let oneColor = require('onecolor');
-
 const ONE_DAY = 1000 * 60 * 60 * 24;
 const ONE_HOUR = 1000 * 60 * 60;
 const ONE_MINUTE = 1000 * 60;
 const BobId = "Bob123";
+
 
 let docReady = false;
 
@@ -213,7 +212,7 @@ app.proto.create = function (model) {
     self.factoidHandler = require('./public/collaborative-app/factoid/factoid-handler')(this) ;
     self.factoidHandler.initialize();
 
-
+    //
     //Loading cytoscape and clients
 
     let cyIds = self.modelManager.getCyIds();
@@ -232,6 +231,7 @@ app.proto.create = function (model) {
 
 
     self.editorListener = require('./public/collaborative-app/editor-listener.js')(self.modelManager,self.socket, id, self);
+
     //HACK: This is normally called when a new network is created, but the initial network is created before editor-listener
     //Lets editor-listener to subscribe to UI operations
     $(document).trigger('createNewNetwork', [appUtilities.getActiveCy(), appUtilities.getActiveNetworkId()]);
@@ -247,6 +247,8 @@ app.proto.create = function (model) {
 
             // console.log("Connection requested " + noTrips + " " + op);
             self.connectTripsAgent();
+
+            self.connectVisualizationHandler(self.modelManager);
         }
     }, 500); // wait a little while for the server to update user list and handle disconnections
 
@@ -373,7 +375,7 @@ app.proto.loadCyFromModel = function(cyId, callback){
 
             let container = $('#canvas-tab-area');
 
-            console.log("Panzoom updated");
+            // console.log("Panzoom updated");
             // appUtilities.getCyInstance(parseInt(cyId)).zoom(1); //was 2 before
             // appUtilities.getCyInstance(parseInt(cyId)).pan({x:container.width()/2, y:container.height()/2});
             //
@@ -855,6 +857,115 @@ app.proto.connectCausalityAgent = function(){
     this.socket.emit('connectToCausalityAgentRequest');
 };
 
+app.proto.connectVisualizationHandler = function(modelManager){
+    let self = this;
+
+
+    let VisHandler = require('./public/collaborative-app/visual-manipulation/vis-handler.js');
+    this.visHandler = new VisHandler(modelManager);
+
+};
+app.proto.findLabelAndStateOfSelectedNode = function() {
+
+    if (appUtilities.getActiveCy().nodes(":selected").length <= 0)
+        return;
+
+    let nodeSelected = appUtilities.getActiveCy().nodes(":selected")[0];
+
+    let nodeName = nodeSelected.data("label");
+
+    let state = null;
+    let statesandinfos = nodeSelected.data("statesandinfos");
+
+    if (statesandinfos && statesandinfos.length > 0) {
+        if (statesandinfos[0].clazz == "state variable") {
+            if (statesandinfos[0].state.value)
+                state = statesandinfos[0].state.value;
+            else
+                state = '';
+        }
+    }
+
+    return {name: nodeName, state:state}
+}
+
+app.proto.moveNode = function(){
+
+    let nodeProps = this.findLabelAndStateOfSelectedNode();
+    if(!nodeProps || !nodeProps.name) {
+        alert("Node not selected or it has an empty label");
+        return;
+    }
+
+    let el = document.getElementById("move-node");
+    let location = el.options[el.selectedIndex].text;
+
+    let cyId = appUtilities.getActiveNetworkId();
+
+
+
+    this.visHandler.moveNode({name: nodeProps.name, location: location, cyId:cyId, state:nodeProps.state});
+};
+
+app.proto.highlightNodeStream = function(){
+
+    let nodeProps = this.findLabelAndStateOfSelectedNode();
+    if(!nodeProps || !nodeProps.name){
+        alert("Node not selected or it has an empty label");
+        return;
+    }
+
+    let el = document.getElementById("highlight-node-stream");
+    let direction = el.options[el.selectedIndex].text;
+
+    let cyId = appUtilities.getActiveNetworkId();
+
+    this.visHandler.highlightNodeStream({name: nodeProps.name, direction:direction,  state:nodeProps.state, cyId:cyId} );
+};
+
+app.proto.selectNodeStream = function(){
+
+    let nodeProps = this.findLabelAndStateOfSelectedNode();
+    if(!nodeProps || !nodeProps.name){
+        alert("Node not selected or it has an empty label");
+        return;
+    }
+
+    let el = document.getElementById("select-node-stream");
+    let direction = el.options[el.selectedIndex].text;
+
+    let cyId = appUtilities.getActiveNetworkId();
+
+    this.visHandler.selectNodeStream({name: nodeProps.name, direction:direction,  state:nodeProps.state, cyId:cyId} );
+};
+
+
+app.proto.moveNodeStream = function(){
+
+    let nodeProps = this.findLabelAndStateOfSelectedNode();
+    if(!nodeProps || !nodeProps.name) {
+        alert("Node not selected or it has an empty label");
+        return;
+    }
+
+    let elDir = document.getElementById("move-node-stream-direction");
+    let direction = elDir.options[elDir.selectedIndex].text;
+
+    let elLoc = document.getElementById("move-node-stream-location");
+    let location = elLoc.options[elLoc.selectedIndex].text;
+
+    let cyId = appUtilities.getActiveNetworkId();
+
+    this.visHandler.moveNodeStream({name: nodeProps.name, direction:direction, location:location,  state:nodeProps.state, cyId:cyId} );
+};
+
+// app.proto.lockSelected  = function(){
+//     cy.elements(':selected').lock();
+// }
+
+app.proto.unlockSelected  = function(){
+    cy.elements(':selected').unlock();
+}
 
 app.proto.connectTripsAgent = function(){
     let self = this;
