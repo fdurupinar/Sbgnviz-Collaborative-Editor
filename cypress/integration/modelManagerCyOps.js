@@ -16,7 +16,8 @@ describe('modelManager Cytoscape Operations Test', function () {
 
     }
 
-    function addModelNode(cyId, id, delay) {
+
+    function addModelNode(cyId, id) {
 
         let testName = extendTestNameWithNetworkId('modelManager.addModelNode', cyId);
 
@@ -33,7 +34,9 @@ describe('modelManager Cytoscape Operations Test', function () {
 
                 modelManager.addModelNode(id, cyId, {position: {x: 100, y: 200} , data: {id: id, class: "macromolecule"}});
 
-                expect(cyInstance.getElementById(id)).to.be.ok;
+
+                    expect(cyInstance.getElementById(id).data).to.be.ok;
+
 
                 expect(modelManager.getModelNodeAttribute("data.id", id, cyId)).to.equal(cyInstance.getElementById(id).data("id"));
                 expect(cyInstance.getElementById(id).data("class")).to.equal("macromolecule");
@@ -549,7 +552,12 @@ describe('modelManager Cytoscape Operations Test', function () {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
                 modelManager.undoCommand();
+
+                let chiseInstance = window.appUtilities.getChiseInstance(cyId);
+                let cyInstance = chiseInstance.getCy();
                 expect(modelManager.getModelNode(id, cyId)).to.be.ok;
+                expect(cyInstance.getElementById(id).length).to.equal(1);
+
             });
         });
     }
@@ -562,11 +570,17 @@ describe('modelManager Cytoscape Operations Test', function () {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
                 modelManager.redoCommand();
-                expect(modelManager.getModelNode(id, cyId)).to.not.ok;
-                expect(window.appUtilities.getCyInstance(cyId).getElementById(id).length).to.be.equal(0);
+
+                    expect(modelManager.getModelNode(id, cyId)).to.not.ok;
+                let chiseInstance = window.appUtilities.getChiseInstance(cyId);
+                let cyInstance = chiseInstance.getCy();
+                expect(cyInstance.getElementById(id).length).to.equal(0);
+
             });
         });
     }
+
+
 
     function undoDeleteModelEdge(cyId, id){
 
@@ -594,10 +608,13 @@ describe('modelManager Cytoscape Operations Test', function () {
                 expect(window.appUtilities.getCyInstance(cyId).getElementById(id).length).to.be.equal(0);
             });
 
-            cy.wait(200);
 
         });
     }
+
+
+
+
 
     // inital expected network ids to traverse
     var initialNetworkIds = [0, 2];
@@ -625,40 +642,45 @@ describe('modelManager Cytoscape Operations Test', function () {
     // array that is traversed here should be updated accordingly.
     initialNetworkIds.forEach( function (cyId) {
 
-      addModelNode(cyId, "node1");
-      initModelNode(cyId, "node1");
-      getModelNode(cyId, "node1");
+            addModelNode(cyId, "node1");
+            initModelNode(cyId, "node1");
+            getModelNode(cyId, "node1");
 
-      addModelNode(cyId, "node2");
-      initModelNode(cyId, "node2");
+            addModelNode(cyId, "node2");
+            initModelNode(cyId, "node2");
 
-      addModelNode(cyId, "node3");
-      initModelNode(cyId, "node3");
+            addModelNode(cyId, "node3");
+            initModelNode(cyId, "node3");
 
-      addModelNode(cyId, "node4");
-      initModelNode(cyId, "node4");
+            addModelNode(cyId, "node4");
+            initModelNode(cyId, "node4");
 
 
-      addModelEdge(cyId, "node1","node2");
-      initModelEdge(cyId, "node1-node2");
+            addModelEdge(cyId, "node1", "node2");
+            initModelEdge(cyId, "node1-node2");
 
-      selectModelNode(cyId, "node1");
-      unselectModelNode(cyId, "node1");
+            selectModelNode(cyId, "node1");
+            unselectModelNode(cyId, "node1");
 
-      selectModelEdge(cyId, "node1-node2");
-      unselectModelEdge(cyId, "node1-node2");
+            selectModelEdge(cyId, "node1-node2");
+            unselectModelEdge(cyId, "node1-node2");
 
-      changeModelNodeAttribute(cyId, "node1");
-      changeModelEdgeAttribute(cyId, "node1-node2");
+            changeModelNodeAttribute(cyId, "node1");
+            changeModelEdgeAttribute(cyId, "node1-node2");
 
-      deleteModelNode(cyId, "node3");
-      undoDeleteModelNode(cyId, "node3");
-      redoDeleteModelNode(cyId, "node3");
+            deleteModelNode(cyId, "node1");
+            undoDeleteModelNode(cyId, "node1");
+            redoDeleteModelNode(cyId, "node1");
 
-      deleteModelEdge(cyId, "node1-node2");
-      undoDeleteModelEdge(cyId, "node1-node2");
-      redoDeleteModelEdge(cyId, "node1-node2");
+            deleteModelEdge(cyId, "node1-node2");
 
+            if(cyId !== 0) {
+                undoDeleteModelEdge(cyId, "node1-node2");
+                redoDeleteModelEdge(cyId, "node1-node2");
+            }
+
+
+    });
 
     });
 

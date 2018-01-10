@@ -201,7 +201,7 @@ app.proto.create = function (model) {
     // self.modelManager.setName( model.get('_session.userId'),name);
 
 
-    self.dynamicResize(model.get('_page.doc.images'));
+    self.dynamicResize();
 
     //Notify server about the client connection
     self.socket.emit("subscribeHuman", { userName:name, room:  model.get('_page.room'), userId: id});
@@ -231,7 +231,7 @@ app.proto.create = function (model) {
     self.notyView.close();
 
 
-    self.editorListener = require('./public/collaborative-app/editor-listener.js')(self.modelManager,self.socket, id);
+    self.editorListener = require('./public/collaborative-app/editor-listener.js')(self.modelManager,self.socket, id, self);
     //HACK: This is normally called when a new network is created, but the initial network is created before editor-listener
     //Lets editor-listener to subscribe to UI operations
     $(document).trigger('createNewNetwork', [appUtilities.getActiveCy(), appUtilities.getActiveNetworkId()]);
@@ -287,11 +287,6 @@ app.proto.listenToUIOperations = function(model){
 
     //change scroll position
     $('#messages').scrollTop($('#messages')[0].scrollHeight  - $('.message').height());
-
-    $(window).on('resize', function(){
-        let images = model.get('_page.doc.images');
-        self.dynamicResize(images);
-    });
 
 
     self.lastMsgInd = -1; //increment in app.proto.app
@@ -1026,20 +1021,20 @@ app.proto.formatObj = function(obj){
 };
 
 
-app.proto.dynamicResize = function (images) {
-    let win = $(window);
-    let windowWidth = win.width();
-    let windowHeight = win.height();
+app.proto.dynamicResize = function () {
+    // get window inner width and inner height that includes scrollbars when they are rendered
+    // using $(window).width() would be problematic when scrolls are visible
+    // please see: https://stackoverflow.com/questions/19582862/get-browser-window-width-including-scrollbar
+    // and https://developer.mozilla.org/en-US/docs/Web/API/Window/innerWidth
+    let windowWidth = window.innerWidth;
+    var windowHeight = window.innerHeight;
     let canvasWidth = 1200;
     let canvasHeight = 680;
 
+    let images = this.model.get('_page.doc.images');
+
 
     if (windowWidth > canvasWidth) {
-        $("#canvas-tab-area").resizable({
-                alsoResize: '#inspector-tab-area',
-                minWidth: 1000
-            }
-        );
 
         let wCanvasTab = $("#canvas-tab-area").width();
 
@@ -1047,22 +1042,17 @@ app.proto.dynamicResize = function (images) {
         $(".navbar").width(wCanvasTab);
         $("#sbgn-toolbar").width(wCanvasTab);
 
-        $("#network-panels-container").width( wCanvasTab* 0.99);
+        $("#network-panels-container").width(wCanvasTab);
 
         if(images) {
             images.forEach(function (img) {
-                $("#static-image-container-" + img.tabIndex).width(wCanvasTab * 0.99);
+                $("#static-image-container-" + img.tabIndex).width(wCanvasTab);
             });
         }
 
-
-        $("#inspector-tab-area").resizable({
-            minWidth:355
-        });
-
         let wInspectorTab = $("#inspector-tab-area").width();
         $("#sbgn-inspector").width(wInspectorTab);
-        $("#canvas-tabs").width( wCanvasTab* 0.99);
+        $("#canvas-tabs").width( wCanvasTab);
     }
     else {
         if(images) {
@@ -1075,23 +1065,13 @@ app.proto.dynamicResize = function (images) {
 
     if (windowHeight > canvasHeight) {
 
-        $("#canvas-tab-area").resizable({
-            alsoResize:'#inspector-tab-area',
-            minHeight: 600
-        });
-
         let hCanvasTab = $("#canvas-tab-area").height();
-        $("#network-panels-container").height(hCanvasTab * 0.99);
+        $("#network-panels-container").height(hCanvasTab);
         if(images) {
             images.forEach(function (img) {
-                $("#static-image-container-" + img.tabIndex).height(hCanvasTab * 0.99);
+                $("#static-image-container-" + img.tabIndex).height(hCanvasTab);
             });
         }
-
-        $("#inspector-tab-area").resizable({
-            alsoResize:'#canvas-tab-area',
-            minHeight: 600
-        });
 
         let hInspectorTab = $("#inspector-tab-area").height();
 
@@ -1099,7 +1079,45 @@ app.proto.dynamicResize = function (images) {
         $("#factoid-area").height(hInspectorTab * 0.9);
         $("#factoidBox").height(hInspectorTab * 0.6);
     }
+
+    // TODO it would be better if find a good place to move these resizable calls.
+    
+    // make canvas tab area resizable and resize some other components as it is resized
+    $("#canvas-tab-area").resizable({
+            alsoResize: '#inspector-tab-area, #network-panels-container',
+            minWidth: 1000,
+            minHeight: 600
+        }
+    );
+
+    // make inspector-tab-area resizable
+    $("#inspector-tab-area").resizable({
+        minWidth:355
+    });
+
+    // force each of the cytoscape.js
+    // instance renderer to recalculate the viewport bounds
+    this.resizeCyCanvases();
 };
+
+// force each of the cytoscape.js
+// instance renderer to recalculate the viewport bounds
+app.proto.resizeCyCanvases = function () {
+
+  // traverse each network id
+  for ( var i = 0; i < appUtilities.networkIdsStack.length; i++ ) {
+
+    // get current networkId
+    var networkId = appUtilities.networkIdsStack[i];
+
+    // get the associated cy instance
+    var cy = appUtilities.getCyInstance(networkId);
+
+    // force renderer of cy to recalculate the viewport bounds
+    cy.resize();
+  }
+
+}
 
 
 app.proto.testImageTab = function(){
@@ -1111,8 +1129,7 @@ app.proto.testImageTab = function(){
         fileName: "modelRXN"
     };
     var status = this.modelManager.addImage(imgData);
-    var images = this.modelManager.getImages();
-    this.dynamicResize(images);
+    this.dynamicResize();
 }
 ////////////////////////////////////////////////////////////////////////////
 //Local functions
