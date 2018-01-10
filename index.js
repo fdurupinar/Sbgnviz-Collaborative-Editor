@@ -1092,7 +1092,30 @@ app.proto.dynamicResize = function () {
             minHeight: 600
         }
     );
+
+    // force each of the cytoscape.js
+    // instance renderer to recalculate the viewport bounds
+    this.resizeCyCanvases();
 };
+
+// force each of the cytoscape.js
+// instance renderer to recalculate the viewport bounds
+app.proto.resizeCyCanvases = function () {
+
+  // traverse each network id
+  for ( var i = 0; i < appUtilities.networkIdsStack.length; i++ ) {
+
+    // get current networkId
+    var networkId = appUtilities.networkIdsStack[i];
+
+    // get the associated cy instance
+    var cy = appUtilities.getCyInstance(networkId);
+
+    // force renderer of cy to recalculate the viewport bounds
+    cy.resize();
+  }
+
+}
 
 
 app.proto.testImageTab = function(){
