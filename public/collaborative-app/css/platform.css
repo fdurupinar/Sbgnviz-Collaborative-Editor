@@ -35,6 +35,9 @@
     /*float: left;*/
 }
 
+#canvas-tab-area .ui-icon-gripsmall-diagonal-se {
+  z-index: 1000 !important;
+}
 
 #canvas-tabs{
     position: absolute;
@@ -62,7 +65,15 @@
 #network-panels-container {
     margin: auto;
     border:none;
+    height: var(--canvas-height);
+    width: var(--canvas-width);
+}
 
+/*Setting sizes of network panels would not be needed here
+if PR(https://github.com/iVis-at-Bilkent/newt/pull/223) is merged*/
+.network-panel {
+    height: 100%;
+    width: 100%;
 }
 
 #sbgn-inspector-and-canvas {
