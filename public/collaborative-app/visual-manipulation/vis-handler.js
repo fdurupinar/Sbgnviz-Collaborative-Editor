@@ -9,6 +9,7 @@ if(typeof module !== 'undefined' && module.exports){
 
     module.exports = VisHandler;
 }
+
 function VisHandler(modelManager){
 
     this.modelManager = modelManager;
@@ -30,6 +31,8 @@ VisHandler.prototype.initialize = function(){
 VisHandler.prototype.findNodeFromLabel = function(name, state, nodes) {
 
     let myNode = null;
+
+
     nodes.forEach(function(node){
         let label = node.data("label");
         if(label && label.toLowerCase() === name.toLowerCase()){
@@ -43,7 +46,6 @@ VisHandler.prototype.findNodeFromLabel = function(name, state, nodes) {
                         var value = sbgnstateandinfo.state.value;
                         if (value && value.toLowerCase() === state.toLowerCase() || !value && state === '') //if any state matches this
                             myNode = node;
-
                     }
                 }
             }
@@ -52,31 +54,6 @@ VisHandler.prototype.findNodeFromLabel = function(name, state, nodes) {
     });
 
     return myNode;
-}
-
-/***
- * Find the bounding box of a group of nodes
- * @param nodes
- */
-VisHandler.prototype.findBoundingBox = function(nodes){
-
-    let bBox = {left:100000, right: -100000, top: 100000, bottom: -100000};
-    nodes.forEach(function(node){
-        let nodePos = node.position();
-        if (nodePos.x < bBox.left)
-            bBox.left = nodePos.x;
-        else if (nodePos.x > bBox.right)
-            bBox.right = nodePos.x;
-
-        if (nodePos.y < bBox.top)
-            bBox.top = nodePos.y;
-        else if (nodePos.y > bBox.bottom)
-            bBox.bottom = nodePos.y;
-
-    });
-
-    return bBox;
-
 }
 
 /***
@@ -106,52 +83,139 @@ VisHandler.prototype.moveNode = function(data) {
     nodeToMove = self.findNodeFromLabel(name, state, nodes);
 
     //move our node first
-    let bBox = self.findBoundingBox(nodes);
+
+    let bBox = cy.elements().boundingBox();
+
     //extend bbox
-    bBox.left -= extensionX;
-    bBox.right += extensionX;
-    bBox.top -= extensionY;
-    bBox.bottom += extensionY;
+    bBox.x1 -= extensionX;
+    bBox.x2 += extensionX;
+    bBox.y1 -= extensionY;
+    bBox.y2 += extensionY;
+
+    if(location.indexOf('top')> -1)
+        posToMove = {x: (bBox.x1 + bBox.x2) / 2, y: bBox.y1};
+    else if(location.indexOf('bottom')> -1)
+        posToMove = {x: (bBox.x1 + bBox.x2) / 2, y: bBox.y2};
+    else if(location.indexOf('left')> -1)
+        posToMove = {x: bBox.x1, y: (bBox.y1 + bBox.y2) / 2};
+    else if(location.indexOf('right')> -1)
+        posToMove = {x: bBox.x2, y: (bBox.y1 + bBox.y2) / 2};
 
     //move node -- no need to update the model for now
     nodeToMove.position(posToMove);
 
-    nodeToMove.lock();
-    $("#perform-layout").trigger('click'); //run layout
-    cy.on('layoutstop', function() {
-        nodeToMove.unlock();
+    //make sure model is updated accordingly
+   self.modelManager.changeModelNodeAttribute("position", nodeToMove.data("id"), data.cyId, posToMove, "me");
 
-        nodes = appUtilities.getCyInstance(data.cyId).nodes();
+    // nodeToMove.lock();
 
-
-        //recompute bbox to update the node position
-        bBox = self.findBoundingBox(nodes);
-
-        bBox.left -= extensionX;
-        bBox.right += extensionX;
-        bBox.top -= extensionY;
-        bBox.bottom += extensionY;
-
-        location = location.toLowerCase();
-
-
-        if(location.indexOf('top')> -1)
-            posToMove = {x: (bBox.left + bBox.right) / 2, y: bBox.top};
-        else if(location.indexOf('bottom')> -1)
-            posToMove = {x: (bBox.left + bBox.right) / 2, y: bBox.bottom};
-        else if(location.indexOf('left')> -1)
-            posToMove = {x: bBox['left'], y: (bBox.top + bBox.bottom) / 2};
-        else if(location.indexOf('right')> -1)
-            posToMove = {x: bBox['right'], y: (bBox.top + bBox.bottom) / 2};
-
-
-        //update position
-        nodeToMove.position(posToMove);
-        //make sure model is updated accordingly
-        self.modelManager.changeModelNodeAttribute("position", nodeToMove.data("id"), data.cyId, posToMove, "me");
-
-
-    });
+    //perform layout on the rest of the elements
+    //
+    // //
+    // let nodeEdges = nodeToMove._private.edges;
+    // let elesRest = cy.elements().difference(nodeToMove.union(nodeEdges));
+    //
+    // let bBoxRest = bBox;
+    //
+    // // let bBoxRest = elesRest.boundingBox();
+    //
+    // // //update bounding box so that it constrains only one direction
+    // // // bBoxRest.w = bBoxRest.h = 1000;
+    //
+    // if(location.indexOf('top')> -1) {
+    //     bBoxRest.y1  =  posToMove.y + extensionY ;
+    // }
+    // else if(location.indexOf('bottom')> -1){
+    //     bBoxRest.y2  =  posToMove.y - extensionY;
+    // }
+    //
+    // else if(location.indexOf('left')> -1){
+    //     bBoxRest.x1  =  posToMove.x + extensionX;
+    // }
+    //
+    // else if(location.indexOf('right')> -1){
+    //     bBoxRest.x2  =  posToMove.x - extensionX;
+    // }
+    //
+    //
+    //
+    //
+    // let layoutOptions = this.modelManager.getLayoutProperties();
+    //
+    // layoutOptions.name = 'cose';
+    // layoutOptions.boundingBox = bBoxRest;
+    //
+    //
+    // let layoutRest = elesRest.layout(layoutOptions);
+    // layoutRest.run();
+    //
+    //
+    // //let the others learn about the layout updates
+    // let nodesRest = [];
+    // let paramList = [];
+    // elesRest.forEach(function(ele){
+    //     if(ele.isNode()){
+    //         nodesRest.push({id:ele.id(), isNode:true});
+    //         paramList.push(ele.position());
+    //
+    //     }
+    // });
+    // self.modelManager.changeModelElementGroupAttribute("position", nodesRest, data.cyId, paramList, "me");
+    //
+    //
+    //
+    // //
+    // let nodeEdges = nodeToMove._private.edges;
+    // let elesRest = cy.elements().difference(nodeToMove.union(nodeEdges));
+    //
+    // let bBoxRest = bBox;
+    //
+    // // let bBoxRest = elesRest.boundingBox();
+    //
+    // // //update bounding box so that it constrains only one direction
+    // // // bBoxRest.w = bBoxRest.h = 1000;
+    //
+    // if(location.indexOf('top')> -1) {
+    //     bBoxRest.y1  =  posToMove.y + extensionY ;
+    // }
+    // else if(location.indexOf('bottom')> -1){
+    //     bBoxRest.y2  =  posToMove.y - extensionY;
+    // }
+    //
+    // else if(location.indexOf('left')> -1){
+    //     bBoxRest.x1  =  posToMove.x + extensionX;
+    // }
+    //
+    // else if(location.indexOf('right')> -1){
+    //     bBoxRest.x2  =  posToMove.x - extensionX;
+    // }
+    //
+    //
+    //
+    //
+    // let layoutOptions = this.modelManager.getLayoutProperties();
+    //
+    // layoutOptions.name = 'cose';
+    // layoutOptions.boundingBox = bBoxRest;
+    //
+    //
+    // let layoutRest = elesRest.layout(layoutOptions);
+    // layoutRest.run();
+    //
+    //
+    // //let the others learn about the layout updates
+    // let nodesRest = [];
+    // let paramList = [];
+    // elesRest.forEach(function(ele){
+    //     if(ele.isNode()){
+    //         nodesRest.push({id:ele.id(), isNode:true});
+    //         paramList.push(ele.position());
+    //
+    //     }
+    // });
+    // self.modelManager.changeModelElementGroupAttribute("position", nodesRest, data.cyId, paramList, "me");
+    //
+    //
 
 }
 
@@ -164,7 +228,11 @@ VisHandler.prototype.highlightNodeStream = function(data){
 
     let cy = appUtilities.getCyInstance(data.cyId);
 
+    let chise = appUtilities.getChiseInstance(data.cyId)
+
+    chise.getSbgnvizInstance().removeHighlights();
     this.selectNodeStream(data);
+
 
     appUtilities.getChiseInstance(data.cyId).highlightSelected(cy.elements(':selected'));
 
@@ -182,15 +250,18 @@ VisHandler.prototype.selectNodeStream = function(data){
 
     let nodeIds = this.findStream(nodeId, data.direction, cy);
 
+    //unselect all first
+    cy.elements().unselect();
+
     //select elements
     nodeIds.forEach(function(id) {
-        cy.getElementById(nodeId).select();
+        cy.getElementById(id).select();
     });
 
 }
 
+
 /***
- * TODO
  * @param data
  */
 VisHandler.prototype.moveNodeStream = function(data){
@@ -201,10 +272,54 @@ VisHandler.prototype.moveNodeStream = function(data){
 
     let nodeIds = this.findStream(nodeId, data.direction, cy);
 
-    //highlight nodes nodeIds
-    nodeIds.forEach(function(id){
-        self.sendRequest("agentChangeNodeAttributeRequest", { id: id, cyId: data.cyId, attStr:"highlightStatus", attVal: "highlighted"});
+    //unselect all first
+    cy.elements().unselect();
+
+    //select elements
+    nodeIds.forEach(function(id) {
+        cy.getElementById(id).select();
     });
+
+
+
+    let streamEles = cy.elements(':selected');
+    let restEles = cy.elements().difference(streamEles);
+
+    let bBoxRest = restEles.boundingBox();
+    let bBoxStream = streamEles.boundingBox();
+
+
+    let posUpdate = {};
+    posUpdate.x = Math.abs(bBoxStream.x - bBoxRest.x);
+    posUpdate.y = Math.abs(bBoxStream.y - bBoxRest.y);
+    //unselect again
+    cy.elements().unselect();
+
+    let modelEles = [];
+    let paramList = [];
+    streamEles.forEach(function(ele){
+        let currPos = ele.position();
+        if(data.location.indexOf('top')> -1)  //move up
+            currPos.y -= 2 * Math.abs(currPos.y - bBoxRest.y1);
+        else if(data.location.indexOf('bottom')> -1)
+            currPos.y += 2 * Math.abs(currPos.y - bBoxRest.y2);
+        else if(data.location.indexOf('left')> -1)
+            currPos.x -= 2 * Math.abs(currPos.x - bBoxRest.x1);
+        else if(data.location.indexOf('right')> -1)
+            currPos.x += 2 * Math.abs(currPos.x - bBoxRest.x2);
+
+        ele.position(currPos);
+        modelEles.push({id: ele.id(), isNode: ele.isNode()});
+        paramList.push(currPos);
+
+    });
+
+
+    //update model so that others know
+    this.modelManager.changeModelElementGroupAttribute("position", modelEles, data.cyId, paramList, "me");
+
+
+
 }
 
 /***

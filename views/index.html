@@ -2121,54 +2121,64 @@
 
                     <table class = "visTable"><tbody >
                         <tr>
+
+
                             <td> Move selected node: </td>
                             <td>
-                                <select id = "move-node" on-click="moveNode()" >
+
+                                <select id = "move-node">
                                     <option selected = "selected">top</option>
                                     <option>bottom</option>
                                     <option>left</option>
                                     <option>right</option>
                                 </select>
+
                             </td>
+                            <td><button on-click = "moveNode()"> Submit </button></td>
+
                         </tr>
 
                         <tr>
                             <td>Highlight upstream or downstream of selected node: </td>
                             <td>
-                                <select id = "highlight-node-stream" on-click="highlightNodeStream()" >
-                                    <option selected = "selected">up</option>
-                                    <option>down</option>
+                                <select id = "highlight-node-stream">
+                                    <option >up</option>
+                                    <option selected = "selected">down</option>
                                 </select>
                             </td>
+                            <td><button on-click = "highlightNodeStream()"> Submit </button></td>
                         </tr>
 
                         <tr>
                             <td>Select upstream or downstream of selected node: </td>
                             <td>
-                                <select id = "select-node-stream" on-click="selectNodeStream()" >
-                                    <option selected = "selected">up</option>
-                                    <option>down</option>
+                                <select id = "select-node-stream">
+                                    <option >up</option>
+                                    <option selected = "selected">down</option>
                                 </select>
                             </td>
+                            <td><button on-click = "selectNodeStream()"> Submit </button></td>
                         </tr>
 
                         <tr>
                             <td>Move upstream or downstream of selected node: </td>
                             <td>
-                                <select id = "move-node-stream-direction" on-click="moveNodeStream()" >
-                                    <option selected = "selected">up</option>
-                                    <option>down</option>
+                                <select id = "move-node-stream-direction" >
+                                    <option >up</option>
+                                    <option selected = "selected">down</option>
                                 </select>
                             </td>
                             <td>
-                                <select id = "move-node-stream-location" on-click="moveNodeStream()" >
+                                <select id = "move-node-stream-location">
                                     <option selected = "selected">top</option>
                                     <option>bottom</option>
                                     <option>left</option>
                                     <option>right</option>
                                 </select>
                             </td>
+                            <td><button on-click = "moveNodeStream()"> Submit </button></td>
                         </tr>
+
 
 
                     </tbody></table>

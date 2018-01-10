@@ -212,9 +212,7 @@ app.proto.create = function (model) {
     self.factoidHandler = require('./public/collaborative-app/factoid/factoid-handler')(this) ;
     self.factoidHandler.initialize();
 
-    self.visualizationHandler =
-        self.factoidHandler.initialize();
-
+    //
     //Loading cytoscape and clients
 
     let cyIds = self.modelManager.getCyIds();
@@ -381,7 +379,7 @@ app.proto.loadCyFromModel = function(cyId, callback){
 
             let container = $('#canvas-tab-area');
 
-            console.log("Panzoom updated");
+            // console.log("Panzoom updated");
             // appUtilities.getCyInstance(parseInt(cyId)).zoom(1); //was 2 before
             // appUtilities.getCyInstance(parseInt(cyId)).pan({x:container.width()/2, y:container.height()/2});
             //
@@ -866,6 +864,7 @@ app.proto.connectCausalityAgent = function(){
 app.proto.connectVisualizationHandler = function(modelManager){
     let self = this;
 
+
     let VisHandler = require('./public/collaborative-app/visual-manipulation/vis-handler.js');
     this.visHandler = new VisHandler(modelManager);
 
@@ -897,11 +896,17 @@ app.proto.findLabelAndStateOfSelectedNode = function() {
 app.proto.moveNode = function(){
 
     let nodeProps = this.findLabelAndStateOfSelectedNode();
+    if(!nodeProps || !nodeProps.name) {
+        alert("Node not selected or it has an empty label");
+        return;
+    }
 
     let el = document.getElementById("move-node");
     let location = el.options[el.selectedIndex].text;
 
     let cyId = appUtilities.getActiveNetworkId();
+
+
 
     this.visHandler.moveNode({name: nodeProps.name, location: location, cyId:cyId, state:nodeProps.state});
 };
@@ -909,6 +914,10 @@ app.proto.moveNode = function(){
 app.proto.highlightNodeStream = function(){
 
     let nodeProps = this.findLabelAndStateOfSelectedNode();
+    if(!nodeProps || !nodeProps.name){
+        alert("Node not selected or it has an empty label");
+        return;
+    }
 
     let el = document.getElementById("highlight-node-stream");
     let direction = el.options[el.selectedIndex].text;
@@ -921,6 +930,10 @@ app.proto.highlightNodeStream = function(){
 app.proto.selectNodeStream = function(){
 
     let nodeProps = this.findLabelAndStateOfSelectedNode();
+    if(!nodeProps || !nodeProps.name){
+        alert("Node not selected or it has an empty label");
+        return;
+    }
 
     let el = document.getElementById("select-node-stream");
     let direction = el.options[el.selectedIndex].text;
@@ -934,6 +947,10 @@ app.proto.selectNodeStream = function(){
 app.proto.moveNodeStream = function(){
 
     let nodeProps = this.findLabelAndStateOfSelectedNode();
+    if(!nodeProps || !nodeProps.name) {
+        alert("Node not selected or it has an empty label");
+        return;
+    }
 
     let elDir = document.getElementById("move-node-stream-direction");
     let direction = elDir.options[elDir.selectedIndex].text;
@@ -943,8 +960,16 @@ app.proto.moveNodeStream = function(){
 
     let cyId = appUtilities.getActiveNetworkId();
 
-    this.visHandler.selectNodeStream({name: nodeProps.nodeName, direction:direction, location:location,  state:nodeProps.state, cyId:cyId} );
+    this.visHandler.moveNodeStream({name: nodeProps.name, direction:direction, location:location,  state:nodeProps.state, cyId:cyId} );
 };
+
+// app.proto.lockSelected  = function(){
+//     cy.elements(':selected').lock();
+// }
+
+app.proto.unlockSelected  = function(){
+    cy.elements(':selected').unlock();
+}
 
 app.proto.connectTripsAgent = function(){
     let self = this;
