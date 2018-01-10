@@ -69,9 +69,11 @@
     width: var(--canvas-width);
 }
 
+/*Setting sizes of network panels would not be needed here
+if PR(https://github.com/iVis-at-Bilkent/newt/pull/223) is merged*/
 .network-panel {
-    height: var(--canvas-height);
-    width: var(--canvas-width);
+    height: 100%;
+    width: 100%;
 }
 
 #sbgn-inspector-and-canvas {

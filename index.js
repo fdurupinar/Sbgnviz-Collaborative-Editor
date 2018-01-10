@@ -1042,7 +1042,7 @@ app.proto.dynamicResize = function () {
         $(".navbar").width(wCanvasTab);
         $("#sbgn-toolbar").width(wCanvasTab);
 
-        $("#network-panels-container, .network-panel").width(wCanvasTab);
+        $("#network-panels-container").width(wCanvasTab);
 
         if(images) {
             images.forEach(function (img) {
@@ -1071,7 +1071,7 @@ app.proto.dynamicResize = function () {
     if (windowHeight > canvasHeight) {
 
         let hCanvasTab = $("#canvas-tab-area").height();
-        $("#network-panels-container, .network-panel").height(hCanvasTab);
+        $("#network-panels-container").height(hCanvasTab);
         if(images) {
             images.forEach(function (img) {
                 $("#static-image-container-" + img.tabIndex).height(hCanvasTab);
@@ -1087,7 +1087,7 @@ app.proto.dynamicResize = function () {
 
     // make canvas tab area resizable and resize some other components as it is resized
     $("#canvas-tab-area").resizable({
-            alsoResize: '#inspector-tab-area, #network-panels-container, .network-panel',
+            alsoResize: '#inspector-tab-area, #network-panels-container',
             minWidth: 1000,
             minHeight: 600
         }

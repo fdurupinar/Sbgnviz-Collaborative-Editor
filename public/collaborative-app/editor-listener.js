@@ -77,6 +77,24 @@ module.exports = function(modelManager, socket, userId, app){
         lastCopiedElesCy = cy;
     } );
 
+    // listen 'resizestop' event on canvas tab area and force each of the cytoscape.js
+    // instance renderer to recalculate the viewport bounds.
+    $("#canvas-tab-area").on('resizestop', function () {
+
+        // traverse each network id
+        for ( var i = 0; i < appUtilities.networkIdsStack.length; i++ ) {
+
+          // get current networkId
+          var networkId = appUtilities.networkIdsStack[i];
+
+          // get the associated cy instance
+          var cy = appUtilities.getCyInstance(networkId);
+
+          // force renderer of cy to recalculate the viewport bounds
+          cy.resize();
+        }
+
+    });
 
     $("#new-file, #new-file-icon").click(function () {
         modelManager.openCy(appUtilities.getActiveNetworkId(), "me");

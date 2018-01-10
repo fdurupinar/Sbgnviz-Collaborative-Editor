@@ -408,7 +408,14 @@ appUtilities.createNewNetwork = function (networkIdParam) {
   appUtilities.chooseNetworkTab(networkId);
 
   // resize html components according to the window size
-  appUtilities.dynamicResize();
+  // CWC change
+  // The following line unexpectedly causing a little bug when
+  // canvas is resized through resize handle at the bottom right.
+  // It is commented out here for now and
+  // by the PR (https://github.com/iVis-at-Bilkent/newt/pull/223)
+  // it is removed from Newt. This change will not be needed
+  // if it is merged and that version of Newt is used.
+  // appUtilities.dynamicResize();
 
   // activate palette tab
   if (!$('#inspector-palette-tab').hasClass('active')) {
