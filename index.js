@@ -212,6 +212,8 @@ app.proto.create = function (model) {
     self.factoidHandler = require('./public/collaborative-app/factoid/factoid-handler')(this) ;
     self.factoidHandler.initialize();
 
+    self.visualizationHandler =
+        self.factoidHandler.initialize();
 
     //Loading cytoscape and clients
 
@@ -230,7 +232,7 @@ app.proto.create = function (model) {
     self.notyView.close();
 
 
-    self.editorListener = require('./public/collaborative-app/editor-listener.js')(self.modelManager,self.socket, id);
+    self.editorListener = require('./public/collaborative-app/editor-listener.js')(self.modelManager,self.socket, id, this);
     //HACK: This is normally called when a new network is created, but the initial network is created before editor-listener
     //Lets editor-listener to subscribe to UI operations
     $(document).trigger('createNewNetwork', [appUtilities.getActiveCy(), appUtilities.getActiveNetworkId()]);
@@ -247,7 +249,7 @@ app.proto.create = function (model) {
             // console.log("Connection requested " + noTrips + " " + op);
             self.connectTripsAgent();
 
-            self.connectVisAgent();
+            self.connectVisualizationHandler(self.modelManager);
         }
     }, 500); // wait a little while for the server to update user list and handle disconnections
 
@@ -861,32 +863,88 @@ app.proto.connectCausalityAgent = function(){
     this.socket.emit('connectToCausalityAgentRequest');
 };
 
-app.proto.connectVisAgent = function(){
+app.proto.connectVisualizationHandler = function(modelManager){
     let self = this;
-    let VisAgent = require('./agent-interaction/VisAgent.js');
-    this.visA = new VisAgent("VisAgent123")
 
-    self.visA.connectToServer("http://localhost:3000/", function(){
-        self.visA.loadModel(function () {
-            self.visA.loadChatHistory(function () {
-                self.visA.init(); //connects to trips
-            });
-        });
-    });
+    let VisHandler = require('./public/collaborative-app/visual-manipulation/vis-handler.js');
+    this.visHandler = new VisHandler(modelManager);
+
+};
+app.proto.findLabelAndStateOfSelectedNode = function() {
+
+    if (appUtilities.getActiveCy().nodes(":selected").length <= 0)
+        return;
+
+    let nodeSelected = appUtilities.getActiveCy().nodes(":selected")[0];
+
+    let nodeName = nodeSelected.data("label");
+
+    let state = null;
+    let statesandinfos = nodeSelected.data("statesandinfos");
+
+    if (statesandinfos && statesandinfos.length > 0) {
+        if (statesandinfos[0].clazz == "state variable") {
+            if (statesandinfos[0].state.value)
+                state = statesandinfos[0].state.value;
+            else
+                state = '';
+        }
+    }
+
+    return {name: nodeName, state:state}
+}
+
+app.proto.moveNode = function(){
+
+    let nodeProps = this.findLabelAndStateOfSelectedNode();
+
+    let el = document.getElementById("move-node");
+    let location = el.options[el.selectedIndex].text;
+
+    let cyId = appUtilities.getActiveNetworkId();
+
+    this.visHandler.moveNode({name: nodeProps.name, location: location, cyId:cyId, state:nodeProps.state});
 };
 
-// app.proto.moveNode = function(location){
-//
-//     if(appUtilities.getActiveCy().nodes(":selected").length <= 0)
-//         return;
-//
-//     if(this.visA == null)
-//         this.connectVisAgent();
-//
-//     let nodeName =  appUtilities.getActiveCy().nodes(":selected")[0].data("label");
-//     this.visA.moveNode(nodeName, location);
-// };
+app.proto.highlightNodeStream = function(){
 
+    let nodeProps = this.findLabelAndStateOfSelectedNode();
+
+    let el = document.getElementById("highlight-node-stream");
+    let direction = el.options[el.selectedIndex].text;
+
+    let cyId = appUtilities.getActiveNetworkId();
+
+    this.visHandler.highlightNodeStream({name: nodeProps.name, direction:direction,  state:nodeProps.state, cyId:cyId} );
+};
+
+app.proto.selectNodeStream = function(){
+
+    let nodeProps = this.findLabelAndStateOfSelectedNode();
+
+    let el = document.getElementById("select-node-stream");
+    let direction = el.options[el.selectedIndex].text;
+
+    let cyId = appUtilities.getActiveNetworkId();
+
+    this.visHandler.selectNodeStream({name: nodeProps.name, direction:direction,  state:nodeProps.state, cyId:cyId} );
+};
+
+
+app.proto.moveNodeStream = function(){
+
+    let nodeProps = this.findLabelAndStateOfSelectedNode();
+
+    let elDir = document.getElementById("move-node-stream-direction");
+    let direction = elDir.options[elDir.selectedIndex].text;
+
+    let elLoc = document.getElementById("move-node-stream-location");
+    let location = elLoc.options[elLoc.selectedIndex].text;
+
+    let cyId = appUtilities.getActiveNetworkId();
+
+    this.visHandler.selectNodeStream({name: nodeProps.nodeName, direction:direction, location:location,  state:nodeProps.state, cyId:cyId} );
+};
 
 app.proto.connectTripsAgent = function(){
     let self = this;
@@ -1074,11 +1132,11 @@ app.proto.dynamicResize = function (images) {
         $(".navbar").width(wCanvasTab);
         $("#sbgn-toolbar").width(wCanvasTab);
 
-        $("#network-panels-container").width( wCanvasTab* 0.99);
+        $("#network-panels-container").width( wCanvasTab* 1);
 
         if(images) {
             images.forEach(function (img) {
-                $("#static-image-container-" + img.tabIndex).width(wCanvasTab * 0.99);
+                $("#static-image-container-" + img.tabIndex).width(wCanvasTab * 1);
             });
         }
 
@@ -1108,10 +1166,10 @@ app.proto.dynamicResize = function (images) {
         });
 
         let hCanvasTab = $("#canvas-tab-area").height();
-        $("#network-panels-container").height(hCanvasTab * 0.99);
+        $("#network-panels-container").height(hCanvasTab *1);
         if(images) {
             images.forEach(function (img) {
-                $("#static-image-container-" + img.tabIndex).height(hCanvasTab * 0.99);
+                $("#static-image-container-" + img.tabIndex).height(hCanvasTab * 1);
             });
         }
 

@@ -7,7 +7,7 @@ let modelMergeFunctions = require('./model-merge-functions.js')();
 // Use mousetrap library to listen keyboard events
 let Mousetrap = require('mousetrap');
 
-module.exports = function(modelManager, socket, userId){
+module.exports = function(modelManager, socket, userId, app){
 
     // get a new mousetrap instance
     var mt = new Mousetrap();

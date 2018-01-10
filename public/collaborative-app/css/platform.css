@@ -382,9 +382,8 @@ input[type="file"] {
     margin-bottom: 5px;
     /*padding:  10px;*/
 
-
-
 }
+
 
 
 .td{
@@ -551,4 +550,11 @@ input[type="file"] {
     padding: 10px;
     margin-left: 10px;
     font-size: medium;
+}
+
+.visTable{
+    margin: 10px;
+}
+.visTable td{
+    padding: 10px;
 }
