@@ -408,7 +408,14 @@ appUtilities.createNewNetwork = function (networkIdParam) {
   appUtilities.chooseNetworkTab(networkId);
 
   // resize html components according to the window size
-  appUtilities.dynamicResize();
+  // CWC change
+  // The following line unexpectedly causing a little bug when
+  // canvas is resized through resize handle at the bottom right.
+  // It is commented out here for now and
+  // by the PR (https://github.com/iVis-at-Bilkent/newt/pull/223)
+  // it is removed from Newt. This change will not be needed
+  // if it is merged and that version of Newt is used.
+  // appUtilities.dynamicResize();
 
   // activate palette tab
   if (!$('#inspector-palette-tab').hasClass('active')) {
@@ -850,6 +857,12 @@ appUtilities.dynamicResize = function () {
     $("#network-panels-container, .network-panel").height(windowHeight * 0.85);
     $("#sbgn-inspector").height(windowHeight * 0.85);
   }
+
+  // CWC change
+  // when dynamic resize is called from newt side it should be called from CWC specific part as well
+  // this change will not be needed when the related PR (https://github.com/iVis-at-Bilkent/newt/pull/222) is merged
+  // to Newt and the updated version of Newt is being used
+  $(document).trigger('newtAfterDynamicResize');
 };
 /*
 appUtilities.nodeQtipFunction = function (node) {

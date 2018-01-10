@@ -7,7 +7,7 @@ let modelMergeFunctions = require('./model-merge-functions.js')();
 // Use mousetrap library to listen keyboard events
 let Mousetrap = require('mousetrap');
 
-module.exports = function(modelManager, socket, userId){
+module.exports = function(modelManager, socket, userId, app){
 
     // get a new mousetrap instance
     var mt = new Mousetrap();
@@ -21,7 +21,6 @@ module.exports = function(modelManager, socket, userId){
     // listen to "ctrl/command + m" keyboard event
     mt.bind(["ctrl+m", "command+m"], function () {
 
-        // TODO perform the merge staff here
         console.log('to perform merge operation here');
 
         // get the active chise instance
@@ -62,6 +61,11 @@ module.exports = function(modelManager, socket, userId){
         // },1000);
     });
 
+    // call dynamicResize of CWC when dynamicResize is called for newt
+    $(document).on('newtAfterDynamicResize', function () {
+      app.dynamicResize();
+    });
+
     $(document).on("CWC_after_copy", function (event, eleJsons, cy) {
 
         console.log('common clipboard is updated');
@@ -73,6 +77,13 @@ module.exports = function(modelManager, socket, userId){
         lastCopiedElesCy = cy;
     } );
 
+    // listen 'resizestop' event on canvas tab area and force each of the cytoscape.js
+    // instance renderer to recalculate the viewport bounds.
+    $("#canvas-tab-area").on('resizestop', function () {
+
+        app.resizeCyCanvases();
+
+    });
 
     $("#new-file, #new-file-icon").click(function () {
         modelManager.openCy(appUtilities.getActiveNetworkId(), "me");
