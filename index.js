@@ -1050,11 +1050,6 @@ app.proto.dynamicResize = function () {
             });
         }
 
-
-        $("#inspector-tab-area").resizable({
-            minWidth:355
-        });
-
         let wInspectorTab = $("#inspector-tab-area").width();
         $("#sbgn-inspector").width(wInspectorTab);
         $("#canvas-tabs").width( wCanvasTab);
@@ -1085,6 +1080,8 @@ app.proto.dynamicResize = function () {
         $("#factoidBox").height(hInspectorTab * 0.6);
     }
 
+    // TODO it would be better if find a good place to move these resizable calls.
+    
     // make canvas tab area resizable and resize some other components as it is resized
     $("#canvas-tab-area").resizable({
             alsoResize: '#inspector-tab-area, #network-panels-container',
@@ -1092,6 +1089,11 @@ app.proto.dynamicResize = function () {
             minHeight: 600
         }
     );
+
+    // make inspector-tab-area resizable
+    $("#inspector-tab-area").resizable({
+        minWidth:355
+    });
 
     // force each of the cytoscape.js
     // instance renderer to recalculate the viewport bounds
