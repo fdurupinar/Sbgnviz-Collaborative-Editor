@@ -838,27 +838,21 @@ module.exports.start = function(io, model, cancerDataOrganizer){
 
         socket.on('agentConnectToTripsRequest', function(param){
             console.log("Agent trips connection request");
-
-            if(param.isInterfaceAgent){
-                if(!tripsGeneralInterfaceInstance || !tripsGeneralInterfaceInstance.isConnectedToTrips()) {
-                    let TripsGeneralInterfaceModule = require('./trips/TripsGeneralInterfaceModule.js');
-                    tripsGeneralInterfaceInstance = new TripsGeneralInterfaceModule(param.userId, param.userName, socket, model, askHuman);
-                }
-                else {//already there is an instance
-                    tripsGeneralInterfaceInstance.updateWebSocket(socket);
-                    tripsGeneralInterfaceInstance.updateListeners(socket);
-                }
+            if(!tripsGeneralInterfaceInstance || !tripsGeneralInterfaceInstance.isConnectedToTrips()) {
+                let TripsGeneralInterfaceModule = require('./trips/TripsGeneralInterfaceModule.js');
+                tripsGeneralInterfaceInstance = new TripsGeneralInterfaceModule(param.userId, param.userName, socket, model, askHuman);
             }
-            else if(param.isVisualizationAgent){
-                console.log("trips causality module connection " + socket.id + " room: " + socket.room);
-
-                if(!tripsVisualizationInterfaceInstance || !tripsVisualizationInterfaceInstance.isConnectedToTrips()) {
-                    let tripsVisualizationInterfaceModule = require('./trips/TripsVisualizationInterfaceModule.js');
-                    tripsVisualizationInterfaceInstance = new tripsVisualizationInterfaceModule(param.userId, param.userName, socket, model, askHuman);
-                }
-                else {
-                    tripsVisualizationInterfaceInstance.updateWebSocket(socket);
-                }
+            else {//already there is an instance
+                tripsGeneralInterfaceInstance.updateWebSocket(socket);
+                tripsGeneralInterfaceInstance.updateListeners(socket);
+            }
+        //connect vismodule when the trips agent is connected
+            if(!tripsVisualizationInterfaceInstance || !tripsVisualizationInterfaceInstance.isConnectedToTrips()) {
+                let tripsVisualizationInterfaceModule = require('./trips/TripsVisualizationInterfaceModule.js');
+                tripsVisualizationInterfaceInstance = new tripsVisualizationInterfaceModule(param.userId, param.userName, socket, model, askHuman);
+            }
+            else {
+                tripsVisualizationInterfaceInstance.updateWebSocket(socket);
             }
         });
     };

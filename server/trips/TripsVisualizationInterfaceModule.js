@@ -69,6 +69,10 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
             self.moveGeneStream(text);
         });
 
+        pattern = {0: 'request', 1: '&key', content: ['highlight-gene-stream', '.', '*']};
+        self.tm.addHandler(pattern, function (text) {
+            self.highlightGeneStream(text);
+        });
     }
 
 
@@ -77,7 +81,9 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
         let contentObj = KQML.keywordify(text.content);
         if (contentObj) {
             self.getTermName(contentObj.name, function (geneName) {
-                self.askHuman(self.agentId, self.room, "moveGene", {name: geneName, state: contentObj.state, location: contentObj.location, cyId: "0"}, function (val) {
+                let state = trimDoubleQuotes(contentObj.state);
+                let location = trimDoubleQuotes(contentObj.location);
+                self.askHuman(self.agentId, self.room, "moveGene", {name: geneName, state: state, location: location, cyId: "0"}, function (val) {
 
                     // self.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
                 });
@@ -91,8 +97,35 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
         let contentObj = KQML.keywordify(text.content);
         if (contentObj) {
             self.getTermName(contentObj.name, function (geneName) {
-                self.askHuman(self.agentId, self.room, "moveGeneStream", {name: geneName, state: contentObj.state, location:contentObj.location, cyId: "0", direction: contentObj.direction}, function (val) {
+                let state = trimDoubleQuotes(contentObj.state);
+                let location = trimDoubleQuotes(contentObj.location);
+                let direction = trimDoubleQuotes(contentObj.direction);
+                if(direction.toLowerCase().indexOf("upstream")> 0)
+                    direction = "up";
+                else if(direction.toLowerCase().indexOf("downstream")> 0)
+                    direction = "down";
+                self.askHuman(self.agentId, self.room, "moveGeneStream", {name: geneName, state: state, location:location, cyId: "0", direction: direction}, function (val) {
 
+
+
+                });
+            });
+        }
+    }
+
+
+    highlightGeneStream(text) {
+        let self = this;
+        let contentObj = KQML.keywordify(text.content);
+        if (contentObj) {
+            self.getTermName(contentObj.name, function (geneName) {
+                let state = trimDoubleQuotes(contentObj.state);
+                let direction = trimDoubleQuotes(contentObj.direction);
+                if(direction.toLowerCase().indexOf("upstream")> 0)
+                    direction = "up";
+                else if(direction.toLowerCase().indexOf("downstream")> 0)
+                    direction = "down";
+                self.askHuman(self.agentId, self.room, "highlightGeneStream", {name: geneName, state: state, cyId: "0", direction: direction}, function (val) {
 
 
                 });

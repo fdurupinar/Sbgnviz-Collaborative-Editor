@@ -372,14 +372,20 @@ module.exports =  function(app) {
 
             app.socket.on('moveGene', function ( data, callback) {
 
-                app.visA.moveNode(data);
+                app.visHandler.moveNode(data);
             });
 
 
             app.socket.on('moveGeneStream', function ( data, callback) {
 
-                app.visA.moveNodeStream(data);
+                app.visHandler.moveNodeStream(data);
             });
+
+            app.socket.on('highlightGeneStream', function ( data, callback) {
+                console.log(data);
+                app.visHandler.highlightNodeStream(data);
+            });
+
 
             app.socket.on("changeLockState", function(data, callback){
                 if(!data.cyId)
@@ -390,9 +396,6 @@ module.exports =  function(app) {
                     appUtilities.getCyInstance(data.cyId).getElementById(data.id).lock();
                 else
                     appUtilities.getCyInstance(data.cyId).getElementById(data.id).unlock();
-
-
-
             });
 
         },

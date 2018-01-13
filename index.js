@@ -889,6 +889,26 @@ app.proto.findLabelAndStateOfSelectedNode = function() {
     return {name: nodeName, state:state}
 }
 
+app.proto.lockNodes = function () {
+
+    let nodes = appUtilities.getActiveCy().nodes(":selected");
+    if (nodes.length <= 0)
+        return;
+
+    nodes.lock();
+
+}
+
+app.proto.unlockNodes = function () {
+
+    let nodes = appUtilities.getActiveCy().nodes(":selected");
+    if (nodes.length <= 0)
+        return;
+
+    nodes.unlock();
+
+}
+
 app.proto.moveNode = function(){
 
     let nodeProps = this.findLabelAndStateOfSelectedNode();
@@ -958,6 +978,22 @@ app.proto.moveNodeStream = function(){
 
     this.visHandler.moveNodeStream({name: nodeProps.name, direction:direction, location:location,  state:nodeProps.state, cyId:cyId} );
 };
+
+
+
+app.proto.moveCompartment = function(){
+
+    let compName = document.getElementById("move-compartment-name").value;
+
+    let elLoc = document.getElementById("move-compartment-location");
+    let location = elLoc.options[elLoc.selectedIndex].text;
+
+    let cyId = appUtilities.getActiveNetworkId();
+
+    this.visHandler.moveCompartmentNodes({name: compName, location:location,  cyId:cyId} );
+};
+
+
 
 // app.proto.lockSelected  = function(){
 //     cy.elements(':selected').lock();

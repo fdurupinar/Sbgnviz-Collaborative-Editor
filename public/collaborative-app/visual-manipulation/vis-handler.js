@@ -13,16 +13,13 @@ if(typeof module !== 'undefined' && module.exports){
 function VisHandler(modelManager){
 
     this.modelManager = modelManager;
+
 }
 
-/***
- * Makes sure we connect to trips to listen to visual manipulation requests
- */
-VisHandler.prototype.initialize = function(){
-    this.sendRequest('agentConnectToTripsRequest', {isVisualizationAgent: true, userName: this.agentName}, function(result){
-    });
-}
 
+const possibleStates = {
+    "ont::phosphorylation": ["p", "phosphorylation", "phospho", "phosphorylated"]
+}
 
 /***
  * @param name
@@ -32,26 +29,36 @@ VisHandler.prototype.findNodeFromLabel = function(name, state, nodes) {
 
     let myNode = null;
 
+    let possibleNodes = [];
 
-    nodes.forEach(function(node){
+    nodes.forEach(function(node) {
         let label = node.data("label");
-        if(label && label.toLowerCase() === name.toLowerCase()){
-            if(state == null) //no need to compare
-                myNode = node;
-            else {
-                let statesandinfos = node.data("statesandinfos");
-                for (var i = 0; i < statesandinfos.length; i++) {
-                    var sbgnstateandinfo = statesandinfos[i];
-                    if (sbgnstateandinfo.clazz == "state variable") {
-                        var value = sbgnstateandinfo.state.value;
-                        if (value && value.toLowerCase() === state.toLowerCase() || !value && state === '') //if any state matches this
-                            myNode = node;
-                    }
+        if (label && label.toLowerCase() === name.toLowerCase()) {
+            possibleNodes.push(node);
+        }
+    });
+
+    if(state == null && nodes.length > 0) //no need to compare
+        myNode = nodes[0];
+    else{
+
+
+        //now look at possible nodes to compare states
+        possibleNodes.forEach(function(node){
+
+            let statesandinfos = node.data("statesandinfos");
+            for (var i = 0; i < statesandinfos.length; i++) {
+                var sbgnstateandinfo = statesandinfos[i];
+                if (sbgnstateandinfo.clazz == "state variable") {
+                    var value = sbgnstateandinfo.state.value;
+                    if (value && value.toLowerCase() === state.toLowerCase() ||
+                        value && possibleStates[state.toLowerCase()] && possibleStates[state.toLowerCase()].indexOf(value.toLowerCase()) || !value && state === '') //if any state matches this
+                        myNode = node;
                 }
             }
-        }
 
-    });
+        });
+    }
 
     return myNode;
 }
@@ -107,115 +114,45 @@ VisHandler.prototype.moveNode = function(data) {
     //make sure model is updated accordingly
    self.modelManager.changeModelNodeAttribute("position", nodeToMove.data("id"), data.cyId, posToMove, "me");
 
-    // nodeToMove.lock();
 
-    //perform layout on the rest of the elements
-    //
-    // //
-    // let nodeEdges = nodeToMove._private.edges;
-    // let elesRest = cy.elements().difference(nodeToMove.union(nodeEdges));
-    //
-    // let bBoxRest = bBox;
-    //
-    // // let bBoxRest = elesRest.boundingBox();
-    //
-    // // //update bounding box so that it constrains only one direction
-    // // // bBoxRest.w = bBoxRest.h = 1000;
-    //
-    // if(location.indexOf('top')> -1) {
-    //     bBoxRest.y1  =  posToMove.y + extensionY ;
-    // }
-    // else if(location.indexOf('bottom')> -1){
-    //     bBoxRest.y2  =  posToMove.y - extensionY;
-    // }
-    //
-    // else if(location.indexOf('left')> -1){
-    //     bBoxRest.x1  =  posToMove.x + extensionX;
-    // }
-    //
-    // else if(location.indexOf('right')> -1){
-    //     bBoxRest.x2  =  posToMove.x - extensionX;
-    // }
-    //
-    //
-    //
-    //
-    // let layoutOptions = this.modelManager.getLayoutProperties();
-    //
-    // layoutOptions.name = 'cose';
-    // layoutOptions.boundingBox = bBoxRest;
-    //
-    //
-    // let layoutRest = elesRest.layout(layoutOptions);
-    // layoutRest.run();
-    //
-    //
-    // //let the others learn about the layout updates
-    // let nodesRest = [];
-    // let paramList = [];
-    // elesRest.forEach(function(ele){
-    //     if(ele.isNode()){
-    //         nodesRest.push({id:ele.id(), isNode:true});
-    //         paramList.push(ele.position());
-    //
-    //     }
-    // });
-    // self.modelManager.changeModelElementGroupAttribute("position", nodesRest, data.cyId, paramList, "me");
-    //
-    //
-    //
-    // //
-    // let nodeEdges = nodeToMove._private.edges;
-    // let elesRest = cy.elements().difference(nodeToMove.union(nodeEdges));
-    //
-    // let bBoxRest = bBox;
-    //
-    // // let bBoxRest = elesRest.boundingBox();
-    //
-    // // //update bounding box so that it constrains only one direction
-    // // // bBoxRest.w = bBoxRest.h = 1000;
-    //
-    // if(location.indexOf('top')> -1) {
-    //     bBoxRest.y1  =  posToMove.y + extensionY ;
-    // }
-    // else if(location.indexOf('bottom')> -1){
-    //     bBoxRest.y2  =  posToMove.y - extensionY;
-    // }
-    //
-    // else if(location.indexOf('left')> -1){
-    //     bBoxRest.x1  =  posToMove.x + extensionX;
-    // }
-    //
-    // else if(location.indexOf('right')> -1){
-    //     bBoxRest.x2  =  posToMove.x - extensionX;
-    // }
-    //
-    //
-    //
-    //
-    // let layoutOptions = this.modelManager.getLayoutProperties();
-    //
-    // layoutOptions.name = 'cose';
-    // layoutOptions.boundingBox = bBoxRest;
-    //
-    //
-    // let layoutRest = elesRest.layout(layoutOptions);
-    // layoutRest.run();
-    //
-    //
-    // //let the others learn about the layout updates
-    // let nodesRest = [];
-    // let paramList = [];
-    // elesRest.forEach(function(ele){
-    //     if(ele.isNode()){
-    //         nodesRest.push({id:ele.id(), isNode:true});
-    //         paramList.push(ele.position());
-    //
-    //     }
-    // });
-    // self.modelManager.changeModelElementGroupAttribute("position", nodesRest, data.cyId, paramList, "me");
-    //
-    //
+   //
+   // nodeToMove.lock();
+   //
+   //
+   //  // $("#perform-layout").trigger('click');
+   //
+   //  let layoutCose = cy.layout({'name': 'cose', iterative:true});
+   //  layoutCose.run();
+   //
+   //  cy.on('layoutstop', function() {
+   //      nodeToMove.unlock();
+   //
+   //      //move again
+   //
+   //      let bBox = cy.elements().boundingBox();
+   //
+   //      //extend bbox
+   //      bBox.x1 -= extensionX;
+   //      bBox.x2 += extensionX;
+   //      bBox.y1 -= extensionY;
+   //      bBox.y2 += extensionY;
+   //
+   //      if(location.indexOf('top')> -1)
+   //          posToMove = {x: (bBox.x1 + bBox.x2) / 2, y: bBox.y1};
+   //      else if(location.indexOf('bottom')> -1)
+   //          posToMove = {x: (bBox.x1 + bBox.x2) / 2, y: bBox.y2};
+   //      else if(location.indexOf('left')> -1)
+   //          posToMove = {x: bBox.x1, y: (bBox.y1 + bBox.y2) / 2};
+   //      else if(location.indexOf('right')> -1)
+   //          posToMove = {x: bBox.x2, y: (bBox.y1 + bBox.y2) / 2};
+   //
+   //      //move node -- no need to update the model for now
+   //      nodeToMove.position(posToMove);
+   //
+   //      //make sure model is updated accordingly
+   //      self.modelManager.changeModelNodeAttribute("position", nodeToMove.data("id"), data.cyId, posToMove, "me");
+   //
+   //  });
 
 }
 
@@ -264,7 +201,7 @@ VisHandler.prototype.selectNodeStream = function(data){
 /***
  * @param data
  */
-VisHandler.prototype.moveNodeStream = function(data){
+VisHandler.prototype.moveNodeStream = function(data) {
     let self = this;
 
     let cy = appUtilities.getCyInstance(data.cyId);
@@ -272,8 +209,10 @@ VisHandler.prototype.moveNodeStream = function(data){
 
     let nodeIds = this.findStream(nodeId, data.direction, cy);
 
+
     //unselect all first
     cy.elements().unselect();
+
 
     //select elements
     nodeIds.forEach(function(id) {
@@ -281,23 +220,30 @@ VisHandler.prototype.moveNodeStream = function(data){
     });
 
 
-
     let streamEles = cy.elements(':selected');
-    let restEles = cy.elements().difference(streamEles);
+
+    this.moveSelected(streamEles, data);
+}
+
+
+VisHandler.prototype.moveSelected = function(nodesSelected, data){
+
+    let cy = appUtilities.getCyInstance(data.cyId);
+    let restEles = cy.elements().difference(nodesSelected);
 
     let bBoxRest = restEles.boundingBox();
-    let bBoxStream = streamEles.boundingBox();
+    let bBoxSelected = nodesSelected.boundingBox();
 
 
     let posUpdate = {};
-    posUpdate.x = Math.abs(bBoxStream.x - bBoxRest.x);
-    posUpdate.y = Math.abs(bBoxStream.y - bBoxRest.y);
+    posUpdate.x = Math.abs(bBoxSelected.x - bBoxRest.x);
+    posUpdate.y = Math.abs(bBoxSelected.y - bBoxRest.y);
     //unselect again
     cy.elements().unselect();
 
     let modelEles = [];
     let paramList = [];
-    streamEles.forEach(function(ele){
+    nodesSelected.forEach(function(ele){
         let currPos = ele.position();
         if(data.location.indexOf('top')> -1)  //move up
             currPos.y -= 2 * Math.abs(currPos.y - bBoxRest.y1);
@@ -317,10 +263,6 @@ VisHandler.prototype.moveNodeStream = function(data){
 
     //update model so that others know
     this.modelManager.changeModelElementGroupAttribute("position", modelEles, data.cyId, paramList, "me");
-
-
-
-
 
 }
 
@@ -356,9 +298,42 @@ VisHandler.prototype.findStream = function(nodeId, direction, cy){
 
 }
 
+/***
+ *
+ * @param data.name : compartment name
+ */
+VisHandler.prototype.findCompartmentNodes = function(data){
+
+    let cy = appUtilities.getCyInstance(data.cyId);
+
+    let myComp;
+    cy.nodes().forEach(function (node){
+       if(node.data("class") === "compartment" && node.data("label").toLowerCase() === data.name.toLowerCase()){
+            myComp = node;
+       }
+    });
+
+
+    if(myComp)
+        return myComp.children();
+
+    return null;
+
+}
 
 
 
+VisHandler.prototype.moveCompartmentNodes = function (data) {
+    let nodes = this.findCompartmentNodes(data);
+
+
+    nodes.select();
+
+    this.moveSelected(nodes, data);
+
+
+
+}
 
 
 
