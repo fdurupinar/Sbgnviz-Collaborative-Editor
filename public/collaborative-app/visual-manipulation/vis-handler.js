@@ -115,44 +115,44 @@ VisHandler.prototype.moveNode = function(data) {
    self.modelManager.changeModelNodeAttribute("position", nodeToMove.data("id"), data.cyId, posToMove, "me");
 
 
-   //
-   // nodeToMove.lock();
-   //
-   //
-   //  // $("#perform-layout").trigger('click');
-   //
-   //  let layoutCose = cy.layout({'name': 'cose', iterative:true});
-   //  layoutCose.run();
-   //
-   //  cy.on('layoutstop', function() {
-   //      nodeToMove.unlock();
-   //
-   //      //move again
-   //
-   //      let bBox = cy.elements().boundingBox();
-   //
-   //      //extend bbox
-   //      bBox.x1 -= extensionX;
-   //      bBox.x2 += extensionX;
-   //      bBox.y1 -= extensionY;
-   //      bBox.y2 += extensionY;
-   //
-   //      if(location.indexOf('top')> -1)
-   //          posToMove = {x: (bBox.x1 + bBox.x2) / 2, y: bBox.y1};
-   //      else if(location.indexOf('bottom')> -1)
-   //          posToMove = {x: (bBox.x1 + bBox.x2) / 2, y: bBox.y2};
-   //      else if(location.indexOf('left')> -1)
-   //          posToMove = {x: bBox.x1, y: (bBox.y1 + bBox.y2) / 2};
-   //      else if(location.indexOf('right')> -1)
-   //          posToMove = {x: bBox.x2, y: (bBox.y1 + bBox.y2) / 2};
-   //
-   //      //move node -- no need to update the model for now
-   //      nodeToMove.position(posToMove);
-   //
-   //      //make sure model is updated accordingly
-   //      self.modelManager.changeModelNodeAttribute("position", nodeToMove.data("id"), data.cyId, posToMove, "me");
-   //
-   //  });
+
+   nodeToMove.lock();
+
+
+    $("#perform-layout").trigger('click');
+
+    let layoutCose = cy.layout({'name': 'cose', idealEdgeLength:5, edgeElasticity:5});
+    layoutCose.run();
+
+    cy.on('layoutstop', function() {
+        nodeToMove.unlock();
+
+        //move again
+
+        let bBox = cy.elements().boundingBox();
+
+        //extend bbox
+        bBox.x1 -= extensionX;
+        bBox.x2 += extensionX;
+        bBox.y1 -= extensionY;
+        bBox.y2 += extensionY;
+
+        if(location.indexOf('top')> -1)
+            posToMove = {x: (bBox.x1 + bBox.x2) / 2, y: bBox.y1};
+        else if(location.indexOf('bottom')> -1)
+            posToMove = {x: (bBox.x1 + bBox.x2) / 2, y: bBox.y2};
+        else if(location.indexOf('left')> -1)
+            posToMove = {x: bBox.x1, y: (bBox.y1 + bBox.y2) / 2};
+        else if(location.indexOf('right')> -1)
+            posToMove = {x: bBox.x2, y: (bBox.y1 + bBox.y2) / 2};
+
+        //move node -- no need to update the model for now
+        nodeToMove.position(posToMove);
+
+        //make sure model is updated accordingly
+        self.modelManager.changeModelNodeAttribute("position", nodeToMove.data("id"), data.cyId, posToMove, "me");
+
+    });
 
 }
 

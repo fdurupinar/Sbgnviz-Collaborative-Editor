@@ -721,10 +721,10 @@ app.proto.listenToModelOperations = function(model){
         }
     });
 
-    model.on('all', '_page.doc.cy.*', function( val, op, cyId, prev, passed){
+    model.on('all', '_page.doc.cy.*', function( cyId, op, val, prev, passed){
 
         if(docReady && !passed.user){
-                self.loadCyFromModel(val);
+                self.loadCyFromModel(cyId);
         }
     });
 

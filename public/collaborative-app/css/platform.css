@@ -531,6 +531,7 @@ input[type="file"] {
 }
 #factoidBox{
     width: 100%;
+    overflow: scroll;
 }
 
 .factoid-button{
