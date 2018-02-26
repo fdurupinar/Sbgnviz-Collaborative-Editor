@@ -217,7 +217,8 @@ appUtilities.getNetworkTabSelector = function (networkId) {
 
 // get the string to represent the tab for given network id
 appUtilities.getNetworkTabDesc = function (networkId) {
-  return 'Network #' + networkId;
+  // return 'Network #' + networkId; //FUNDA
+  return '#' +(networkId + 1);
 };
 
 // map given chise instance to the given network id
@@ -275,36 +276,49 @@ appUtilities.getChiseInstance = function (key) {
 // If there is just one network then network tabs should not be rendered.
 // This function is to adjust that.
 appUtilities.adjustVisibilityOfNetworkTabs = function () {
-
-  var tabsContainer = $('#network-tabs-list');
-
-  // if there is just one tab hide tabs container else show it
-  if ( this.networkIdsStack.length === 1 ) {
-    tabsContainer.hide();
-  }
-  else {
-    tabsContainer.show();
-  }
+//FUNDA: don't use in cwc
+  // var tabsContainer = $('#network-tabs-list');
+  //
+  // // if there is just one tab hide tabs container else show it
+  // if ( this.networkIdsStack.length === 1 ) {
+  //   tabsContainer.hide();
+  // }
+  // else {
+  //   tabsContainer.show();
+  // }
 
 };
 
+appUtilities.getCyInstance = function(key){
+    let chiseInst = this.getChiseInstance(key);
+
+    return chiseInst.getCy();
+
+}
+
+//FUNDA changed all of it
 // creates a new network and returns the new chise.js instance that is created for this network
-appUtilities.createNewNetwork = function () {
+appUtilities.createNewNetwork = function (networkIdParam) {
+
+    let networkId = appUtilities.nextNetworkId;
+    if(networkIdParam)
+        networkId = networkIdParam;
+
 
   // id of the div panel associated with the new network
-  var networkPanelId = appUtilities.getNetworkPanelId(appUtilities.nextNetworkId);
+  var networkPanelId = appUtilities.getNetworkPanelId(networkId);
 
   // id of the tab for the new network
-  var networkTabId = appUtilities.getNetworkTabId(appUtilities.nextNetworkId);
+  var networkTabId = appUtilities.getNetworkTabId(networkId);
 
   // string to represent the new tab
-  var networkTabDesc = appUtilities.getNetworkTabDesc(appUtilities.nextNetworkId);
+  var networkTabDesc = appUtilities.getNetworkTabDesc(networkId);
 
   // create physical html components for the new network
   appUtilities.createPhysicalNetworkComponents(networkPanelId, networkTabId, networkTabDesc);
 
   // generate network panel selector from the network panel id
-  var networkPanelSelector = appUtilities.getNetworkPanelSelector(appUtilities.nextNetworkId);
+  var networkPanelSelector = appUtilities.getNetworkPanelSelector(networkId);
 
   // initialize current properties for the new instance by copying the default properties
   var currentLayoutProperties = jquery.extend(true, {}, appUtilities.defaultLayoutProperties);
@@ -358,6 +372,9 @@ appUtilities.createNewNetwork = function () {
     undoableDrag: function() {
       return appUtilities.ctrlKeyDown !== true;
     }
+
+
+
   });
 
   // set scracth pad of the related cy instance with these properties
@@ -376,22 +393,29 @@ appUtilities.createNewNetwork = function () {
   modeHandler.initModeProperties(newInst.getCy());
 
   // maintain networkIdToChiseInstance map
-  appUtilities.putToChiseInstances(appUtilities.nextNetworkId, newInst);
+  appUtilities.putToChiseInstances(networkId, newInst);
 
   // push network id to the top of network ids stack
-  this.networkIdsStack.push(appUtilities.nextNetworkId);
+  this.networkIdsStack.push(networkId);
 
   // if this is the first network to be created set it as active network here
   // otherwise it will be activated (by listening html events) when the new tab is choosen
-  if (appUtilities.nextNetworkId === 0) {
-    appUtilities.setActiveNetwork(appUtilities.nextNetworkId);
+  if (networkId === 0) {
+    appUtilities.setActiveNetwork(networkId);
   }
 
   // physically open the new tab
-  appUtilities.chooseNetworkTab(appUtilities.nextNetworkId);
+  appUtilities.chooseNetworkTab(networkId);
 
   // resize html components according to the window size
-  appUtilities.dynamicResize();
+  // CWC change
+  // The following line unexpectedly causing a little bug when
+  // canvas is resized through resize handle at the bottom right.
+  // It is commented out here for now and
+  // by the PR (https://github.com/iVis-at-Bilkent/newt/pull/223)
+  // it is removed from Newt. This change will not be needed
+  // if it is merged and that version of Newt is used.
+  // appUtilities.dynamicResize();
 
   // activate palette tab
   if (!$('#inspector-palette-tab').hasClass('active')) {
@@ -400,13 +424,77 @@ appUtilities.createNewNetwork = function () {
   }
 
   // increment new network id
-  appUtilities.nextNetworkId++;
+    
+    // appUtilities.nextNetworkId++;
+    appUtilities.nextNetworkId = networkId + 1;
+
 
   // adjust the visibility of network tabs
   appUtilities.adjustVisibilityOfNetworkTabs();
 
+
+  //funda
+  newInst.cyId = networkId;
+    //FUNDA
+    $(document).trigger('createNewNetwork', [newInst.getCy(), networkId]);
+
+
   // return the new instance
   return newInst;
+};
+
+// CWC change
+// remove the networks other than the one having the given networkId
+// if networkId is not given then use the active networkId by default
+appUtilities.closeOtherNetworks = function (networkId) {
+
+  var networkIdsStack = this.networkIdsStack;
+
+  // if there is already at most one network then we have nothing to do here
+  if ( networkIdsStack.length <= 1 ) {
+    return;
+  }
+
+  // the id of active network before the operation
+  var activeNetworkId = this.getActiveNetworkId();
+
+  // if networkId is not defined use the active one by default
+  if ( networkId === undefined ) {
+    networkId = activeNetworkId;
+  }
+
+  // check if we are already using the active network
+  var wasActiveNetwork = ( networkId === activeNetworkId);
+
+  for ( var i = 0; i <  networkIdsStack.length; i++) {
+
+    // get the current network id to close
+    var currentNetworkId = networkIdsStack[i];
+
+    // pass the parametrized networkId
+    if (currentNetworkId === networkId) {
+      continue;
+    }
+
+    // remove the chise instance mapped to the network id from the chise instances map
+    this.removeFromChiseInstances(currentNetworkId);
+
+    // remove physical html components for networkId
+    this.removePhysicalNetworkComponents(currentNetworkId);
+  }
+
+  // the remaining network is the new active network if it was not so before the operation
+  // then we need to choose it as the new active network here
+  if ( !wasActiveNetwork ) {
+    // choose the network tab for the new active network
+    this.chooseNetworkTab(networkId);
+  }
+
+  // adjust the visibility of network tabs
+  this.adjustVisibilityOfNetworkTabs();
+
+  // update the network ids stack accordingly
+  this.networkIdsStack = [ networkId ];
 };
 
 // close the active network
@@ -439,7 +527,11 @@ appUtilities.closeActiveNetwork = function () {
   }
 
   // adjust the visibility of network tabs
-  this.adjustVisibilityOfNetworkTabs();
+   this.adjustVisibilityOfNetworkTabs();
+
+
+    //FUNDA
+    $(document).trigger('closeActiveNetwork', activeNetworkId);
 
 };
 
@@ -477,6 +569,13 @@ appUtilities.createPhysicalNetworkComponents = function (panelId, tabId, tabDesc
 
   // create new tab inside the list of network tabs
   tabsList.append(newTabStr);
+};
+
+//FUNDA
+appUtilities.getActiveNetworkId = function(){
+    if(this.networkIdsStack.length  <= 0 )
+        return 0;
+    return this.networkIdsStack[this.networkIdsStack.length - 1];
 };
 
 // basically get the active chise instance
@@ -565,8 +664,8 @@ appUtilities.defaultLayoutProperties = {
   numIter: 2500,
   tile: true,
   animationEasing: 'cubic-bezier(0.17,0.72,0.41,0.98)',
-  animate: 'end',
-  animationDuration: 2000,
+  animate: false, //funda
+  animationDuration: 0,
   randomize: false,
   tilingPaddingVertical: 20,
   tilingPaddingHorizontal: 20,
@@ -758,6 +857,12 @@ appUtilities.dynamicResize = function () {
     $("#network-panels-container, .network-panel").height(windowHeight * 0.85);
     $("#sbgn-inspector").height(windowHeight * 0.85);
   }
+
+  // CWC change
+  // when dynamic resize is called from newt side it should be called from CWC specific part as well
+  // this change will not be needed when the related PR (https://github.com/iVis-at-Bilkent/newt/pull/222) is merged
+  // to Newt and the updated version of Newt is being used
+  $(document).trigger('newtAfterDynamicResize');
 };
 /*
 appUtilities.nodeQtipFunction = function (node) {

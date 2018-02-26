@@ -444,7 +444,6 @@
                     </div>
                 </div>
 
-
             </td>
 
             <td>
@@ -453,20 +452,24 @@
         </tr>
         <tr>
             <td>
-            <div id = "canvas-tabs">
+            <div id = "canvas-tabs" class = "tabbable boxed parentTabs">
                 <ul class="nav nav-tabs">
+                <li class = "active tab-link" ><a data-toggle="tab" id = "defaultOpen" href="#network-panels-container">Networks</a></li>
+                    <div class tabbable>
+                    <ul id="network-tabs-list" class="nav nav-tabs">
+                    </ul>
 
-                    <li class = "active tab-link" ><a data-toggle="tab" id = "defaultOpen" href="#sbgn-network-container">Sbgn</a></li>
+                    </div>
+
+                    <!--<li class = "active tab-link" ><a data-toggle="tab" id = "defaultOpen" href="#network-panels-container">Sbgn</a></li>-->
+
                     {{ each _page.doc.images as #imageFile}}
-
 
                     <li class = "tab-link">
                         <!--TODO: We can open this later-->
                             <!--<span onclick= closeTab(this) class="close-icon"></span>-->
 
                         <a data-toggle="tab" href={{"#static-image-container-"+#imageFile.tabIndex}}>
-
-
 
                              {{#imageFile.tabLabel}}</a></li>
                     {{/each}}
@@ -477,8 +480,6 @@
         </tbody>
     </table>
 
-    <ul id="network-tabs-list" class="nav nav-tabs">
-    </ul>
 
     <div id="layout-properties-table" tabindex="-1" class="modal fade" role="dialog">
         <!-- sbgn layout table will be shown here -->
@@ -1892,6 +1893,7 @@
                         <li class = "tab-link"><a data-toggle="tab" href="#sbgn-inspector">Inspector</a></li>
                         <!--<li class = "tab-link"><a data-toggle="tab" href="#command-history-area">Operations</a></li>-->
                         <li class = "tab-link"><a data-toggle="tab" href="#factoid-area">Factoid</a></li>
+                        <li class = "tab-link"><a data-toggle="tab" href="#visualization-test-area">VTest</a></li>
 
                     </ul>
                 </div>
@@ -2052,6 +2054,7 @@
                     </div>
                 </div>
 
+
                 <div id = "factoid-area" class = "tab-pane">
 
                     <div id= "factoid-input-container">
@@ -2114,6 +2117,99 @@
 
                 </div>
 
+                <div id ="visualization-test-area"  class="tab-pane  fade in active">
+
+                    <table class = "visTable"><tbody >
+                        <tr>
+
+
+                            <td> Move selected node: </td>
+                            <td>
+
+                                <select id = "move-node">
+                                    <option selected = "selected">top</option>
+                                    <option>bottom</option>
+                                    <option>left</option>
+                                    <option>right</option>
+                                </select>
+
+                            </td>
+                            <td><button on-click = "moveNode()"> Submit </button></td>
+
+                        </tr>
+
+                        <tr>
+                            <td>Highlight upstream or downstream of selected node: </td>
+                            <td>
+                                <select id = "highlight-node-stream">
+                                    <option >up</option>
+                                    <option selected = "selected">down</option>
+                                </select>
+                            </td>
+                            <td><button on-click = "highlightNodeStream()"> Submit </button></td>
+                        </tr>
+
+                        <tr>
+                            <td>Select upstream or downstream of selected node: </td>
+                            <td>
+                                <select id = "select-node-stream">
+                                    <option >up</option>
+                                    <option selected = "selected">down</option>
+                                </select>
+                            </td>
+                            <td><button on-click = "selectNodeStream()"> Submit </button></td>
+                        </tr>
+
+                        <tr>
+                            <td>Move upstream or downstream of selected node: </td>
+                            <td>
+                                <select id = "move-node-stream-direction" >
+                                    <option >up</option>
+                                    <option selected = "selected">down</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select id = "move-node-stream-location">
+                                    <option selected = "selected">top</option>
+                                    <option>bottom</option>
+                                    <option>left</option>
+                                    <option>right</option>
+                                </select>
+                            </td>
+                            <td><button on-click = "moveNodeStream()"> Submit </button></td>
+                        </tr>
+
+                        <tr>
+                            <td>Move compartment: </td>
+                            <td>
+                                <input id = "move-compartment-name" type = "text">
+                            </td>
+                            <td>
+                                <select id = "move-compartment-location">
+                                    <option selected = "selected">top</option>
+                                    <option>bottom</option>
+                                    <option>left</option>
+                                    <option>right</option>
+                                </select>
+                            </td>
+                            <td><button on-click = "moveCompartment()"> Submit </button></td>
+                        </tr>
+
+
+                        <tr>
+                            <td>Lock selected node(s): </td>
+                            <td><button on-click = "lockNodes()"> Submit </button></td>
+                        </tr>
+
+                        <tr>
+                            <td>Unlock selected node(s): </td>
+                            <td><button on-click = "unlockNodes()"> Submit </button></td>
+                        </tr>
+
+
+                    </tbody></table>
+                </div>
+
                 <div id ="chat-area"  class="tab-pane  fade in active">
                     <div id = "users" as="container"  on-change = "onScroll()">
                         <!--<ul id ="user-list" as = "list">-->
@@ -2156,6 +2252,13 @@
 
 
                             <option selected = "selected" >Let's build a model.</option>
+                            <option>Let's show akt1 on the top.</option>
+                            <option>Let's show phosphorylated akt1 on the top.</option>
+                            <option>Let's show the downstream of erk on the top.</option>
+                            <option>Let's highlight the downstream of ERK.</option>
+                            <option>Let's highlight the upstream of p-ERK.</option>
+                            <option>How does BRAF activate MAPK1?</option>
+                            <option>What is the path between BRAF and MAPK1?</option>
                             <option>AKT1 phosphorylates MAPK1.</option>
                             <option>How does MAPK1 affect JUND?</option>
                             <option>AKT1 activates BRAF.</option>
@@ -2174,6 +2277,9 @@
                             <option>How does  ITGAV affect ILK?</option>
                             <option>What genes activate ILK?</option>
                             <option>How does KRAS activate MAPK3?</option>
+
+
+                            <option>What is the most likely cellular location of AKT1, BRAF?</option>
 
                             <option>What are the common upstreams of AKT1, BRAF?</option>
                             <option>Are there common upstreams of AKT1, BRAF?</option>
@@ -2242,15 +2348,20 @@
                 </div>
 
                 <div id = "provenance-area" class="tab-pane" as = "list">
-                    <ul id = "provenance-messages">
+                    <div id = "provenance-messages">
                         {{each _page.doc.provenance as #message}}
                             {{if #message.pc}}
-                                <li class = "message"> <b>{{#message.userName}}: </b> <button on-click = "openPCQueryWindow(#message.pc)">PC Query View</button>{{unescaped #message.html}}</li>
+                            <!--<li class = "message">-->
+                                {{unescaped #message.html}}
+                                <p></p>
+                                <a href="#" on-click = "openPCQueryWindow(#message.pc)"> Click to open query in a new tab</a>
+
+                                <hr>
                             {{else}}
-                                <li class = "message"> <b>{{#message.userName}}: </b> {{unescaped #message.html}}</li>
+                                {{unescaped #message.html}}
                             {{/if}}
                         {{/each}}
-                    </ul>
+                    </div>
                 </div>
 
                 <div id ="command-history-area" class="tab-pane" as = "list">
@@ -2275,7 +2386,9 @@
         <audio id="notificationAudio" src="resources/chatSound.wav" preload="auto"></audio>
 
         <!--TODO: Close this-->
+        <!--<button id = "connect-visualization-agent" class = "btn-mini" on-click = "connectVisAgent()">VisA</button>-->
         <!--<button id = "connect-causality-agent" class = "btn  btn-mini" on-click = "connectCausalityAgent()">CA</button>-->
+        <!--<button id = "test-image-tab" class = "btn  btn-mini" on-click = "testImageTab()">Test image tab</button>-->
 
         <chat-user:>
             <div class="user" style = background:{{_page.doc.users[#pUserId].colorCode}}>

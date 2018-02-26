@@ -42,7 +42,8 @@ module.exports.start = function(io, model, cancerDataOrganizer){
     let humanList = [];
     let pnnlArr  = [];
     let tripsGeneralInterfaceInstance;
-    let tripsCausalityInterfaceInstance;
+
+    let tripsVisualizationInterfaceInstance;
 
     let request = require('request'); //REST call over http/https
 
@@ -542,7 +543,7 @@ module.exports.start = function(io, model, cancerDataOrganizer){
         });
 
         socket.on('agentRunLayoutRequest', function(data, callback){
-            askHuman(data.userId, data.room,  "runLayout", null, function(val){
+            askHuman(data.userId, data.room,  "runLayout", data, function(val){
                 if (callback) callback(val);
             });
         });
@@ -562,7 +563,7 @@ module.exports.start = function(io, model, cancerDataOrganizer){
                 requestStr = "mergeJsonWithCurrent";
 
 
-            askHuman(data.userId, data.room,  requestStr, data.graph, function(val){
+            askHuman(data.userId, data.room,  requestStr, data, function(val){
 
                 if (callback) callback(val);
             });
@@ -582,7 +583,7 @@ module.exports.start = function(io, model, cancerDataOrganizer){
                     }
                     else  {
                         if(response.statusCode === 200) {
-                            askHuman(data.userId, data.room,  "loadFile", data.content, function(val){
+                            askHuman(data.userId, data.room,  "loadFile", data, function(val){
                                 if (callback) callback(val);
                             });
                         }
@@ -591,15 +592,15 @@ module.exports.start = function(io, model, cancerDataOrganizer){
                 });
             }
             else
-                askHuman(data.userId, data.room,  "loadFile", data.content, function(val){
+                askHuman(data.userId, data.room,  "loadFile", data, function(val){
                     if (callback) callback(val);
                 });
 
             if(callback) callback();
         });
 
-        socket.on('agentNewFileRequest',  function(data, callback){
-            askHuman(data.userId, data.room,  "newFile", null, function(val){
+        socket.on('agentCleanAllRequest',  function(data, callback){
+            askHuman(data.userId, data.room,  "cleanAll", data, function(val){
                 if (callback) callback(val);
             });
         });
@@ -640,9 +641,16 @@ module.exports.start = function(io, model, cancerDataOrganizer){
             });
         });
 
+        socket.on('agentChangeLockStateRequest', function(data, callback) {
+            askHuman(data.userId, data.room,  "changeLockState", data, function(val){
+                if(callback) callback(val);
+            });
+        });
+
+
         socket.on('agentGetNodeRequest',function(data, callback){
             try {
-                let node = modelManagerList[data.room].getModelNode(data.id);
+                let node = modelManagerList[data.room].getModelNode(data.id, data.cyId);
                 if (callback) callback(node);
             }
             catch(e){
@@ -653,7 +661,7 @@ module.exports.start = function(io, model, cancerDataOrganizer){
 
         socket.on('agentGetEdgeRequest',function(data, callback){
             try {
-                let edge = modelManagerList[data.room].getModelEdge(data.id);
+                let edge = modelManagerList[data.room].getModelEdge(data.id, data.cyId);
                 if (callback) callback(edge);
             }
             catch(e){
@@ -673,7 +681,7 @@ module.exports.start = function(io, model, cancerDataOrganizer){
             try {
                 //we know the edge id so add directly to the model
                 //second parameter needs to have a data field
-                let status = modelManagerList[data.room].addModelEdge(data.id, data, "me");
+                let status = modelManagerList[data.room].addModelEdge(data.id,  data.cyId, data, "me");
                 if (callback) callback(data.id);
             }
             catch(e){
@@ -690,7 +698,7 @@ module.exports.start = function(io, model, cancerDataOrganizer){
 
         socket.on('agentMoveNodeRequest',function(data, callback){
             try {
-                let status = modelManagerList[data.room].changeModelNodeAttribute("position", data.id, data.pos);
+                let status = modelManagerList[data.room].changeModelNodeAttribute("position", data.id, data.cyId,  data.pos);
                 if (callback) callback(status);
             }
             catch(e){
@@ -701,7 +709,7 @@ module.exports.start = function(io, model, cancerDataOrganizer){
 
         socket.on('agentChangeNodeAttributeRequest', function(data, callback){
             try {
-                let status = modelManagerList[data.room].changeModelNodeAttribute(data.attStr, data.id, data.attVal);
+                let status = modelManagerList[data.room].changeModelNodeAttribute(data.attStr, data.id,data.cyId, data.attVal);
                 if (callback) callback(status);
             }
             catch(e){
@@ -713,7 +721,7 @@ module.exports.start = function(io, model, cancerDataOrganizer){
         });
         socket.on('agentChangeEdgeAttributeRequest', function(data, callback){
             try {
-                let status = modelManagerList[data.room].changeModelEdgeAttribute(data.attStr, data.id, data.attVal);
+                let status = modelManagerList[data.room].changeModelEdgeAttribute(data.attStr, data.id,data.cyId, data.attVal);
                 if (callback) callback(status);
             }
             catch(e){
@@ -789,7 +797,9 @@ module.exports.start = function(io, model, cancerDataOrganizer){
         socket.on('agentPageDocRequest', function(data, callback){ //from computer agent
             try {
 
+
                 let pageDoc = modelManagerList[data.room].getPageDoc();
+
                 callback(pageDoc);
 
             }
@@ -828,27 +838,21 @@ module.exports.start = function(io, model, cancerDataOrganizer){
 
         socket.on('agentConnectToTripsRequest', function(param){
             console.log("Agent trips connection request");
-
-            if(param.isInterfaceAgent){
-                if(!tripsGeneralInterfaceInstance || !tripsGeneralInterfaceInstance.isConnectedToTrips()) {
-                    let TripsGeneralInterfaceModule = require('./trips/TripsGeneralInterfaceModule.js');
-                    tripsGeneralInterfaceInstance = new TripsGeneralInterfaceModule(param.userId, param.userName, socket, model, askHuman);
-                }
-                else {//already there is an instance
-                    tripsGeneralInterfaceInstance.updateWebSocket(socket);
-                    tripsGeneralInterfaceInstance.updateListeners(socket);
-                }
+            if(!tripsGeneralInterfaceInstance || !tripsGeneralInterfaceInstance.isConnectedToTrips()) {
+                let TripsGeneralInterfaceModule = require('./trips/TripsGeneralInterfaceModule.js');
+                tripsGeneralInterfaceInstance = new TripsGeneralInterfaceModule(param.userId, param.userName, socket, model, askHuman);
+            }
+            else {//already there is an instance
+                tripsGeneralInterfaceInstance.updateWebSocket(socket);
+                tripsGeneralInterfaceInstance.updateListeners(socket);
+            }
+        //connect vismodule when the trips agent is connected
+            if(!tripsVisualizationInterfaceInstance || !tripsVisualizationInterfaceInstance.isConnectedToTrips()) {
+                let tripsVisualizationInterfaceModule = require('./trips/TripsVisualizationInterfaceModule.js');
+                tripsVisualizationInterfaceInstance = new tripsVisualizationInterfaceModule(param.userId, param.userName, socket, model, askHuman);
             }
             else {
-                console.log("trips causality module connection " + socket.id + " room: " + socket.room);
-
-                if(!tripsCausalityInterfaceInstance || !tripsCausalityInterfaceInstance.isConnectedToTrips()) {
-                    let TripsCausalityInterfaceModule = require('./trips/TripsCausalityInterfaceModule.js');
-                    tripsCausalityInterfaceInstance = new TripsCausalityInterfaceModule(param.userId, param.userName, socket, model);
-                }
-                else {
-                    tripsCausalityInterfaceInstance.updateWebSocket(socket);
-                }
+                tripsVisualizationInterfaceInstance.updateWebSocket(socket);
             }
         });
     };

@@ -7,12 +7,11 @@
 let app = module.exports = require('derby').createApp('cwc', __filename);
 app.loadViews(__dirname + '/views');
 
-let oneColor = require('onecolor');
-
 const ONE_DAY = 1000 * 60 * 60 * 24;
 const ONE_HOUR = 1000 * 60 * 60;
 const ONE_MINUTE = 1000 * 60;
 const BobId = "Bob123";
+
 
 let docReady = false;
 
@@ -169,14 +168,6 @@ app.proto.changeDuration = function () {
     return this.model.filter('_page.doc.messages', 'biggerTime').ref('_page.list');
 };
 
-/***
- * Query windows always include the "query" string appended to regular docId
- * @returns {boolean}
- */
-app.proto.isQueryWindow = function(){
-    var docId = this.model.get('_page.doc.id');
-    return (docId.indexOf("_query_") > -1);
-};
 
 /***
  * Called only once in a browser after the first page rendering
@@ -189,7 +180,7 @@ app.proto.create = function (model) {
     docReady = true;
 
     self.socket = io();
-    self.notyView = noty({layout: "bottom",theme:"bootstrapTheme", text: "Please wait while model is loading."});
+    self.notyView = window.noty({layout: "bottom",theme:"bootstrapTheme", text: "Please wait while model is loading."});
 
     self.listenToUIOperations(model);
 
@@ -209,7 +200,7 @@ app.proto.create = function (model) {
     // self.modelManager.setName( model.get('_session.userId'),name);
 
 
-    self.dynamicResize(model.get('_page.doc.images'));
+    self.dynamicResize();
 
     //Notify server about the client connection
     self.socket.emit("subscribeHuman", { userName:name, room:  model.get('_page.room'), userId: id});
@@ -221,18 +212,29 @@ app.proto.create = function (model) {
     self.factoidHandler = require('./public/collaborative-app/factoid/factoid-handler')(this) ;
     self.factoidHandler.initialize();
 
-
+    //
     //Loading cytoscape and clients
-    if(!self.isQueryWindow()) { //initialization for a regular window
-        self.loadCyFromModel(function(isModelEmpty){
-            if (isModelEmpty)
-                self.modelManager.initModel(appUtilities.getActiveCy().nodes(), appUtilities.getActiveCy().edges(), appUtilities, "me");
-            else
-                self.notyView.close();
-        });
-    }
 
-    self.editorListener = require('./public/collaborative-app/editor-listener.js')(self.modelManager,self.socket, id);
+    let cyIds = self.modelManager.getCyIds();
+
+    cyIds.forEach(function(cyId) {
+        if(parseInt(cyId) !== parseInt(appUtilities.getActiveNetworkId())) //tab 0: initial tab
+            appUtilities.createNewNetwork(parseInt(cyId)); //opens a new tab
+        self.loadCyFromModel(cyId, function (isModelEmpty) {
+        });
+    });
+
+    if(cyIds.length === 0) //no previous model -- first time loading the document
+        self.modelManager.openCy(appUtilities.getActiveNetworkId(), "me");
+
+    self.notyView.close();
+
+
+    self.editorListener = require('./public/collaborative-app/editor-listener.js')(self.modelManager,self.socket, id, self);
+
+    //HACK: This is normally called when a new network is created, but the initial network is created before editor-listener
+    //Lets editor-listener to subscribe to UI operations
+    $(document).trigger('createNewNetwork', [appUtilities.getActiveCy(), appUtilities.getActiveNetworkId()]);
 
     this.atBottom = true;
 
@@ -241,10 +243,12 @@ app.proto.create = function (model) {
     setTimeout(()=>{
         let userIds = self.modelManager.getUserIds();
         let noTrips = model.get('_page.doc.noTrips');
-        if(!noTrips && !self.isQueryWindow() &&  userIds.indexOf(BobId) < 0) {
+        if(!noTrips &&  userIds.indexOf(BobId) < 0) {
 
             // console.log("Connection requested " + noTrips + " " + op);
             self.connectTripsAgent();
+
+            self.connectVisualizationHandler(self.modelManager);
         }
     }, 500); // wait a little while for the server to update user list and handle disconnections
 
@@ -267,11 +271,9 @@ app.proto.create = function (model) {
  * @param model
  */
 app.proto.init = function (model) {
-
     this.listenToNodeOperations(model);
     this.listenToEdgeOperations(model);
     this.listenToModelOperations(model);
-
 };
 
 /***
@@ -287,11 +289,6 @@ app.proto.listenToUIOperations = function(model){
 
     //change scroll position
     $('#messages').scrollTop($('#messages')[0].scrollHeight  - $('.message').height());
-
-    $(window).on('resize', function(){
-        let images = model.get('_page.doc.images');
-        self.dynamicResize(images);
-    });
 
 
     self.lastMsgInd = -1; //increment in app.proto.app
@@ -339,48 +336,51 @@ app.proto.listenToUIOperations = function(model){
 
 
     // //If we get a message on a separate window
-    window.addEventListener('message', function(event) {biopax
-        if(event.data) { //initialization for a query window
-            self.modelManager.newModel("me"); //do not delete cytoscape, only the model
-            appUtilities.getActiveChiseInstance().updateGraph(JSON.parse(event.data), function(){
-                self.modelManager.initModel(appUtilities.getActiveCy().nodes(), appUtilities.getActiveCy().edges(), appUtilities, "me");
-                $("#perform-layout").trigger('click');
-
-            });
-        }
-
-    }, false);
+    //TODO: this will be done in a new tab
+    // window.addEventListener('message', function(event) {
+    //     if(event.data) { //initialization for a query window
+    //         self.modelManager.newModel("me"); //do not delete cytoscape, only the model
+    //         appUtilities.getActiveChiseInstance.updateGraph(JSON.parse(event.data), function(){
+    //             self.modelManager.initModel(appUtilities.getActiveCy().nodes(), appUtilities.getActiveCy().edges(),
+    //                 appUtilities.getActiveNetworkId(), appUtilities, "me");
+    //             $("#perform-layout").trigger('click');
+    //
+    //         });
+    //     }
+    //
+    // }, false);
 
 
 };
 
-app.proto.loadCyFromModel = function(callback){
+app.proto.loadCyFromModel = function(cyId, callback){
     let self = this;
-    let jsonArr = self.modelManager.getJsonFromModel();
+    let jsonArr = self.modelManager.getJsonFromModel(cyId);
 
     if (jsonArr) {
 
         //Updates data fields and sets style fields to default
-        appUtilities.getActiveChiseInstance().updateGraph({
+        appUtilities.getChiseInstance(parseInt(cyId)).updateGraph({
             nodes: jsonArr.nodes,
             edges: jsonArr.edges
         }, function(){
             //Update position fields separately
-            appUtilities.getActiveCy().nodes().forEach(function(node){
+            appUtilities.getCyInstance(parseInt(cyId)).nodes().forEach(function(node){
 
-                let position = self.modelManager.getModelNodeAttribute('position',node.id());
+                let position = self.modelManager.getModelNodeAttribute('position',node.id(), cyId);
 
                 node.position({x:position.x, y: position.y});
 
             });
 
             let container = $('#canvas-tab-area');
-            appUtilities.getActiveCy().zoom(2);
-            appUtilities.getActiveCy().pan({x:container.width()/2, y:container.height()/2});
-            //reset to the center
-            // appUtilities.getActiveCy().panzoom().reset();
-            // appUtilities.getActiveCy().panzoom().fit();
 
+            // console.log("Panzoom updated");
+            // appUtilities.getCyInstance(parseInt(cyId)).zoom(1); //was 2 before
+            // appUtilities.getCyInstance(parseInt(cyId)).pan({x:container.width()/2, y:container.height()/2});
+            //
+
+             // appUtilities.getCyInstance(parseInt(cyId)).panzoom().reset();
 
             if(callback) callback(false);
 
@@ -403,80 +403,88 @@ app.proto.listenToNodeOperations = function(model){
     //     inspectorUtilities.handleSBGNInspector();
     // });
 
-    model.on('all', '_page.doc.cy.nodes.*', function(id, op, val, prev, passed){
+    model.on('all', '_page.doc.cy.*.nodes.*', function(cyId, id, op, val, prev, passed){
+
         if(docReady &&  !passed.user) {
-            let node  = model.get('_page.doc.cy.nodes.' + id);
+            let node  = model.get('_page.doc.cy.' + cyId + '.nodes.' + id);
             if(!node || !node.id){ //node is deleted
-                appUtilities.getActiveCy().getElementById(id).remove();
+                appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).remove();
             }
         }
     });
 
 
-    model.on('all', '_page.doc.cy.nodes.*.addedLater', function(id, op, idName, prev, passed){ //this property must be something that is only changed during insertion
-
+    model.on('all', '_page.doc.cy.*.nodes.*.addedLater', function(cyId, id, op, idName, prev, passed){ //this property must be something that is only changed during insertion
+        console.log(cyId);
+        console.log(id);
+        console.log(op);
 
         if(docReady && !passed.user) {
-            let pos = model.get('_page.doc.cy.nodes.'+ id + '.position');
-            let sbgnclass = model.get('_page.doc.cy.nodes.'+ id + '.data.class');
-            let visibility = model.get('_page.doc.cy.nodes.'+ id + '.visibility');
-            let parent = model.get('_page.doc.cy.nodes.'+ id + '.data.parent');
+            let pos = model.get('_page.doc.cy.' + cyId +'.nodes.'+ id + '.position');
+            let sbgnclass = model.get('_page.doc.cy.' + + cyId +'.nodes.'+ id + '.data.class');
+            let visibility = model.get('_page.doc.cy.' + cyId + '.nodes.'+ id + '.visibility');
+            let parent = model.get('_page.doc.cy.'+ cyId +'.nodes.'+ id + '.data.parent');
 
             if(parent === undefined) parent = null;
-            let newNode = appUtilities.getActiveChiseInstance().elementUtilities.addNode(pos.x, pos.y, sbgnclass, id, parent, visibility);
+            let newNode = appUtilities.getChiseInstance(parseInt(cyId)).elementUtilities.addNode(pos.x, pos.y, sbgnclass, id, parent, visibility);
 
-            self.modelManager.initModelNode(newNode,"me", true);
+            self.modelManager.initModelNode(newNode,cyId, "me", true);
 
-            let parentEl = appUtilities.getActiveCy().getElementById(parent);
+            let parentEl = appUtilities.getCyInstance(parseInt(cyId)).getElementById(parent);
             newNode.move({"parent":parentEl});
 
 
         }
     });
 
-    model.on('all', '_page.doc.cy.nodes.*.position', function(id, op, pos,prev, passed){
-        if(docReady && !passed.user && appUtilities.getActiveCy().getElementById(id).length>0) {
+    model.on('all', '_page.doc.cy.*.nodes.*.position', function(cyId, id, op, pos,prev, passed){
 
-            let posDiff = {x: (pos.x - appUtilities.getActiveCy().getElementById(id).position("x")), y:(pos.y - appUtilities.getActiveCy().getElementById(id).position("y"))} ;
-            moveNodeAndChildren(posDiff, appUtilities.getActiveCy().getElementById(id)); //children need to be updated manually here
+
+
+        if(docReady && !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0) {
+
+            let posDiff = {x: (pos.x - appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).position("x")), y:(pos.y - appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).position("y"))} ;
+            moveNodeAndChildren(posDiff, appUtilities.getCyInstance(parseInt(cyId)).getElementById(id)); //children need to be updated manually here
+
+
+            appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).updateStyle();
+
             //parent as well
-            // appUtilities.getActiveCy().panzoom().fit();
+            // appUtilities.getCyInstance(parseInt(cyId)).panzoom().fit();
 
         }
     });
 
-    model.on('all', '_page.doc.cy.nodes.*.highlightColor', function(id, op, val,prev, passed){
+    model.on('all', '_page.doc.cy.*.nodes.*.highlightColor', function(cyId, id, op, val,prev, passed){
         //call it here so that everyone can highlight their own textbox
         self.factoidHandler.highlightSentenceInText(id, val);
 
-        if(docReady && !passed.user && appUtilities.getActiveCy().getElementById(id).length>0) {
+        if(docReady && !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0) {
             if(!val){
-                appUtilities.getActiveCy().getElementById(id).css({
+                appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).css({
                     "overlay-color": null,
                     "overlay-padding": 10,
                     "overlay-opacity": 0
                 });
 
-                console.log("Updated overlay color tp " + appUtilities.getActiveCy().getElementById().css("overlay-color"));
-                console.log("Updated overlay color tp " + id);
             }
             else {
-                appUtilities.getActiveCy().getElementById(id).css({
+                appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).css({
                     "overlay-color": val,
                     "overlay-padding": 10,
                     "overlay-opacity": 0.25
                 });
             }
-            appUtilities.getActiveCy().getElementById(id).updateStyle();
+            appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).updateStyle();
         }
     });
 
     //Called by agents to change bbox
-    model.on('all', '_page.doc.cy.nodes.*.data.bbox.*', function(id, att, op, val,prev, passed){
-        if(docReady && !passed.user && appUtilities.getActiveCy().getElementById(id).length>0) {
-            let newAtt = appUtilities.getActiveCy().getElementById(id).data("bbox");
+    model.on('all', '_page.doc.cy.*.nodes.*.data.bbox.*', function(cyId, id, att, op, val,prev, passed){
+        if(docReady && !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0) {
+            let newAtt = appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).data("bbox");
             newAtt[att] = val;
-            appUtilities.getActiveCy().getElementById(id).data("bbox", newAtt);
+            appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).data("bbox", newAtt);
         }
     });
 
@@ -484,53 +492,53 @@ app.proto.listenToNodeOperations = function(model){
 
 
     //Called by agents to change specific properties of data
-    model.on('all', '_page.doc.cy.nodes.*.data.*', function(id, att, op, val,prev, passed){
-        if(docReady && !passed.user && appUtilities.getActiveCy().getElementById(id).length>0) {
-            appUtilities.getActiveCy().getElementById(id).data(att, val);
+    model.on('all', '_page.doc.cy.*.nodes.*.data.*', function(cyId, id, att, op, val,prev, passed){
+        if(docReady && !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0) {
+            appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).data(att, val);
             if(att === "parent")
-                appUtilities.getActiveCy().getElementById(id).move({"parent":val});
+                appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).move({"parent":val});
         }
     });
 
 
-    model.on('all', '_page.doc.cy.nodes.*.data', function(id,  op, data,prev, passed){
-        if(docReady && !passed.user && appUtilities.getActiveCy().getElementById(id).length>0) {
-            appUtilities.getActiveCy().getElementById(id)._private.data = data;
+    model.on('all', '_page.doc.cy.*.nodes.*.data', function(cyId, id,  op, data,prev, passed){
+        if(docReady && !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0) {
+            appUtilities.getCyInstance(parseInt(cyId)).getElementById(id)._private.data = data;
 
             //to update parent
             let newParent = data.parent;
             if(newParent === undefined)
                 newParent = null;  //must be null explicitly
 
-            appUtilities.getActiveCy().getElementById(id).move({"parent":newParent});
-            appUtilities.getActiveCy().getElementById(id).updateStyle();
+            appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).move({"parent":newParent});
+            appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).updateStyle();
         }
     });
 
 
 
-    model.on('all', '_page.doc.cy.nodes.*.expandCollapseStatus', function(id, op, val,prev, passed){
-        if(docReady && !passed.user && appUtilities.getActiveCy().getElementById(id).length>0) {
-            let expandCollapse = appUtilities.getActiveCy().expandCollapse('get'); //we can't call chise.expand or collapse directly as it causes infinite calls
+    model.on('all', '_page.doc.cy.*.nodes.*.expandCollapseStatus', function(cyId, id, op, val,prev, passed){
+        if(docReady && !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0) {
+            let expandCollapse = appUtilities.getCyInstance(parseInt(cyId)).expandCollapse('get'); //we can't call chise.expand or collapse directly as it causes infinite calls
             if(val === "collapse")
-                expandCollapse.collapse(appUtilities.getActiveCy().getElementById(id));
+                expandCollapse.collapse(appUtilities.getCyInstance(parseInt(cyId)).getElementById(id));
             else
-                expandCollapse.expand(appUtilities.getActiveCy().getElementById(id));
+                expandCollapse.expand(appUtilities.getCyInstance(parseInt(cyId)).getElementById(id));
         }
     });
 
 
-    model.on('all', '_page.doc.cy.nodes.*.highlightStatus', function(id, op, highlightStatus, prev, passed){ //this property must be something that is only changed during insertion
-        if(docReady && !passed.user && appUtilities.getActiveCy().getElementById(id).length>0) {
+    model.on('all', '_page.doc.cy.*.nodes.*.highlightStatus', function(cyId, id, op, highlightStatus, prev, passed){ //this property must be something that is only changed during insertion
+        if(docReady && !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0) {
             try{
-                let viewUtilities = appUtilities.getActiveCy().viewUtilities('get');
+                let viewUtilities = appUtilities.getCyInstance(parseInt(cyId)).viewUtilities('get');
 
                 if(highlightStatus === "highlighted")
-                    viewUtilities.highlight(appUtilities.getActiveCy().getElementById(id));
+                    viewUtilities.highlight(appUtilities.getCyInstance(parseInt(cyId)).getElementById(id));
                 else
-                    viewUtilities.unhighlight(appUtilities.getActiveCy().getElementById(id));
+                    viewUtilities.unhighlight(appUtilities.getCyInstance(parseInt(cyId)).getElementById(id));
 
-                //    appUtilities.getActiveCy().getElementById(id).updateStyle();
+                //    appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).updateStyle();
             }
             catch(e){
                 console.log(e);
@@ -539,15 +547,15 @@ app.proto.listenToNodeOperations = function(model){
         }
     });
 
-    model.on('all', '_page.doc.cy.nodes.*.visibilityStatus', function(id, op, visibilityStatus, prev, passed){ //this property must be something that is only changed during insertion
-        if(docReady && !passed.user && appUtilities.getActiveCy().getElementById(id).length>0) {
+    model.on('all', '_page.doc.cy.*.nodes.*.visibilityStatus', function(cyId, id, op, visibilityStatus, prev, passed){ //this property must be something that is only changed during insertion
+        if(docReady && !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0) {
             try{
-                let viewUtilities = appUtilities.getActiveCy().viewUtilities('get');
+                let viewUtilities = appUtilities.getCyInstance(parseInt(cyId)).viewUtilities('get');
                 if(visibilityStatus === "hide") {
-                    viewUtilities.hide(appUtilities.getActiveCy().getElementById(id));
+                    viewUtilities.hide(appUtilities.getCyInstance(parseInt(cyId)).getElementById(id));
                 }
                 else { //default is show
-                    viewUtilities.show(appUtilities.getActiveCy().getElementById(id));
+                    viewUtilities.show(appUtilities.getCyInstance(parseInt(cyId)).getElementById(id));
                 }
             }
             catch(e){
@@ -575,17 +583,17 @@ app.proto.listenToEdgeOperations = function(model){
     // });
 
 
-    model.on('all', '_page.doc.cy.edges.*.highlightColor', function(id, op, val,prev, passed){
-        if(docReady && !passed.user && appUtilities.getActiveCy().getElementById(id).length>0) {
+    model.on('all', '_page.doc.cy.*.edges.*.highlightColor', function(cyId, id, op, val,prev, passed){
+        if(docReady && !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0) {
             if(val == null){
-                appUtilities.getActiveCy().getElementById(id).css({
+                appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).css({
                     "overlay-color": null,
                     "overlay-padding": 10,
                     "overlay-opacity": 0
                 });
             }
             else {
-                appUtilities.getActiveCy().getElementById(id).css({
+                appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).css({
                     "overlay-color": val,
                     "overlay-padding": 10,
                     "overlay-opacity": 0.25
@@ -594,46 +602,46 @@ app.proto.listenToEdgeOperations = function(model){
         }
     });
 
-    model.on('all', '_page.doc.cy.edges.*', function(id, op, val, prev, passed){
-        if(docReady &&  !passed.user && appUtilities.getActiveCy().getElementById(id).length>0) {
-            let edge  = model.get('_page.doc.appUtilities.getActiveCy().edges.' + id); //check
+    model.on('all', '_page.doc.cy.*.edges.*', function(cyId, id, op, val, prev, passed){
+        if(docReady &&  !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0) {
+            let edge  = model.get('_page.doc.cy.' + cyId +'.edges.' + id); //check
 
             if(!edge|| !edge.id){ //edge is deleted
-                appUtilities.getActiveCy().getElementById(id).remove();
+                appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).remove();
 
             }
         }
     });
 
-    model.on('all', '_page.doc.cy.edges.*.addedLater', function(id,op, idName, prev, passed){//this property must be something that is only changed during insertion
+    model.on('all', '_page.doc.cy.*.edges.*.addedLater', function(cyId, id,op, idName, prev, passed){//this property must be something that is only changed during insertion
         if(docReady && !passed.user ){
-            let source = model.get('_page.doc.cy.edges.'+ id + '.data.source');
-            let target = model.get('_page.doc.cy.edges.'+ id + '.data.target');
-            let sbgnclass = model.get('_page.doc.cy.edges.'+ id + '.data.class');
-            let visibility = model.get('_page.doc.cy.nodes.'+ id + '.visibility');
-            let newEdge = appUtilities.getActiveChiseInstance().elementUtilities.addEdge(source, target, sbgnclass, id, visibility);
+            let source = model.get('_page.doc.cy.'+ cyId +'.edges.'+ id + '.data.source');
+            let target = model.get('_page.doc.cy.'+ cyId +'.edges.'+ id + '.data.target');
+            let sbgnclass = model.get('_page.doc.cy.'+ cyId +'.edges.'+ id + '.data.class');
+            let visibility = model.get('_page.doc.cy.' + cyId +'.nodes.'+ id + '.visibility');
+            let newEdge = appUtilities.getChiseInstance(cyId).elementUtilities.addEdge(source, target, sbgnclass, id, visibility);
 
-            self.modelManager.initModelEdge(newEdge,"me", true);
+            self.modelManager.initModelEdge(newEdge, cyId, "me", true);
         }
     });
 
-    model.on('all', '_page.doc.cy.edges.*.data', function(id, op, data,prev, passed){
-        if(docReady && !passed.user && appUtilities.getActiveCy().getElementById(id).length>0) {
-            //appUtilities.getActiveCy().getElementById(id).data(data); //can't call this if cy element does not have a field called "data"
-            appUtilities.getActiveCy().getElementById(id)._private.data = data;
-            appUtilities.getActiveCy().getElementById(id).updateStyle();
+    model.on('all', '_page.doc.cy.*.edges.*.data', function(cyId, id, op, data,prev, passed){
+        if(docReady && !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0) {
+            //appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).data(data); //can't call this if cy element does not have a field called "data"
+            appUtilities.getCyInstance(parseInt(cyId)).getElementById(id)._private.data = data;
+            appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).updateStyle();
         }
     });
 
-    model.on('all', '_page.doc.cy.edges.*.data.*', function(id, att, op, val,prev, passed){
-        if(docReady && !passed.user && appUtilities.getActiveCy().getElementById(id).length>0)
-            appUtilities.getActiveCy().getElementById(id).data(att, val);
+    model.on('all', '_page.doc.cy.*.edges.*.data.*', function(cyId, id, att, op, val,prev, passed){
+        if(docReady && !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0)
+            appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).data(att, val);
     });
 
-    model.on('all', '_page.doc.cy.edges.*.bendPoints', function(id, op, bendPoints, prev, passed){ //this property must be something that is only changed during insertion
-        if(docReady && !passed.user && appUtilities.getActiveCy().getElementById(id).length>0) {
+    model.on('all', '_page.doc.cy.*.edges.*.bendPoints', function(cyId, id, op, bendPoints, prev, passed){ //this property must be something that is only changed during insertion
+        if(docReady && !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0) {
             try{
-                let edge = appUtilities.getActiveCy().getElementById(id);
+                let edge = appUtilities.getCyInstance(parseInt(cyId)).getElementById(id);
                 if(bendPoints.weights && bendPoints.weights.length > 0) {
                     edge.data('cyedgebendeditingWeights', bendPoints.weights);
                     edge.data('cyedgebendeditingDistances', bendPoints.distances);
@@ -646,7 +654,7 @@ app.proto.listenToEdgeOperations = function(model){
                 }
 
                 edge.trigger('cyedgebendediting.changeBendPoints');
-             //   appUtilities.getActiveCy().getElementById(id).updateStyle();
+             //   appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).updateStyle();
 
             }
             catch(e){
@@ -656,14 +664,14 @@ app.proto.listenToEdgeOperations = function(model){
         }
     });
 
-    model.on('all', '_page.doc.cy.edges.*.highlightStatus', function(id, op, highlightStatus, prev, passed){ //this property must be something that is only changed during insertion
-        if(docReady && !passed.user && appUtilities.getActiveCy().getElementById(id).length>0) {
-            let viewUtilities = appUtilities.getActiveCy().viewUtilities('get');
+    model.on('all', '_page.doc.cy.*.edges.*.highlightStatus', function(cyId, id, op, highlightStatus, prev, passed){ //this property must be something that is only changed during insertion
+        if(docReady && !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0) {
+            let viewUtilities = appUtilities.getCyInstance(parseInt(cyId)).viewUtilities('get');
             try{
                 if(highlightStatus === "highlighted")
-                    viewUtilities.highlight(appUtilities.getActiveCy().getElementById(id));
+                    viewUtilities.highlight(appUtilities.getCyInstance(parseInt(cyId)).getElementById(id));
                 else
-                    viewUtilities.unhighlight(appUtilities.getActiveCy().getElementById(id));
+                    viewUtilities.unhighlight(appUtilities.getCyInstance(parseInt(cyId)).getElementById(id));
             }
             catch(e){
                 console.log(e);
@@ -671,14 +679,14 @@ app.proto.listenToEdgeOperations = function(model){
         }
     });
 
-    model.on('all', '_page.doc.cy.edges.*.visibilityStatus', function(id, op, visibilityStatus, prev, passed){ //this property must be something that is only changed during insertion
-        if(docReady && !passed.user && appUtilities.getActiveCy().getElementById(id).length>0) {
-            let viewUtilities = appUtilities.getActiveCy().viewUtilities('get');
+    model.on('all', '_page.doc.cy.*.edges.*.visibilityStatus', function(cyId, id, op, visibilityStatus, prev, passed){ //this property must be something that is only changed during insertion
+        if(docReady && !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0) {
+            let viewUtilities = appUtilities.getCyInstance(parseInt(cyId)).viewUtilities('get');
             try{
                 if(visibilityStatus === "hide")
-                    viewUtilities.hide(appUtilities.getActiveCy().getElementById(id));
+                    viewUtilities.hide(appUtilities.getCyInstance(parseInt(cyId)).getElementById(id));
                 else
-                    viewUtilities.show(appUtilities.getActiveCy().getElementById(id));
+                    viewUtilities.show(appUtilities.getCyInstance(parseInt(cyId)).getElementById(id));
             }
             catch(e){
                 console.log(e);
@@ -702,39 +710,64 @@ app.proto.listenToModelOperations = function(model){
         }
     });
 
-    //Cy updated by other clients
-    model.on('all', '_page.doc.cy.initTime', function( op, val, prev, passed){
+
+    //A new tab is open
+    model.on('all', '_page.doc.cy.**', function( val, op, cyId, prev, passed){
+
+        if(docReady && !passed.user){
+            if( op === 'insert')
+                appUtilities.createNewNetwork(cyId);
+
+        }
+    });
+
+    model.on('all', '_page.doc.cy.*', function( cyId, op, val, prev, passed){
+
+        if(docReady && !passed.user){
+                self.loadCyFromModel(cyId);
+        }
+    });
+
+
+    //Tab is closed by another client
+    model.on('all', '_page.doc.closedCy', function(  op, cyId, prev, passed){
 
         if(docReady) {
             if(docReady && !passed.user) {
-                self.loadCyFromModel(function () {
+                appUtilities.setActiveNetwork(cyId);
+                appUtilities.closeActiveNetwork();
 
-                });
+            }
+        }
+    });
+
+
+
+    //Cy updated by other clients
+    model.on('all', '_page.doc.cy.*.initTime', function( cyId, op, val, prev, passed){
+
+        if(docReady) {
+            if(docReady && !passed.user) {
+                self.loadCyFromModel(cyId);
             }
             self.notyView.close();
         }
     });
 
     model.on('change', '_page.doc.pcQuery.*.graph', function(ind, data){
-        var loc = window.location.href;
-        if (loc[loc.length - 1] === "#") {
-            loc = loc.slice(0, -1);
-        }
-        if (loc[loc.length - 1] === "?") {
-            loc = loc.slice(0, -1);
-        }
+        let chiseInst = appUtilities.createNewNetwork();
 
-        let w = window.open((loc + "_query_" + ind ), function(){
-        });
+        let jsonObj = chiseInst.convertSbgnmlTextToJson(data);
 
-        // //because window opening takes a while
-        setTimeout(function () {
-            var json = appUtilities.getActiveChiseInstance().convertSbgnmlTextToJson(data);
-            w.postMessage(JSON.stringify(json), "*");
+            chiseInst.updateGraph(jsonObj, function() {
+                self.modelManager.initModel(chiseInst.getCy().nodes(), chiseInst.getCy().edges(), chiseInst.cyId, appUtilities, "me");
+                $("#perform-layout").trigger('click');
+
+            });
+
+    }); //opens a new tab
 
 
-        }, 3000);
-    });
 
     //Sometimes works
     model.on('all', '_page.doc.images', function() {
@@ -816,7 +849,6 @@ app.proto.updateTripsMessage = function(){
 app.proto.resetConversationOnTrips = function(){
     //directly ask the server as this client may not have a tripsAgent
     this.socket.emit('resetConversationRequest');
-    this.agentSocket.newFile();
 
 };
 
@@ -825,6 +857,151 @@ app.proto.connectCausalityAgent = function(){
     this.socket.emit('connectToCausalityAgentRequest');
 };
 
+app.proto.connectVisualizationHandler = function(modelManager){
+    let self = this;
+
+
+    let VisHandler = require('./public/collaborative-app/visual-manipulation/vis-handler.js');
+    this.visHandler = new VisHandler(modelManager);
+
+};
+app.proto.findLabelAndStateOfSelectedNode = function() {
+
+    if (appUtilities.getActiveCy().nodes(":selected").length <= 0)
+        return;
+
+    let nodeSelected = appUtilities.getActiveCy().nodes(":selected")[0];
+
+    let nodeName = nodeSelected.data("label");
+
+    let state = null;
+    let statesandinfos = nodeSelected.data("statesandinfos");
+
+    if (statesandinfos && statesandinfos.length > 0) {
+        if (statesandinfos[0].clazz == "state variable") {
+            if (statesandinfos[0].state.value)
+                state = statesandinfos[0].state.value;
+            else
+                state = '';
+        }
+    }
+
+    return {name: nodeName, state:state}
+}
+
+app.proto.lockNodes = function () {
+
+    let nodes = appUtilities.getActiveCy().nodes(":selected");
+    if (nodes.length <= 0)
+        return;
+
+    nodes.lock();
+
+}
+
+app.proto.unlockNodes = function () {
+
+    let nodes = appUtilities.getActiveCy().nodes(":selected");
+    if (nodes.length <= 0)
+        return;
+
+    nodes.unlock();
+
+}
+
+app.proto.moveNode = function(){
+
+    let nodeProps = this.findLabelAndStateOfSelectedNode();
+    if(!nodeProps || !nodeProps.name) {
+        alert("Node not selected or it has an empty label");
+        return;
+    }
+
+    let el = document.getElementById("move-node");
+    let location = el.options[el.selectedIndex].text;
+
+    let cyId = appUtilities.getActiveNetworkId();
+
+
+
+    this.visHandler.moveNode({name: nodeProps.name, location: location, cyId:cyId, state:nodeProps.state});
+};
+
+app.proto.highlightNodeStream = function(){
+
+    let nodeProps = this.findLabelAndStateOfSelectedNode();
+    if(!nodeProps || !nodeProps.name){
+        alert("Node not selected or it has an empty label");
+        return;
+    }
+
+    let el = document.getElementById("highlight-node-stream");
+    let direction = el.options[el.selectedIndex].text;
+
+    let cyId = appUtilities.getActiveNetworkId();
+
+    this.visHandler.highlightNodeStream({name: nodeProps.name, direction:direction,  state:nodeProps.state, cyId:cyId} );
+};
+
+app.proto.selectNodeStream = function(){
+
+    let nodeProps = this.findLabelAndStateOfSelectedNode();
+    if(!nodeProps || !nodeProps.name){
+        alert("Node not selected or it has an empty label");
+        return;
+    }
+
+    let el = document.getElementById("select-node-stream");
+    let direction = el.options[el.selectedIndex].text;
+
+    let cyId = appUtilities.getActiveNetworkId();
+
+    this.visHandler.selectNodeStream({name: nodeProps.name, direction:direction,  state:nodeProps.state, cyId:cyId} );
+};
+
+
+app.proto.moveNodeStream = function(){
+
+    let nodeProps = this.findLabelAndStateOfSelectedNode();
+    if(!nodeProps || !nodeProps.name) {
+        alert("Node not selected or it has an empty label");
+        return;
+    }
+
+    let elDir = document.getElementById("move-node-stream-direction");
+    let direction = elDir.options[elDir.selectedIndex].text;
+
+    let elLoc = document.getElementById("move-node-stream-location");
+    let location = elLoc.options[elLoc.selectedIndex].text;
+
+    let cyId = appUtilities.getActiveNetworkId();
+
+    this.visHandler.moveNodeStream({name: nodeProps.name, direction:direction, location:location,  state:nodeProps.state, cyId:cyId} );
+};
+
+
+
+app.proto.moveCompartment = function(){
+
+    let compName = document.getElementById("move-compartment-name").value;
+
+    let elLoc = document.getElementById("move-compartment-location");
+    let location = elLoc.options[elLoc.selectedIndex].text;
+
+    let cyId = appUtilities.getActiveNetworkId();
+
+    this.visHandler.moveCompartmentNodes({name: compName, location:location,  cyId:cyId} );
+};
+
+
+
+// app.proto.lockSelected  = function(){
+//     cy.elements(':selected').lock();
+// }
+
+app.proto.unlockSelected  = function(){
+    cy.elements(':selected').unlock();
+}
 
 app.proto.connectTripsAgent = function(){
     let self = this;
@@ -912,10 +1089,10 @@ app.proto.clearHistory = function () {
     this.model.set('_page.clickTime', new Date);
 
     //TODO: silllll
-    // appUtilities.getActiveCy().panzoom().fit();
+    // appUtilities.getCyInstance(parseInt(cyId)).panzoom().fit();
     // var $reset = $('<div class="cy-panzoom-reset cy-panzoom-zoom-button"></div>');
     // $('#cy-panzoom-zoom-button').trigger('mousedown');
-    // appUtilities.getActiveCy().panzoom.reset();
+    // appUtilities.getCyInstance(parseInt(cyId)).panzoom.reset();
     return this.model.filter('_page.doc.messages', 'biggerThanCurrentTime').ref('_page.list');
 };
 
@@ -991,20 +1168,20 @@ app.proto.formatObj = function(obj){
 };
 
 
-app.proto.dynamicResize = function (images) {
-    let win = $(window);
-    let windowWidth = win.width();
-    let windowHeight = win.height();
+app.proto.dynamicResize = function () {
+    // get window inner width and inner height that includes scrollbars when they are rendered
+    // using $(window).width() would be problematic when scrolls are visible
+    // please see: https://stackoverflow.com/questions/19582862/get-browser-window-width-including-scrollbar
+    // and https://developer.mozilla.org/en-US/docs/Web/API/Window/innerWidth
+    let windowWidth = window.innerWidth;
+    var windowHeight = window.innerHeight;
     let canvasWidth = 1200;
     let canvasHeight = 680;
 
+    let images = this.model.get('_page.doc.images');
+
 
     if (windowWidth > canvasWidth) {
-        $("#canvas-tab-area").resizable({
-                alsoResize: '#inspector-tab-area',
-                minWidth: 1000
-            }
-        );
 
         let wCanvasTab = $("#canvas-tab-area").width();
 
@@ -1012,22 +1189,17 @@ app.proto.dynamicResize = function (images) {
         $(".navbar").width(wCanvasTab);
         $("#sbgn-toolbar").width(wCanvasTab);
 
-        $("#network-panels-container").width( wCanvasTab* 0.99);
+        $("#network-panels-container").width(wCanvasTab);
 
         if(images) {
             images.forEach(function (img) {
-                $("#static-image-container-" + img.tabIndex).width(wCanvasTab * 0.99);
+                $("#static-image-container-" + img.tabIndex).width(wCanvasTab);
             });
         }
 
-
-        $("#inspector-tab-area").resizable({
-            minWidth:355
-        });
-
         let wInspectorTab = $("#inspector-tab-area").width();
         $("#sbgn-inspector").width(wInspectorTab);
-        $("#canvas-tabs").width( wCanvasTab* 0.99);
+        $("#canvas-tabs").width( wCanvasTab);
     }
     else {
         if(images) {
@@ -1040,23 +1212,13 @@ app.proto.dynamicResize = function (images) {
 
     if (windowHeight > canvasHeight) {
 
-        $("#canvas-tab-area").resizable({
-            alsoResize:'#inspector-tab-area',
-            minHeight: 600
-        });
-
         let hCanvasTab = $("#canvas-tab-area").height();
-        $("#network-panels-container").height(hCanvasTab * 0.99);
+        $("#network-panels-container").height(hCanvasTab);
         if(images) {
             images.forEach(function (img) {
-                $("#static-image-container-" + img.tabIndex).height(hCanvasTab * 0.99);
+                $("#static-image-container-" + img.tabIndex).height(hCanvasTab);
             });
         }
-
-        $("#inspector-tab-area").resizable({
-            alsoResize:'#canvas-tab-area',
-            minHeight: 600
-        });
 
         let hInspectorTab = $("#inspector-tab-area").height();
 
@@ -1064,9 +1226,58 @@ app.proto.dynamicResize = function (images) {
         $("#factoid-area").height(hInspectorTab * 0.9);
         $("#factoidBox").height(hInspectorTab * 0.6);
     }
+
+    // TODO it would be better if find a good place to move these resizable calls.
+    
+    // make canvas tab area resizable and resize some other components as it is resized
+    $("#canvas-tab-area").resizable({
+            alsoResize: '#inspector-tab-area, #network-panels-container',
+            minWidth: 1000,
+            minHeight: 600
+        }
+    );
+
+    // make inspector-tab-area resizable
+    $("#inspector-tab-area").resizable({
+        minWidth:355
+    });
+
+    // force each of the cytoscape.js
+    // instance renderer to recalculate the viewport bounds
+    this.resizeCyCanvases();
 };
 
+// force each of the cytoscape.js
+// instance renderer to recalculate the viewport bounds
+app.proto.resizeCyCanvases = function () {
 
+  // traverse each network id
+  for ( var i = 0; i < appUtilities.networkIdsStack.length; i++ ) {
+
+    // get current networkId
+    var networkId = appUtilities.networkIdsStack[i];
+
+    // get the associated cy instance
+    var cy = appUtilities.getCyInstance(networkId);
+
+    // force renderer of cy to recalculate the viewport bounds
+    cy.resize();
+  }
+
+}
+
+
+app.proto.testImageTab = function(){
+
+    let imgData = {
+        img: ("data:image/png;base64,"),
+        tabIndex: 1,
+        tabLabel: "test",
+        fileName: "modelRXN"
+    };
+    var status = this.modelManager.addImage(imgData);
+    this.dynamicResize();
+}
 ////////////////////////////////////////////////////////////////////////////
 //Local functions
 ////////////////////////////////////////////////////////////////////////////

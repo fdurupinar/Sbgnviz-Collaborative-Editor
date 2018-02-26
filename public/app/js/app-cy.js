@@ -207,6 +207,11 @@ module.exports = function (chiseInstance) {
         enabled: true, // Whether keyboard shortcuts are enabled
         undoable: appUtilities.undoable // and if undoRedo extension exists
       },
+
+        // CWC change: trigger an event after copy operation is performed
+      afterCopy: function(eleJsons) {
+          $(document).trigger('CWC_after_copy', [eleJsons, cy]);
+          },
       afterPaste: function(eles) {
         eles.nodes().forEach(function(ele){
           // skip nodes without any auxiliary units

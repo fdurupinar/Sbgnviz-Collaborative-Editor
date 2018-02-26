@@ -63,13 +63,11 @@ Agent.prototype.connectToServer = function (url,  callback) {
         if (self.room == ""  || self.room == null) {
 
             self.socket.emit("agentCurrentRoomRequest", function (room) {
-                console.log(room);
                     self.room = room; //select the latest room
                 resolve("success");
             });
         }
         else {
-            console.log(self.room);
             resolve("success");
         }
     });
@@ -175,13 +173,14 @@ Agent.prototype.loadChatHistory= function (callback) {
 
     });
 }
+
 /**
  *
  * @returns {Object} Node list in the shared model
  */
-Agent.prototype.getNodeList = function(){
+Agent.prototype.getNodeList = function(cyId){
 
-    return this.pageDoc.cy.nodes;
+    return this.pageDoc.cy[cyId].nodes;
 };
 
 
@@ -190,8 +189,8 @@ Agent.prototype.getNodeList = function(){
  *
  * @returns {Object} Edge list in the shared model
  */
-Agent.prototype.getEdgeList = function(){
-    return this.pageDoc.cy.edges;
+Agent.prototype.getEdgeList = function(cyId){
+    return this.pageDoc.cy[cyId].edges;
 };
 
 /**
@@ -220,9 +219,9 @@ Agent.prototype.changeName = function(newName, callback){
  * @param id Node id
  * @param callback Function to call after getting node
  */
-Agent.prototype.getNodeRequest = function(id, callback){
+Agent.prototype.getNodeRequest = function(id, cyId, callback){
     var self = this;
-    this.socket.emit('agentGetNodeRequest', {room: this.room,  userId: self.agentId, id:id}, function(data){
+    this.socket.emit('agentGetNodeRequest', {room: this.room,  userId: self.agentId, id:id, cyId: cyId}, function(data){
         self.selectedNode = data;
         if (callback != null) callback();
 
@@ -234,9 +233,9 @@ Agent.prototype.getNodeRequest = function(id, callback){
  * @param id Edge id
  * @param callback Function to call after getting edge
  */
-Agent.prototype.getEdgeRequest = function(id, callback){
+Agent.prototype.getEdgeRequest = function(id, cyId, callback){
     var self = this;
-    this.socket.emit('agentGetEdgeRequest', {room: this.room, userId: self.agentId, id:id}, function(data){
+    this.socket.emit('agentGetEdgeRequest', {room: this.room, userId: self.agentId, id:id, cyId: cyId}, function(data){
         self.selectedEdge = data;
         if (callback != null) callback();
 
@@ -261,8 +260,9 @@ Agent.prototype.getEdgeRequest = function(id, callback){
  * </ul>
  *
  */
-Agent.prototype.sendRequest = function(reqName, param, callback){ //model operations
+Agent.prototype.sendRequest = function(reqName, paramSent, callback){ //model operations
 
+    let param  = paramSent;
     if(!param){
         param = {};
     }
@@ -270,8 +270,6 @@ Agent.prototype.sendRequest = function(reqName, param, callback){ //model operat
     param.userId = this.agentId;
 
     this.socket.emit(reqName, param, function(data){
-
-        console.log(param);
         if(callback)
             callback(data);
         else

@@ -116,6 +116,8 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
 
         });
 
+
+
         //
         // //Listen to model id response from MRA
         pattern = {0: 'reply', 1: '&key', content: ['success', '.', '*'], sender: 'MRA'};
@@ -186,6 +188,41 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
         }
     }
 
+    //TODO: to be deleted
+    /***
+     * Gets the standardized name of the gene from an EKB XML string
+     * by sending a request to sense prioritization agent
+     * @param termStr : EKB XML string
+     * @param callback : Called when sense prioritization agent returns an answer
+     */
+    getTermName(termStr, callback) {
+
+        let self = this;
+        this.tm.sendMsg({0: 'request', content: {0: 'CHOOSE-SENSE', 'ekb-term': termStr}});
+
+
+        let patternXml = {0: 'reply', 1: '&key', content: ['SUCCESS', '.', '*']};
+
+        self.tm.addHandler(patternXml, function (textXml) {
+
+            if(textXml.content && textXml.content.length >= 2 && textXml.content[2].length > 0) {
+
+                let termNames = [];
+                for(let i = 0; i < textXml.content[2].length; i++) {
+                    let contentObj = KQML.keywordify(textXml.content[2][i]);
+                    let termName = trimDoubleQuotes(contentObj.name);
+                    termNames.push(termName);
+                }
+
+                if(termNames.length == 1 && callback)
+                    callback(termNames[0]);
+                else if(callback)
+                    callback(termNames);
+            }
+        });
+    }
+
+
 
     displaySbgn(text) {
 
@@ -203,7 +240,8 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
 
             //The socket connection is between the interface and the agent, so we cannot directly emit messages
             //we must ask the client with the browser to do it for us
-            self.askHuman(self.agentId, self.room, "displaySbgn", sbgnModel, function (val) {
+            //TODO: get the cyId from TRIPS
+            self.askHuman(self.agentId, self.room, "displaySbgn", {sbgn: sbgnModel, cyId: "0"}, function (val) {
 
                 // self.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
             });
@@ -236,7 +274,7 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
         });
 
         //this will clean the image tabs and sbgn model
-        this.askHuman(this.agentId, this.room, "newFile", function (val) {
+        this.askHuman(this.agentId, this.room, "cleanAll",{},  function (val) {
         });
 
 
@@ -286,3 +324,5 @@ function trimDoubleQuotes(str){
     return strTrimmed;
 
 }
+
+

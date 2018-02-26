@@ -8,7 +8,7 @@ describe('Chat Test', function () {
 
     function sendMessage(text) {
 
-        it('Send message', function () {
+        it('Send message', function (done) {
             cy.window().should(function (window) {
                 let app = window.testApp;
                 let $ = window.$;

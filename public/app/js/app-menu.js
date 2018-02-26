@@ -222,12 +222,13 @@ module.exports = function () {
             // use cy instance for active chise instance
             var cy = chiseInstance.getCy();
 
-            if(cy.elements().length != 0) {
-                promptConfirmationView.render(appUtilities.closeActiveNetwork.bind(appUtilities));
-            }
-            else {
+            //FUNDA Closed this
+            // if(cy.elements().length != 0) {
+            //     promptConfirmationView.render(appUtilities.closeActiveNetwork.bind(appUtilities));
+            // }
+            // else {
                 appUtilities.closeActiveNetwork();
-            }
+            // }
         });
 
         $("#load-file, #load-file-icon").click(function () {

@@ -22,6 +22,8 @@ class ModelManager{
         return this.model.get('documents.' + this.docId);
     }
 
+
+
     addImage(data, user, noHistUpdate) {
         let self = this;
         let images = this.model.get('documents.' + this.docId + '.images');
@@ -118,7 +120,6 @@ class ModelManager{
                         console.log(users[att].name);
                         if(users[att].name && users[att].name.indexOf('User') > -1) {
                             let idNumber = Number(users[att].name.slice(4));
-                            console.log(idNumber);
                             if (idNumber > maxId)
                                 maxId = idNumber;
                         }
@@ -154,6 +155,28 @@ class ModelManager{
         }
     }
 
+    setLayoutProperties(properties){
+        this.model.set('documents.' + this.docId + '.layoutProperties', properties);
+    }
+
+    getLayoutProperties(){
+        return this.model.get('documents.' + this.docId + '.layoutProperties');
+    }
+
+    updateFactoidModel(factoidModel, user, noHistUpdate){
+        this.model.pass({user:user}).set('documents.' + this.docId + '.factoid', factoidModel);
+
+        if(!noHistUpdate){
+            let prevFactoidModel = this.model.get('documents.' + this.docId + '.factoid');
+            this.updateHistory({opName:'factoid',  prevParam: prevFactoidModel, param: factoidModel, opTarget:'model'});
+        }
+
+    }
+
+    getFactoidModel(){
+        return this.model.get('documents.' + this.docId + '.factoid');
+    }
+
     /***
      *
      * @param cmd  {opName, opTarget,  elType, elId, opAttr,param, prevParam}
@@ -171,6 +194,7 @@ class ModelManager{
             elType: cmd.elType,
             opAttr: cmd.opAttr,
             elId: cmd.elId,
+            cyId: cmd.cyId,
             param: cmd.param,
             prevParam: cmd.prevParam
         };
@@ -212,52 +236,52 @@ class ModelManager{
 
         if (cmd.opName == "set") {
             if (cmd.opTarget == "element" && cmd.elType == "node")
-                this.changeModelNodeAttribute(cmd.opAttr, cmd.elId, cmd.prevParam, null); //user is null to enable updating in the editor
+                this.changeModelNodeAttribute(cmd.opAttr, cmd.elId, cmd.cyId, cmd.prevParam, null); //user is null to enable updating in the editor
 
             else if (cmd.opTarget == "element" && cmd.elType == "edge")
-                this.changeModelEdgeAttribute(cmd.opAttr, cmd.elId, cmd.prevParam, null);
+                this.changeModelEdgeAttribute(cmd.opAttr, cmd.elId, cmd.cyId, cmd.prevParam, null);
             else if (cmd.opTarget == "element group")
-                this.changeModelElementGroupAttribute(cmd.opAttr, cmd.elId, cmd.prevParam, null);
+                this.changeModelElementGroupAttribute(cmd.opAttr, cmd.elId, cmd.cyId, cmd.prevParam, null);
 
         }
         else if (cmd.opName == "add" || cmd.opName ==="restore") {
             if (cmd.opTarget == "element" && cmd.elType == "node")
-                this.deleteModelNode(cmd.elId);
+                this.deleteModelNode(cmd.elId, cmd.cyId );
             else if (cmd.opTarget == "element" && cmd.elType == "edge")
-                this.deleteModelEdge(cmd.elId);
+                this.deleteModelEdge(cmd.elId, cmd.cyId);
             else if (cmd.opTarget == "compound")
-                this.removeModelCompound(cmd.elId, cmd.param.childrenList, cmd.prevParam);
+                this.removeModelCompound(cmd.elId, cmd.cyId, cmd.param.childrenList, cmd.prevParam);
         }
         else if (cmd.opName == "delete") {
             if (cmd.opTarget == "element")
-                this.restoreModelElement(cmd.elType, cmd.elId, cmd.prevParam);
+                this.restoreModelElement(cmd.elType, cmd.elId, cmd.cyId, cmd.prevParam);
             else if (cmd.opTarget == "element group"){
 
-                this.restoreModelElementGroup(cmd.elId, cmd.prevParam);
+                this.restoreModelElementGroup(cmd.elId, cmd.cyId, cmd.prevParam);
             }
             else if (cmd.opTarget == "compound")
-                this.addModelCompound(cmd.elId, cmd.prevParam.compoundAtts, cmd.prevParam.childrenList, cmd.prevParam.paramList);
+                this.addModelCompound(cmd.elId, cmd.cyId, cmd.prevParam.compoundAtts, cmd.prevParam.childrenList, cmd.prevParam.paramList);
 
         }
-        else if(cmd.opName === "update"){ //properties
-            if(cmd.opTarget.indexOf('general') >= 0)
-                this.updateGeneralProperties(cmd.prevParam);
-            else if(cmd.opTarget.indexOf('layout') >= 0)
-                this.updateLayoutProperties(cmd.prevParam);
-            else if(cmd.opTarget.indexOf('grid') >= 0)
-                this.updateGridProperties(cmd.prevParam);
-
-        }
+        // else if(cmd.opName === "update"){ //properties
+        //     if(cmd.opTarget.indexOf('general') >= 0)
+        //         this.updateGeneralProperties(cmd.prevParam);
+        //     else if(cmd.opTarget.indexOf('layout') >= 0)
+        //         this.updateLayoutProperties(cmd.prevParam);
+        //     else if(cmd.opTarget.indexOf('grid') >= 0)
+        //         this.updateGridProperties(cmd.prevParam);
+        //
+        // }
         else if (cmd.opName == "init") {
-            this.newModel("me", true);
+            this.newModel(cmd.cyId, null, true);
         }
         else if (cmd.opName == "new") { //delete all
-            this.restoreModel(cmd.prevParam);
+            this.restoreModel( cmd.prevParam, cmd.cyId);
 
         }
         else if (cmd.opName == "merge") {
-            this.newModel("me", true);
-            this.restoreModel(cmd.prevParam);
+            this.newModel(cmd.cyId, null, true);
+            this.restoreModel(cmd.prevParam, cmd.cyId);
         }
 
         undoInd = undoInd > 0 ? undoInd - 1 : 0;
@@ -269,77 +293,134 @@ class ModelManager{
         let undoInd = this.model.get('documents.' + this.docId + '.undoIndex');
         let cmd = this.model.get('documents.' + this.docId + '.history.' + (undoInd + 1)); // cmd: opName, opTarget, opAttr, elId, param
 
+
         if (cmd.opName == "set") {
             if (cmd.opTarget == "element" && cmd.elType == "node")
-                this.changeModelNodeAttribute(cmd.opAttr, cmd.elId, cmd.param, null); //user is null to enable updating in the editor
+                this.changeModelNodeAttribute(cmd.opAttr, cmd.elId, cmd.cyId, cmd.param, null); //user is null to enable updating in the editor
             else if (cmd.opTarget == "element" && cmd.elType == "edge")
-                this.changeModelEdgeAttribute(cmd.opAttr, cmd.elId, cmd.param, null);
+                this.changeModelEdgeAttribute(cmd.opAttr, cmd.elId, cmd.cyId, cmd.param, null);
             else if (cmd.opTarget == "element group") {
-                this.changeModelElementGroupAttribute(cmd.opAttr, cmd.elId, cmd.param);
+                this.changeModelElementGroupAttribute(cmd.opAttr, cmd.elId, cmd.cyId, cmd.param, null);
 
             }
 
         }
         else if (cmd.opName == "add" ||cmd.opName == "restore") {
             if (cmd.opTarget == "element")
-                this.restoreModelElement(cmd.elType, cmd.elId, cmd.param);
+                this.restoreModelElement(cmd.elType, cmd.elId, cmd.cyId, cmd.param);
             else if (cmd.opTarget == "compound")
-                this.addModelCompound(cmd.elId, cmd.param.compoundAtts, cmd.param.childrenList, cmd.param.paramList);
+                this.addModelCompound(cmd.elId, cmd.cyId, cmd.param.compoundAtts, cmd.param.childrenList, cmd.param.paramList);
 
 
         }
         else if (cmd.opName == "delete") {
             if (cmd.opTarget == "element" && cmd.elType == "node")
-                this.deleteModelNode(cmd.elId);
+                this.deleteModelNode(cmd.elId, cmd.cyId);
             else if (cmd.opTarget == "element" && cmd.elType == "edge")
-                this.deleteModelEdge(cmd.elId);
+                this.deleteModelEdge(cmd.elId, cmd.cyId);
             else if (cmd.opTarget == "element group")
-                this.deleteModelElementGroup(cmd.elId);
+                this.deleteModelElementGroup(cmd.elId, cmd.cyId);
             else if (cmd.opTarget == "compound")
-                this.removeModelCompound(cmd.elId, cmd.param.childrenList, cmd.param);
+                this.removeModelCompound(cmd.elId, cmd.cyId, cmd.param.childrenList, cmd.param);
 
         }
-        else if(cmd.opName === "update"){ //properties
-            if(cmd.opTarget.indexOf('general') >= 0)
-                this.updateGeneralProperties(cmd.param);
-            else if(cmd.opTarget.indexOf('layout') >= 0)
-                this.updateLayoutProperties(cmd.param);
-            else if(cmd.opTarget.indexOf('grid') >= 0)
-                this.updateGridProperties(cmd.param);
-
-        }
+        // else if(cmd.opName === "update"){ //properties
+        //     if(cmd.opTarget.indexOf('general') >= 0)
+        //         this.updateGeneralProperties(cmd.param);
+        //     else if(cmd.opTarget.indexOf('layout') >= 0)
+        //         this.updateLayoutProperties(cmd.param);
+        //     else if(cmd.opTarget.indexOf('grid') >= 0)
+        //         this.updateGridProperties(cmd.param);
+        //
+        // }
         else if (cmd.opName == "init") {
-            this.restoreModel(cmd.param);
+            this.restoreModel(cmd.param, cmd.cyId );
         }
         else if (cmd.opName == "new") { //delete all
-            this.newModel();
+            this.newModel(cmd.cyId );
         }
         else if (cmd.opName == "merge") { //delete all
-            this.restoreModel(cmd.param);
+            this.restoreModel(cmd.param, cmd.cyId);
         }
 
         undoInd = undoInd < this.model.get('documents.' + this.docId + '.history').length - 1 ? undoInd + 1 : this.model.get('documents.' + this.docId + '.history').length - 1;
         this.model.set('documents.' + this.docId + '.undoIndex', undoInd);
     }
 
-    getModelNode (id) {
-        let nodePath = this.model.at('documents.' + this.docId + '.cy.nodes.' + id);
+
+    openCy(cyId, user){ //to notify other users that a new tab has been opened
+        let cyPathStr = this.getModelCyPathStr(cyId);
+        // this.model.pass({user: user}).set('documents.' + this.docId + '.newCy', cyId); //let others know
+        this.model.pass({user:user}).set(cyPathStr + '.cyId', cyId);
+    }
+
+    //Does not remove the cy, only lets other users that cy is closed
+    closeCy(cyId, user, noHistUpdate){
+        let cyPathStr = this.getModelCyPathStr(cyId);
+
+        let prevParam = this.model.get(cyPathStr); //because cy indices are integers, cy path is recognized as an array
+        // this.model.pass({user:user}).remove('documents.' + this.docId + '.cy', cyId);
+        // this.model.pass({user:user}).del(cyPathStr);
+
+        // this.model.pass({user:user}).set(cyPathStr, null);
+
+        // notify other users that a new tab has been closed
+        this.model.pass({user: user}).set('documents.' + this.docId + '.closedCy', cyId);
+
+        if (!noHistUpdate)
+            this.updateHistory({opName: 'delete', prevParam: prevParam, param: null, cyId: cyId, opTarget: 'model'});
+    }
+
+
+    getCyIds(){
+        let cyList = this.model.get('documents.' + this.docId + '.cy');
+        let cyIds = [];
+        for(var att in cyList){
+            if(cyList.hasOwnProperty(att))
+                cyIds.push(att);
+        }
+
+        return cyIds;
+    }
+
+    getModelCyPathStr(cyId){
+        return 'documents.' + this.docId + '.cy.' + cyId ;
+    }
+
+    getModelNodePathStr(id, cyId){
+        return 'documents.' + this.docId + '.cy.' + cyId +'.nodes.' + id;
+    }
+
+    getModelNode(id, cyId) {
+        let nodePath = this.model.at(this.getModelNodePathStr(id, cyId));
         return nodePath.get();
     }
 
-    getModelNodesArr(){
-        let nodes = this.model.get('documents.' + this.docId + '.cy.nodes');
+    getModelNodesArr(cyId){
+        let nodes = this.model.get('documents.' + this.docId + '.cy.' + cyId + '.nodes');
         let nodeArr = [];
         for(var att in nodes){
             if(nodes.hasOwnProperty(att))
                 nodeArr.push(nodes[att]);
         }
 
+        console.log(nodeArr);
         return nodeArr;
     }
 
-    getModelEdgesArr(){
-        let edges = this.model.get('documents.' + this.docId + '.cy.edges');
+
+    getModelEdgePathStr(id, cyId){
+        return 'documents.' + this.docId + '.cy.' + cyId +'.edges.' + id;
+    }
+
+    getModelEdge (id, cyId) {
+        let edgePath = this.model.at(this.getModelEdgePathStr(id, cyId));
+        return edgePath.get();
+    }
+
+
+    getModelEdgesArr(cyId){
+        let edges = this.model.get('documents.' + this.docId + '.cy.' + cyId +'.edges');
         let edgeArr = [];
         for(var att in edges){
             if(edges.hasOwnProperty(att))
@@ -348,14 +429,10 @@ class ModelManager{
 
         return edgeArr;
     }
-    getModelEdge (id) {
-        let edgePath = this.model.at('documents.' + this.docId + '.cy.edges.' + id);
-        return edgePath.get();
-    }
+    selectModelNode (node, cyId, userId, user,  noHistUpdate) {
 
-    selectModelNode (node, userId, user,  noHistUpdate) {
-
-        let nodePath = this.model.at('documents.' + this.docId + '.cy.nodes.' + node.id());
+        let nodePathStr = this.getModelNodePathStr(node.id(), cyId);
+        let nodePath = this.model.at(nodePathStr);
         if (nodePath.get() == null)
             return "Node id not found";
 
@@ -364,7 +441,7 @@ class ModelManager{
 
 
 
-        this.model.pass({user: user}).set('documents.' + this.docId + '.cy.nodes.' + node.id()+ '.highlightColor', userPath.get('colorCode'));
+        this.model.pass({user: user}).set(nodePathStr + '.highlightColor', userPath.get('colorCode'));
 
 
         return "success";
@@ -372,41 +449,42 @@ class ModelManager{
     }
 
 
-    selectModelEdge (edge, userId, user,  noHistUpdate) {
+    selectModelEdge (edge, cyId, userId, user,  noHistUpdate) {
 
-        let edgePath = this.model.at('documents.' + this.docId + '.cy.edges.' + edge.id());
+        let edgePathStr = this.getModelEdgePathStr(edge.id(), cyId);
+        let edgePath = this.model.at(edgePathStr);
         if (edgePath.get() == null)
             return "Edge id not found";
         let userPath = this.model.at('documents.' + this.docId + '.users.' + userId);
-        this.model.pass({user: user}).set('documents.' + this.docId + '.cy.edges.' + edge.id()+ '.highlightColor', userPath.get('colorCode'));
-
-
-
-
+        this.model.pass({user: user}).set(edgePathStr + '.highlightColor', userPath.get('colorCode'));
         return "success";
 
     }
-    unselectModelNode (node,  user, noHistUpdate) {
 
-        let nodePath = this.model.at('documents.' + this.docId + '.cy.nodes.' + node.id());
+    unselectModelNode (node, cyId,  user, noHistUpdate) {
+
+        let nodePathStr = this.getModelNodePathStr(node.id(), cyId);
+        let nodePath = this.model.at(nodePathStr);
+
 
         if (nodePath.get() == null)
             return "Node id not found";
 
-        this.model.pass({user: user}).set('documents.' + this.docId + '.cy.nodes.' + node.id() + '.highlightColor', null);
+        this.model.pass({user: user}).set(nodePathStr + '.highlightColor', null);
 
         return "success";
 
     }
 
 
-    unselectModelEdge (edge,  user, noHistUpdate) {
+    unselectModelEdge (edge,  cyId, user, noHistUpdate) {
 
-        let edgePath = this.model.at('documents.' + this.docId + '.cy.edges.' + edge.id());
+        let edgePathStr = this.getModelEdgePathStr(edge.id(), cyId);
+        let edgePath = this.model.at(edgePathStr);
         if (edgePath.get() == null)
             return "Edge id not found";
 
-        this.model.pass({user: user}).set('documents.' + this.docId + '.cy.edges.' + edge.id() + '.highlightColor', null);
+        this.model.pass({user: user}).set(edgePathStr + '.highlightColor', null);
 
         return "success";
 
@@ -422,18 +500,19 @@ class ModelManager{
      * @returns {*}
      */
 
-    addModelNode (nodeId, param, user, noHistUpdate) {
+    addModelNode (nodeId, cyId, param, user, noHistUpdate) {
+        let nodePathStr = this.getModelNodePathStr(nodeId, cyId);
 
-
-        if (this.model.get("documents.' + this.docId + '.cy.nodes." + nodeId + '.id') != null)
+        if (this.model.get(nodePathStr) != null)
             return "Node cannot be duplicated";
 
-        this.model.pass({user: user}).set('documents.' + this.docId + '.cy.nodes.' + nodeId + '.data.id', nodeId);
-        this.model.pass({user: user}).set('documents.' + this.docId + '.cy.nodes.' + nodeId + '.position', param.position);
-        this.model.pass({user: user}).set('documents.' + this.docId + '.cy.nodes.' + nodeId + '.data', param.data);
+        this.model.pass({user: user}).set(nodePathStr + '.id', nodeId);
+        this.model.pass({user: user}).set(nodePathStr + '.data.id', nodeId);
+        this.model.pass({user: user}).set(nodePathStr + '.position', param.position);
+        this.model.pass({user: user}).set(nodePathStr + '.data', param.data);
 
         //adding the node in cytoscape
-        this.model.pass({user: user}).set('documents.' + this.docId + '.cy.nodes.' + nodeId + '.addedLater', true);
+        this.model.pass({user: user}).set(nodePathStr+ '.addedLater', true);
 
 
 
@@ -444,6 +523,7 @@ class ModelManager{
                 opTarget: 'element',
                 elType: 'node',
                 elId: nodeId,
+                cyId: cyId,
                 param: param
 
             });
@@ -461,17 +541,18 @@ class ModelManager{
      * @param noHistUpdate
      * @returns {*}
      */
-    addModelEdge (edgeId, param, user, noHistUpdate) {
+    addModelEdge (edgeId, cyId, param, user, noHistUpdate) {
 
-        if (this.model.get("documents.' + this.docId + '.cy.edges." + edgeId + '.id') != null)
+        let edgePathStr = this.getModelEdgePathStr(edgeId, cyId);
+        if (this.model.get(edgePathStr) != null)
             return "Edge cannot be duplicated";
 
-        this.model.pass({user: user}).set('documents.' + this.docId + '.cy.edges.' + edgeId + '.data.id', edgeId);
-        this.model.pass({user: user}).set('documents.' + this.docId + '.cy.edges.' + edgeId + '.data', param.data);
+        this.model.pass({user: user}).set(edgePathStr+ '.data.id', edgeId);
+        this.model.pass({user: user}).set(edgePathStr+ '.data', param.data);
 
 
         //adding the edge...other operations should be called after this
-        this.model.pass({user: user}).set('documents.' + this.docId + '.cy.edges.' + edgeId + '.addedLater', true);
+        this.model.pass({user: user}).set(edgePathStr + '.addedLater', true);
 
 
         if (!noHistUpdate)
@@ -480,6 +561,7 @@ class ModelManager{
                 opTarget: 'element',
                 elType: 'edge',
                 elId: edgeId,
+                cyId: cyId,
                 param: param
 
             });
@@ -497,17 +579,18 @@ class ModelManager{
      * @param user
      * @param noHistUpdate
      */
-    addModelCompound (compoundId, compoundAtts, elList, paramList, user, noHistUpdate) {
+    addModelCompound (compoundId, cyId, compoundAtts, elList, paramList, user, noHistUpdate) {
 
 
         let prevParentList = [];
         paramList.forEach(function(param){
             prevParentList.push(paramList.parent);
         });
-        this.addModelNode(compoundId, compoundAtts, user, true);
+        this.addModelNode(compoundId, cyId, compoundAtts, user, true);
 
 
-        this.changeModelElementGroupAttribute("data", elList, paramList, user, true);
+
+        this.changeModelElementGroupAttribute("data", elList, cyId, paramList,  user, true);
 
 
 
@@ -516,6 +599,7 @@ class ModelManager{
                 opName: 'add',
                 opTarget: 'compound',
                 elId: compoundId,
+                cyId: cyId,
                 param: {paramList: paramList, childrenList: elList, compoundAtts: compoundAtts},
                 prevParam:  prevParentList //TODO
             });
@@ -523,10 +607,10 @@ class ModelManager{
     }
 
     //change children's parents to their old parents
-    removeModelCompound (compoundId, childrenList, prevParentList, user, noHistUpdate) {
+    removeModelCompound (compoundId, cyId, childrenList, prevParentList, user, noHistUpdate) {
         let self = this;
 
-        let nodePath = this.model.at('documents.' + this.docId + '.cy.nodes.' + compoundId);
+        let nodePath = this.model.at('documents.' + this.docId + '.cy.' + cyId + '.nodes.' + compoundId);
 
         let compoundAtts = {
             id: compoundId,
@@ -538,13 +622,13 @@ class ModelManager{
 
         let paramList = [];
         childrenList.forEach(function(child){
-            let data = self.model.get('documents.' + self.docId + '.cy.nodes.'+child.id + '.data');
+            let data = self.model.get(self.getModelNodePathStr(child.id, cyId));
             paramList.push(data);
         });
 
         //isolate the compound first, then delete
-        this.changeModelElementGroupAttribute("data.parent", childrenList, prevParentList, user, true);
-        this.deleteModelNode(compoundId, user, true);
+        this.changeModelElementGroupAttribute("data.parent", childrenList, cyId, prevParentList,   user, true);
+        this.deleteModelNode(compoundId, cyId, user, true);
 
 
 
@@ -554,6 +638,7 @@ class ModelManager{
                 opName: 'delete',
                 opTarget: 'compound',
                 elId: compoundId,
+                cyId: cyId,
                 prevParam: {childrenList: childrenList, compoundAtts: compoundAtts, paramList: paramList},
                 param: prevParentList
             });
@@ -564,7 +649,7 @@ class ModelManager{
 
     //attStr: attribute namein the model
     //historyData is for  sbgnStatesAndInfos only
-    changeModelElementGroupAttribute (attStr, elList, paramList, user, noHistUpdate) { //historyData){
+    changeModelElementGroupAttribute (attStr, elList, cyId, paramList,   user, noHistUpdate) { //historyData){
         let self = this;
         let prevParamList = [];
 
@@ -574,9 +659,9 @@ class ModelManager{
 
                 let prevAttVal;
                 if (el.isNode)
-                    prevAttVal = self.model.get('documents.' + self.docId + '.cy.nodes.' + el.id + '.' + attStr);
+                    prevAttVal = self.model.get(self.getModelNodePathStr(el.id, cyId) + '.' + attStr);
                 else
-                    prevAttVal = self.model.get('documents.' + self.docId + '.cy.edges.' + el.id + '.' + attStr);
+                    prevAttVal = self.model.get(self.getModelEdgePathStr(el.id, cyId) + '.' + attStr);
 
 
                 prevParamList.push(prevAttVal);
@@ -587,6 +672,7 @@ class ModelManager{
                 opName: 'set',
                 opTarget: 'element group',
                 elId: elList,
+                cyId: cyId,
                 opAttr: attStr,
                 param: paramList,
                 prevParam: prevParamList
@@ -599,9 +685,9 @@ class ModelManager{
             let currAttVal = paramList[ind++];
 
             if (el.isNode)
-                self.changeModelNodeAttribute(attStr, el.id, currAttVal, user, true); //don't update individual histories
+                self.changeModelNodeAttribute(attStr, el.id, cyId, currAttVal, user, true); //don't update individual histories
             else
-                self.changeModelEdgeAttribute(attStr, el.id, currAttVal, user, true);
+                self.changeModelEdgeAttribute(attStr, el.id, cyId, currAttVal, user, true);
 
         });
 
@@ -609,23 +695,25 @@ class ModelManager{
 
     }
 
-    getModelNodeAttribute(attStr, nodeId){
-        let nodePath = this.model.at('documents.' + this.docId + '.cy.nodes.' + nodeId);
+    getModelNodeAttribute(attStr, nodeId, cyId){
+        let nodePathStr = this.getModelNodePathStr(nodeId, cyId);
+        let nodePath = this.model.at(nodePathStr);
 
         return nodePath.get(attStr);
     }
 
-    getModelEdgeAttribute(attStr, edgeId){
-        let edgePath = this.model.at('documents.' + this.docId + '.cy.edges.' + edgeId);
+    getModelEdgeAttribute(attStr, edgeId, cyId){
+        let edgePathStr = this.getModelEdgePathStr(edgeId, cyId);
+        let edgePath = this.model.at(edgePathStr);
 
         return edgePath.get(attStr);
     }
     //attStr: attribute namein the model
     //historyData is for  sbgnStatesAndInfos only
-    changeModelNodeAttribute (attStr, nodeId, attVal, user, noHistUpdate) { //historyData){
+    changeModelNodeAttribute (attStr, nodeId, cyId, attVal, user, noHistUpdate) { //historyData){
 
-        let status = "Node id not found";
-        let nodePath = this.model.at('documents.' + this.docId + '.cy.nodes.' + nodeId);
+        let nodePathStr = this.getModelNodePathStr(nodeId, cyId);
+        let nodePath = this.model.at(nodePathStr);
 
 
         let prevAttVal = nodePath.get(attStr);
@@ -652,7 +740,7 @@ class ModelManager{
 
 
         if (attStr != 'interactionCount') {
-            this.model.increment('documents.' + this.docId + '.cy.nodes.' + nodeId + '.interactionCount', 1);
+            this.model.increment(nodePathStr +  '.interactionCount', 1);
 
             if (!noHistUpdate) {
 
@@ -661,33 +749,39 @@ class ModelManager{
                     opTarget: 'element',
                     elType: 'node',
                     elId: nodeId,
+                    cyId: cyId,
                     opAttr: attStr,
                     param: attVal,
                     prevParam: prevAttVal
                 });
             }
         }
-        status = "success";
 
-
-        return status;
+        return "success";
 
     }
 
 
-    changeModelEdgeAttribute (attStr, edgeId, attVal, user, noHistUpdate) {
-        let status = "Edge id not found";
-        let edgePath = this.model.at('documents.' + this.docId + '.cy.edges.' + edgeId);
+    changeModelEdgeAttribute (attStr, edgeId, cyId, attVal, user, noHistUpdate) {
+        let edgePathStr = this.getModelEdgePathStr(edgeId, cyId);
+        let edgePath = this.model.at(edgePathStr);
         let prevAttVal = edgePath.get(attStr);
         edgePath.pass({user: user}).set(attStr, attVal);
 
 
         let sourceId = edgePath.get('source');
         let targetId = edgePath.get('target');
-        if (sourceId)
-            this.model.increment('documents.' + this.docId + '.cy.nodes.' + sourceId + '.interactionCount', 1);
-        if (targetId)
-            this.model.increment('documents.' + this.docId + '.cy.nodes.' + targetId + '.interactionCount', 1);
+
+        if (sourceId){
+            let sourcePathStr = this.getModelNodePathStr(sourceId, cyId);
+            this.model.increment(sourcePathStr +  '.interactionCount', 1);
+        }
+
+        if (targetId){
+            let targetPathStr = this.getModelNodePathStr(targetId, cyId);
+            this.model.increment(targetPathStr +  '.interactionCount', 1);
+        }
+
 
 
         if (!noHistUpdate) {
@@ -697,6 +791,7 @@ class ModelManager{
                 opTarget: 'element',
                 elType: 'edge',
                 elId: edgeId,
+                cyId: cyId,
                 opAttr: attStr,
                 param: attVal,
                 prevParam: prevAttVal
@@ -704,16 +799,16 @@ class ModelManager{
 
         }
 
-        status = "success";
 
 
-        return status;
+
+        return "success";
     }
 
     //willUpdateHistory: Depending on the parent command, history will be updated or not
-    deleteModelNode (nodeId, user, noHistUpdate) {
-        let nodePath = this.model.at('documents.' + this.docId + '.cy.nodes.' + nodeId);
-
+    deleteModelNode (nodeId, cyId, user, noHistUpdate) {
+        let nodePathStr = this.getModelNodePathStr(nodeId, cyId);
+        let nodePath = this.model.at(nodePathStr);
 
         if (nodePath.get() == null)
             return "Node id not found";
@@ -729,22 +824,23 @@ class ModelManager{
                 opTarget: 'element',
                 elType: 'node',
                 elId: nodeId,
+                cyId: cyId,
                 prevParam: prevParam
 
             });
 
         }
 
-        this.model.pass({user: user}).del(('documents.' + this.docId + '.cy.nodes.' + nodeId));
+        this.model.pass({user: user}).del(nodePathStr);
 
         return "success";
 
     }
 
 
-    deleteModelEdge (edgeId, user, noHistUpdate) {
-
-        let edgePath = this.model.at('documents.' + this.docId + '.cy.edges.' + edgeId);
+    deleteModelEdge (edgeId, cyId, user, noHistUpdate) {
+        let edgePathStr = this.getModelEdgePathStr(edgeId, cyId);
+        let edgePath = this.model.at(edgePathStr);
         if (edgePath.get() == null)
             return "Edge id not found";
 
@@ -758,19 +854,20 @@ class ModelManager{
                 opTarget: 'element',
                 elType: 'edge',
                 elId: edgeId,
+                cyId: cyId,
                 prevParam: prevParam
             });
 
         }
 
-        this.model.pass({user: user}).del(('documents.' + this.docId + '.cy.edges.' + edgeId));
+        this.model.pass({user: user}).del(edgePathStr);
 
         return "success";
 
     }
 
 
-    deleteModelElementGroup (selectedEles, user, noHistUpdate) {
+    deleteModelElementGroup (selectedEles, cyId, user, noHistUpdate) {
         let prevParamsNodes = [];
         let prevParamsEdges = [];
         let self = this;
@@ -778,26 +875,28 @@ class ModelManager{
 
         if(selectedEles.edges!= null){
             selectedEles.edges.forEach(function (edge) {
-                let edgePath = self.model.at('documents.' + self.docId + '.cy.edges.' + edge.id);
+                let edgePathStr = self.getModelEdgePathStr(edge.id, cyId);
+                let edgePath = self.model.at(edgePathStr);
                 prevParamsEdges.push(edgePath.get());
             });
 
 
             selectedEles.edges.forEach(function (edge) {
-                self.deleteModelEdge(edge.id, user, true); //will not update children history
+                self.deleteModelEdge(edge.id, cyId, user, true); //will not update children history
             });
         }
 
         if(selectedEles.nodes!= null) {
             selectedEles.nodes.forEach(function (node) {
-                let nodePath = self.model.at('documents.' + self.docId + '.cy.nodes.' + node.id);
+                let nodePathStr = self.getModelNodePathStr(node.id, cyId);
+                let nodePath = self.model.at(nodePathStr);
 
                 prevParamsNodes.push(nodePath.get());
             });
 
 
             selectedEles.nodes.forEach(function (node) {
-                self.deleteModelNode(node.id, user, true); //will not update children history
+                self.deleteModelNode(node.id, cyId, user, true); //will not update children history
             });
         }
         if (!noHistUpdate)
@@ -805,29 +904,30 @@ class ModelManager{
                 opName: 'delete',
                 opTarget: 'element group',
                 elId: selectedEles,
+                cyId: cyId,
                 prevParam: {nodes: prevParamsNodes, edges: prevParamsEdges}
             });
 
 
     }
 
-    restoreModelElementGroup (elList, param, user, noHistUpdate) {
+    restoreModelElementGroup (elList, cyId, param, user, noHistUpdate) {
         let self = this;
         //Restore nodes first
 
 
         for (let i = 0; i < elList.nodes.length; i++) {
-            self.restoreModelNode(elList.nodes[i].id, param.nodes[i], user, noHistUpdate);
+            self.restoreModelNode(elList.nodes[i].id, cyId, param.nodes[i], user, noHistUpdate);
         }
 
         //restore edges later
         for (let i = 0; i < elList.edges.length; i++) {
-            self.restoreModelEdge(elList.edges[i].id, param.edges[i], user, noHistUpdate);
+            self.restoreModelEdge(elList.edges[i].id, cyId,  param.edges[i], user, noHistUpdate);
         }
 
         //change parents after adding them all
         for (let i = 0; i < elList.nodes.length; i++) {
-            self.changeModelNodeAttribute('parent', elList.nodes[i].id, param.nodes[i].parent, null, noHistUpdate);
+            self.changeModelNodeAttribute('parent', elList.nodes[i].id, cyId, param.nodes[i].parent, null, noHistUpdate);
         }
 
 
@@ -837,6 +937,7 @@ class ModelManager{
                 opName: 'restore',
                 opTarget: 'element group',
                 elId: elList,
+                cyId: cyId,
                 param: param
 
             });
@@ -845,37 +946,37 @@ class ModelManager{
      *
      * Restore operations for global undo/redo
      */
-    restoreModelNode (nodeId, param, user, noHistUpdate) {
+    restoreModelNode (nodeId, cyId, param, user, noHistUpdate) {
 
         //param is the previous node data
         //history is updated as restore command
-        this.addModelNode(nodeId, param, user, true);
+        this.addModelNode(nodeId, cyId, param, user, true);
 
         //No need to init -- data and position are updated in the next steps
 
         if (!noHistUpdate)
-            this.updateHistory({opName: 'restore', opTarget: 'element', elType: 'node', elId: nodeId, param:param});
+            this.updateHistory({opName: 'restore', opTarget: 'element', elType: 'node', elId: nodeId, cyId: cyId, param:param});
     }
 
 
-    restoreModelEdge (edgeId, param, user, noHistUpdate) {
+    restoreModelEdge (edgeId, cyId, param, user, noHistUpdate) {
         //param is the previous edge data
         //history is updated as restore command
-        this.addModelEdge(edgeId, param, user, true);
+        this.addModelEdge(edgeId, cyId, param, user, true);
         //No need to init -- data and position are updated in the next steps
 
 
         if (!noHistUpdate)
-            this.updateHistory({opName: 'restore', opTarget: 'element', elType: 'edge', elId: edgeId, param:param});
+            this.updateHistory({opName: 'restore', opTarget: 'element', elType: 'edge', elId: edgeId, cyId: cyId, param:param});
     }
 
 
-    restoreModelElement (elType, elId, param, user, noHistUpdate) {
+    restoreModelElement (elType, elId, cyId, param, user, noHistUpdate) {
 
         if (elType == "node")
-            this.restoreModelNode(elId, param, user, noHistUpdate);
+            this.restoreModelNode(elId, cyId, param, user, noHistUpdate);
         else
-            this.restoreModelEdge(elId, param, user, noHistUpdate);
+            this.restoreModelEdge(elId, cyId, param, user, noHistUpdate);
 
 
     }
@@ -887,40 +988,44 @@ class ModelManager{
      * @param user
      * @param noHistUpdate
      */
-    restoreModel (modelCy, user, noHistUpdate) {
-        let prevParam = this.model.get('documents.' + this.docId + '.cy');
-        this.model.set('documents.' + this.docId + '.cy', modelCy);
+    restoreModel (modelCy, cyId, user, noHistUpdate) {
+        let cyPathStr = this.getModelCyPathStr(cyId);
+        let prevParam = this.model.get(cyPathStr);
+        console.log(prevParam);
+        this.model.pass({user: user}).set(cyPathStr , modelCy);
+
 
         // this.setSampleInd(-1, null, true); //to get a new container
 
         if (!noHistUpdate)
-            this.updateHistory({opName: 'restore', prevParam: prevParam, param: modelCy, opTarget: 'model'});
+            this.updateHistory({opName: 'restore', prevParam: prevParam, param: modelCy, cyId: cyId, opTarget: 'model'});
 
     }
 
     //should be called before loading a new graph to prevent id confusion
-    newModel (user, noHistUpdate) {
+    newModel (cyId, user, noHistUpdate) {
 
         let self = this;
-        let prevModelCy = this.model.get('documents.' + this.docId + '.cy');
+        let cyPathStr = this.getModelCyPathStr(cyId);
+        let prevModelCy = this.model.get(cyPathStr);
 
 
         if (!noHistUpdate)
-            this.updateHistory({opName: 'new', prevParam: prevModelCy, opTarget: 'model'});
+            this.updateHistory({opName: 'new', prevParam: prevModelCy, cyId: cyId, opTarget: 'model'});
 
-        let edges = this.model.get('documents.' + this.docId + '.cy.edges');
-        let nodes = this.model.get('documents.' + this.docId + '.cy.nodes');
+        let edges = this.model.get(cyPathStr +'.edges');
+        let nodes = this.model.get(cyPathStr +'.nodes');
 
 
         for (let att in edges) {
             if (edges.hasOwnProperty(att)) {
-                self.deleteModelEdge(edges[att].id, user, true);
+                self.deleteModelEdge(edges[att].id, cyId, user, true);
             }
         }
 
         for (let att in nodes) {
             if (nodes.hasOwnProperty(att)) {
-                self.deleteModelNode(nodes[att].id, user, true);
+                self.deleteModelNode(nodes[att].id, cyId, user, true);
             }
         }
 
@@ -929,32 +1034,34 @@ class ModelManager{
 
 
     //should be called before loading a new graph to prevent id confusion
-    deleteAll (nodes, edges, user, noHistUpdate) {
+    deleteAll (nodes, edges, cyId, user, noHistUpdate) {
 
         let self = this;
         if (!noHistUpdate)
-            this.updateHistory({opName: 'new', opTarget: 'model'});
+            this.updateHistory({opName: 'new', cyId: cyId, opTarget: 'model'});
 
 
         edges.forEach(function (edge) {
-            self.deleteModelEdge(edge.id(), user, noHistUpdate);
+            self.deleteModelEdge(edge.id(), cyId,  user, noHistUpdate);
         });
 
         nodes.forEach(function (node) {
-            self.deleteModelNode(node.id(), user, noHistUpdate);
+            self.deleteModelNode(node.id(), cyId, user, noHistUpdate);
         });
 
 
     }
 
     //convert model to array
-    getJsonFromModel () {
-        let nodes = this.model.get('documents.' + this.docId + '.cy.nodes');
+    getJsonFromModel (cyId) {
+
+        let cyPathStr = this.getModelCyPathStr(cyId);
+        let nodes = this.model.get(cyPathStr +'.nodes');
 
         if (nodes == null)
             return null;
 
-        let edges = this.model.get('documents.' + this.docId + '.cy.edges');
+        let edges = this.model.get(cyPathStr +'.edges');
 
         let jsonNodes = [];
         let jsonEdges = [];
@@ -993,23 +1100,23 @@ class ModelManager{
      * @param user: to make sure we don't update the data of same client
      * @param noHistUpdate
      */
-    initModelNode (node, user, noHistUpdate) {
+    initModelNode (node, cyId, user, noHistUpdate) {
 
-
-        let nodePath = this.model.at('documents.' + this.docId + '.cy.nodes.' + node.id());
+        let nodePathStr = this.getModelNodePathStr(node.id(), cyId);
+        let nodePath = this.model.at(nodePathStr);
 
         if (!noHistUpdate)
-            this.updateHistory({opName: 'init', opTarget: 'element', elType: 'node', elId: node.id()});
+            this.updateHistory({opName: 'init', opTarget: 'element', elType: 'node', elId: node.id(), cyId: cyId});
 
 
         nodePath.set('id', node.id());
 
-        node._private.data.annotationsView = null;
+        // node._private.data.annotationsView = null;
 
         let interactionCount = nodePath.get('interactionCount');
 
         if (interactionCount == null) //this is not stored in cy
-            this.changeModelNodeAttribute('interactionCount', node.id(), 0, user, true); //don't update history
+            this.changeModelNodeAttribute('interactionCount', node.id(), cyId,  0, user, true); //don't update history
 
         let data = nodePath.get('data');
         //bbox is a random data parameter to make sure all data parts are already in the model
@@ -1047,7 +1154,7 @@ class ModelManager{
                 }
                 node._private.data.statesandinfos = nodeData.statesandinfos;
             }
-            this.changeModelNodeAttribute('data', node.id(), nodeData, user, noHistUpdate);
+            this.changeModelNodeAttribute('data', node.id(), cyId, nodeData, user, noHistUpdate);
         }
 
         //make this initially unselected
@@ -1063,22 +1170,23 @@ class ModelManager{
             let nodePosition = node.position();
             if(nodePosition == null)
                 nodePosition = node._private.position;
-            this.changeModelNodeAttribute('position', node.id(), nodePosition, user, noHistUpdate);
+            this.changeModelNodeAttribute('position', node.id(), cyId, nodePosition, user, noHistUpdate);
         }
 
         //Initializing css properties causes bypass problems!!
 
     }
 
-    initModelEdge (edge, user, noHistUpdate) {
-        let edgePath = this.model.at('documents.' + this.docId + '.cy.edges.' + edge.id());
+    initModelEdge (edge, cyId, user, noHistUpdate) {
+        let edgePathStr = this.getModelEdgePathStr(edge.id(), cyId);
+        let edgePath = this.model.at(edgePathStr);
 
         if (!noHistUpdate)
-            this.updateHistory({opName: 'init', opTarget: 'element', elType: 'edge', elId: edge.id()});
+            this.updateHistory({opName: 'init', opTarget: 'element', elType: 'edge', elId: edge.id(), cyId: cyId});
 
         edgePath.set('id', edge.id());
 
-        edge._private.data.annotationsView = null;
+        // edge._private.data.annotationsView = null;
 
         //make this initially unselected
         //edgePath.set('highlightColor', null);
@@ -1094,7 +1202,7 @@ class ModelManager{
             if(edgeData == null)
                 edgeData = edge._private.data;
 
-            this.changeModelEdgeAttribute('data', edge.id(), edgeData, user, noHistUpdate);
+            this.changeModelEdgeAttribute('data', edge.id(), cyId, edgeData, user, noHistUpdate);
         }
 
     }
@@ -1107,71 +1215,60 @@ class ModelManager{
      * @param user
      * @param noHistUpdate
      */
-    initModel ( nodes, edges, appUtilities, user, noHistUpdate) {
+    initModel ( nodes, edges, cyId, appUtilities, user, noHistUpdate) {
 
         let self = this;
 
         console.log("inited");
 
         nodes.forEach(function (node) {
-            self.initModelNode(node, user, true);
+            self.initModelNode(node, cyId, user, true);
 
         });
 
         edges.forEach(function (edge) {
-            self.initModelEdge(edge, user, true);
+            self.initModelEdge(edge, cyId, user, true);
         });
 
 
-        let newModelCy = this.model.get('documents.' + this.docId + '.cy');
+        let newModelCy = this.model.get('documents.' + this.docId + '.cy.' + cyId );
 
 
 
         if (!noHistUpdate) {
-            this.updateHistory({opName: 'init', param: newModelCy, opTarget: 'model'});
+            this.updateHistory({opName: 'init', cyId: cyId, param: newModelCy, opTarget: 'model'});
         }
 
-        console.log("Init model finished")
+        console.log("Init model finished");
         //notifies other clients to update their cy graphs
-        this.model.pass({user:"me"}).set('documents.' + this.docId + '.cy.initTime', new Date());
+        let cyPathStr = this.getModelCyPathStr(cyId);
+        this.model.pass({user:"me"}).set(cyPathStr +'.initTime', new Date());
 
     }
 
 
 
-    setRollbackPoint () {
-        let modelCy = this.getModelCy();
-        this.model.set('documents.' + this.docId + '.prevCy', modelCy);
+    setRollbackPoint (cyId) {
+        let modelCy = this.getModelCy(cyId);
+        this.model.set('documents.' + this.docId + '.prevCy.' + cyId, modelCy);
     }
 
-    getModelCy () {
-        return this.model.get('documents.' + this.docId + '.cy');
+    getModelCy (cyId) {
+        let cyPathStr = this.getModelCyPathStr(cyId);
+        return this.model.get(cyPathStr);
     }
 
     //for undo/redo only
-    mergeJsons (user, noHistUpdate) {
-        let modelCy = this.model.get('documents.' + this.docId + '.cy');
-        let prevModelCy = this.model.get('documents.' + this.docId + '.prevCy');
+    mergeJsons (cyId, user, noHistUpdate) {
+        let cyPathStr = this.getModelCyPathStr(cyId);
+        let modelCy = this.model.get(cyPathStr);
+        let prevModelCy = this.model.get('documents.' + this.docId + '.prevCy.' + cyId); //updated at rollback point
 
         if (!noHistUpdate) {
 
-            this.updateHistory({opName: 'merge', prevParam: prevModelCy, param: modelCy, opTarget: 'model'});
+            this.updateHistory({opName: 'merge', cyId: cyId, prevParam: prevModelCy, param: modelCy, opTarget: 'model'});
         }
 
-    }
-
-    updateFactoidModel(factoidModel, user, noHistUpdate){
-        this.model.pass({user:user}).set('documents.' + this.docId + '.factoid', factoidModel);
-
-        if(!noHistUpdate){
-            let prevFactoidModel = this.model.get('documents.' + this.docId + '.factoid');
-            this.updateHistory({opName:'factoid',  prevParam: prevFactoidModel, param: factoidModel, opTarget:'model'});
-        }
-
-    }
-
-    getFactoidModel(){
-        return this.model.get('documents.' + this.docId + '.factoid');
     }
 
 

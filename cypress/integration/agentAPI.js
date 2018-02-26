@@ -73,11 +73,11 @@ describe('Agent API Test', function () {
         });
     }
 
-    function sendGetRequest(){
+    function sendGetRequest(cyId){
 
         it('agent.getNode', function(done) {
             let node1 = "agentNode1";
-            agent.getNodeRequest(node1, function () {
+            agent.getNodeRequest(node1, cyId,  function () {
                 equal(agent.selectedNode.id).to.equal(node1);
                 done();
             });
@@ -85,21 +85,22 @@ describe('Agent API Test', function () {
         });
         it('agent.getEdge', function(done) {
             let edge1 = "agentNode1-agentNode2";
-            agent.getEdgeRequest(edge1, function () {
+            agent.getEdgeRequest(edge1, cyId, function () {
                 equal(agent.selectedEdge.id).to.equal(edge1);
                 done();
             });
         });
     }
 
-    function addNodeRequest(props, attr) {
+    function addNodeRequest(cyId, props, attr) {
 
         it('agent.addNode', function (done) {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
-                agent.sendRequest("agentAddNodeRequest", props, function (nodeId) {
+                props.cyId = cyId;
+                agent.sendRequest("agentAddNodeRequest", props,   function (nodeId) {
                     setTimeout(function () { //should wait here as well
-                        let val = modelManager.getModelNode(nodeId);
+                        let val = modelManager.getModelNode(nodeId, cyId);
 
                         expect(val).to.be.ok;
                         expect(val.data.class).to.equal(props.data.class);
@@ -114,19 +115,20 @@ describe('Agent API Test', function () {
     }
 
 
-    function addEdgeRequest(props, sourceInd, targetInd) {
+    function addEdgeRequest(cyId, props, sourceInd, targetInd) {
         it('agent.addEdge', function (done) {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
-                let nodes = modelManager.getModelNodesArr();
+                let nodes = modelManager.getModelNodesArr(cyId);
                 let source = nodes[sourceInd].data.id;
                 let target = nodes[targetInd].data.id;
                 props.data.source = source;
                 props.data.target = target;
                 props.id = source + "-" + target;
-                agent.sendRequest("agentAddEdgeRequest", props, function (edgeId) {
+                props.cyId = cyId;
+                agent.sendRequest("agentAddEdgeRequest", props,   function (edgeId) {
                     setTimeout(function () { //should wait here as well
-                        let val = modelManager.getModelEdge(edgeId);
+                        let val = modelManager.getModelEdge(edgeId, cyId);
                         expect(props.id).to.equal(edgeId);
                         expect(val).to.be.ok;
                         expect(val.data.class).to.equal(props.data.class);
@@ -140,26 +142,21 @@ describe('Agent API Test', function () {
     }
 
     //Delete 3 elements
-    function deleteElesRequest(type, edgeInd, node1Ind, node2Ind){
+    function deleteElesRequest(cyId,type, edgeInd, node1Ind, node2Ind){
         it('agent.agentDeleteElesRequest', function (done) {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
-                let nodes = modelManager.getModelNodesArr();
-                console.log("nodes are");
-                console.log(nodes);
-                let edges = modelManager.getModelEdgesArr();
-                console.log("edges are");
-
-                console.log(edges);
+                let nodes = modelManager.getModelNodesArr(cyId);
+                let edges = modelManager.getModelEdgesArr(cyId);
 
                 let eles  = [edges[edgeInd].data.id, nodes[node1Ind].data.id, nodes[node2Ind].data.id] ;
-                agent.sendRequest("agentDeleteElesRequest", {elementIds: eles, type: type}, function () {
+                agent.sendRequest("agentDeleteElesRequest", {elementIds: eles, type: type, cyId: cyId}, function () {
                     setTimeout(function () { //should wait here as well
-                        let valEdge = modelManager.getModelEdge(eles[0]);
+                        let valEdge = modelManager.getModelEdge(eles[0], cyId);
                         expect(valEdge).to.be.not.ok;
-                        let valNode1 = modelManager.getModelNode(eles[1]);
+                        let valNode1 = modelManager.getModelNode(eles[1], cyId);
                         expect(valNode1).to.be.not.ok;
-                        let valNode2 = modelManager.getModelNode(eles[2]);
+                        let valNode2 = modelManager.getModelNode(eles[2], cyId);
                         expect(valNode2).to.be.not.ok;
 
                         done();
@@ -171,17 +168,17 @@ describe('Agent API Test', function () {
         });
     }
 
-    function undoDeleteRequest() {
+    function undoDeleteRequest(cyId) {
         it('agent.undoDeleteRequest', function (done) {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
                 agent.sendRequest("agentUndoRequest", null, function () {
                     setTimeout(function () { //should wait here as well
-                        let nodes = modelManager.getModelNodesArr();
+                        let nodes = modelManager.getModelNodesArr(cyId);
                         console.log(nodes);
                         expect(nodes.length).to.equal(3);
 
-                        let edges = modelManager.getModelEdgesArr();
+                        let edges = modelManager.getModelEdgesArr(cyId);
                         expect(edges.length).to.equal(1);
                         console.log(edges);
 
@@ -193,16 +190,16 @@ describe('Agent API Test', function () {
         });
     }
 
-    function redoDeleteRequest() {
+    function redoDeleteRequest(cyId) {
         it('agent.redoDeleteRequest', function (done) {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
                 agent.sendRequest("agentRedoRequest", null, function (undoActionStr) {
                     setTimeout(function () { //should wait here as well
-                        let nodes = modelManager.getModelNodesArr();
+                        let nodes = modelManager.getModelNodesArr(cyId);
                         expect(nodes.length).to.equal(0);
 
-                        let edges = modelManager.getModelEdgesArr();
+                        let edges = modelManager.getModelEdgesArr(cyId);
                         expect(edges.length).to.equal(0);
 
                         done();
@@ -213,14 +210,14 @@ describe('Agent API Test', function () {
         });
     }
 
-    function moveNodeRequest(pos){
+    function moveNodeRequest(cyId,pos){
         it('agent.moveNodeRequest', function (done) {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
-                let nodeId = modelManager.getModelNodesArr()[0].id;
-                agent.sendRequest("agentMoveNodeRequest", {id: nodeId,  pos:pos}, function(){
+                let nodeId = modelManager.getModelNodesArr(cyId)[0].id;
+                agent.sendRequest("agentMoveNodeRequest", {id: nodeId, cyId: cyId,  pos:pos}, function(){
                     setTimeout(function () { //should wait here as well
-                        let val = modelManager.getModelNodeAttribute("position", nodeId);
+                        let val = modelManager.getModelNodeAttribute("position", nodeId, cyId);
                         expect(val).to.be.deep.equal(pos);
                         done();
                     },100);
@@ -230,12 +227,12 @@ describe('Agent API Test', function () {
     }
 
 
-    function alignRequest(){
+    function alignRequest(cyId){
         it('agent.alignRequest', function (done) {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
-                let nodeId = modelManager.getModelNodesArr()[0].id;
-                agent.sendRequest("agentAlignRequest", {nodeIds: '*', alignTo:nodeId, horizontal:"none", vertical:"center"}, function(res){
+                let nodeId = modelManager.getModelNodesArr(cyId)[0].id;
+                agent.sendRequest("agentAlignRequest", {nodeIds: '*', cyId: cyId, alignTo:nodeId, horizontal:"none", vertical:"center"}, function(res){
                     setTimeout(function () { //should wait here as well
                         expect(res).to.equal("success");
                         done();
@@ -246,11 +243,11 @@ describe('Agent API Test', function () {
         });
     }
 
-    function layoutRequest() {
+    function layoutRequest(cyId) {
         it('agent.layoutRequest', function (done) {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
-                agent.sendRequest("agentRunLayoutRequest", null, function (val) {
+                agent.sendRequest("agentRunLayoutRequest", {cyId:cyId}, function (val) {
                     setTimeout(function () { //should wait here as well
                         expect(val).to.equal("success");
                         done();
@@ -260,7 +257,7 @@ describe('Agent API Test', function () {
         });
     }
 
-    function addCompound(type, inds){
+    function addCompound(cyId,type, inds){
 
         it('agent.addCompoundRequest', function(done) {
             cy.window().should(function (window) {
@@ -268,33 +265,33 @@ describe('Agent API Test', function () {
                 //add first two nodes
                 let  elementIds = [];
                 inds.forEach(function(ind){
-                    elementIds.push( modelManager.getModelNodesArr()[ind].id);
+                    elementIds.push( modelManager.getModelNodesArr(cyId)[ind].id);
                 });
 
 
-                agent.sendRequest("agentAddCompoundRequest", {val:type, elementIds:elementIds}, function(data){
+                agent.sendRequest("agentAddCompoundRequest", {val:type, cyId: cyId, elementIds:elementIds}, function(data){
                     setTimeout(function () {
 
-                        let node = modelManager.getModelNode(elementIds[0]);
+                        let node = modelManager.getModelNode(elementIds[0], cyId);
 
                         expect(data).to.equal("success");
                         expect(node.data.parent).to.be.ok;
-                        let parent = modelManager.getModelNode(node.data.parent);
+                        let parent = modelManager.getModelNode(node.data.parent, cyId);
                         expect(parent.data.class).to.equal(type);
                         done();
-                    },100);
+                    },500);
                 });
             });
         });
     }
 
-    function undoAddCompound(ind) {
+    function undoAddCompound(cyId, ind) {
         it('agent.undoAddCompound', function (done) {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
                 agent.sendRequest("agentUndoRequest", null, function (undoActionStr) {
                     setTimeout(function () { //should wait here as well
-                        let arr = modelManager.getModelNodesArr();
+                        let arr = modelManager.getModelNodesArr(cyId);
                         expect(arr[ind].data.parent).to.not.be.ok;
 
 
@@ -306,12 +303,12 @@ describe('Agent API Test', function () {
         });
     }
 
-    function changeNodeAttributes(ind) {
+    function changeNodeAttributes(cyId, ind) {
 
         it('agent.changeNodeAttributeRequest', function (done) {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
-                let id = modelManager.getModelNodesArr()[ind].id;
+                let id = modelManager.getModelNodesArr(cyId)[ind].id;
 
                 let attr = [
                     {str: "highlightColor", val: '#991111'},
@@ -337,32 +334,33 @@ describe('Agent API Test', function () {
 
 
                 for (let i = 0; i < attr.length; i++) {
-                    let sendRequests = function (id, attStr, attVal, index) {
+                    let sendRequests = function (id, cyId, attStr, attVal, index) {
                         //Call like this because of asynchronicity
                         agent.sendRequest("agentChangeNodeAttributeRequest", {
                             id: id,
+                            cyId: cyId,
                             attStr: attStr,
                             attVal: attVal
                         }, function () {
-                        setTimeout(function () { //should wait here as well
-                            let val = modelManager.getModelNodeAttribute(attStr, id);
-                            expect(val).to.deep.equal(attVal);
-                            if(index >= attr.length - 1)
-                                done();
-                        }, 100);
+                            setTimeout(function () { //should wait here as well
+                                let val = modelManager.getModelNodeAttribute(attStr, id, cyId);
+                                expect(val).to.deep.equal(attVal);
+                                if(index >= attr.length - 1)
+                                    done();
+                            }, 100);
                         });
-                    }(id, attr[i].str, attr[i].val, i)
+                    }(id, cyId, attr[i].str, attr[i].val, i)
                 }
             });
         });
     }
 
-    function changeEdgeAttributes(ind) {
+    function changeEdgeAttributes(cyId, ind) {
 
         it('agent.changeEdgeAttributeRequest', function (done) {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
-                let id = modelManager.getModelEdgesArr()[ind].id;
+                let id = modelManager.getModelEdgesArr(cyId)[ind].id;
 
                 let attr = [
                     {str: "highlightColor", val: '#991111'},
@@ -382,38 +380,40 @@ describe('Agent API Test', function () {
 
 
                 for (let i = 0; i < attr.length; i++) {
-                    let sendRequests = function (id, attStr, attVal, index) {
+                    let sendRequests = function (id, cyId, attStr, attVal, index) {
                         //Call like this because of asynchronicity
                         agent.sendRequest("agentChangeEdgeAttributeRequest", {
                             id: id,
+                            cyId: cyId,
                             attStr: attStr,
                             attVal: attVal
                         }, function () {
                             setTimeout(function () { //should wait here as well
-                                let val = modelManager.getModelEdgeAttribute(attStr, id);
+                                let val = modelManager.getModelEdgeAttribute(attStr, id, cyId);
                                 expect(val).to.deep.equal(attVal);
                                 if(index >= attr.length - 1)
                                     done();
                             }, 100);
                         });
-                    }(id, attr[i].str, attr[i].val, i)
+                    }(id, cyId, attr[i].str, attr[i].val, i)
                 }
             });
         });
     }
 
-    function hideShow(){
+    function hideShow(cyId){
         it('agent.hide', function(done) {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
-                let id = modelManager.getModelNodesArr()[0].id;
+                let id = modelManager.getModelNodesArr(cyId)[0].id;
 
                 agent.sendRequest("agentUpdateVisibilityStatusRequest", {
                     val: "hide",
+                    cyId: cyId,
                     elementIds: [id]
                 }, function (out) {
                     setTimeout(function () { //should wait here as well
-                        var vStatus = modelManager.getModelNodeAttribute("visibilityStatus", id);
+                        var vStatus = modelManager.getModelNodeAttribute("visibilityStatus", id,cyId);
                         expect(vStatus).to.equal("hide");
                         done();
                     }, 100);
@@ -424,14 +424,15 @@ describe('Agent API Test', function () {
         it('agent.show', function(done) {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
-                let id = modelManager.getModelNodesArr()[0].id;
+                let id = modelManager.getModelNodesArr(cyId)[0].id;
 
                 agent.sendRequest("agentUpdateVisibilityStatusRequest", {
                     val: "show",
+                    cyId: cyId,
                     elementIds: [id]
                 }, function (out) {
                     setTimeout(function () { //should wait here as well
-                        var vStatus = modelManager.getModelNodeAttribute("visibilityStatus", id);
+                        var vStatus = modelManager.getModelNodeAttribute("visibilityStatus", id, cyId);
                         expect(vStatus).to.equal("hide");
                         done();
                     }, 100);
@@ -443,13 +444,14 @@ describe('Agent API Test', function () {
         it('agent.show', function(done) {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
-                let id = modelManager.getModelNodesArr()[0].id;
+                let id = modelManager.getModelNodesArr(cyId)[0].id;
 
                 agent.sendRequest("agentUpdateVisibilityStatusRequest", {
-                    val: "showAll"
+                    val: "showAll",
+                    cyId: cyId
                 }, function (out) {
                     setTimeout(function () { //should wait here as well
-                        var vStatus = modelManager.getModelNodeAttribute("visibilityStatus", id);
+                        var vStatus = modelManager.getModelNodeAttribute("visibilityStatus", id, cyId);
                         expect(vStatus).to.equal("show");
                         done();
                     }, 100);
@@ -458,16 +460,16 @@ describe('Agent API Test', function () {
         });
     }
 
-    function highlight(){
+    function highlight(cyId){
         it('agent.highlightNeighbors', function(done) {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
-                let id = modelManager.getModelNodesArr()[0].id;
-                let neighborId = modelManager.getModelNodesArr()[2].id;
+                let id = modelManager.getModelNodesArr(cyId)[0].id;
+                let neighborId = modelManager.getModelNodesArr(cyId)[2].id;
 
-                agent.sendRequest("agentUpdateHighlightStatusRequest", {val:"neighbors", elementIds:[id]}, function(out){
+                agent.sendRequest("agentUpdateHighlightStatusRequest", {cyId: cyId, val:"neighbors", elementIds:[id]}, function(out){
                     setTimeout(function () { //should wait here as well
-                        var vStatus = modelManager.getModelNodeAttribute("highlightStatus", neighborId);
+                        var vStatus = modelManager.getModelNodeAttribute("highlightStatus", neighborId, cyId);
                         expect(vStatus).to.equal("highlighted") ;
                         done();
                     },100);
@@ -479,12 +481,12 @@ describe('Agent API Test', function () {
         it('agent.highlightProcesses', function(done) {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
-                let id = modelManager.getModelNodesArr()[0].id;
-                let processId = modelManager.getModelNodesArr()[2].id;
+                let id = modelManager.getModelNodesArr(cyId)[0].id;
+                let processId = modelManager.getModelNodesArr(cyId)[2].id;
 
-                agent.sendRequest("agentUpdateHighlightStatusRequest", {val:"processes", elementIds:[id]}, function(out){
+                agent.sendRequest("agentUpdateHighlightStatusRequest", {cyId:cyId, val:"processes", elementIds:[id]}, function(out){
                     setTimeout(function () { //should wait here as well
-                        var vStatus = modelManager.getModelNodeAttribute("highlightStatus", processId);
+                        var vStatus = modelManager.getModelNodeAttribute("highlightStatus", processId, cyId);
                         expect(vStatus).to.equal("highlighted") ;
                         done();
                     },100);
@@ -496,12 +498,12 @@ describe('Agent API Test', function () {
         it('agent.removeHighlights', function(done) {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
-                let id = modelManager.getModelNodesArr()[2].id;
+                let id = modelManager.getModelNodesArr(cyId)[2].id;
 
 
-                agent.sendRequest("agentUpdateHighlightStatusRequest", {val:"remove"}, function(out){
+                agent.sendRequest("agentUpdateHighlightStatusRequest", {val:"remove", cyId:cyId}, function(out){
                     setTimeout(function () { //should wait here as well
-                        var vStatus = modelManager.getModelNodeAttribute("highlightStatus", id);
+                        var vStatus = modelManager.getModelNodeAttribute("highlightStatus", id,cyId);
                         expect(vStatus).to.not.equal("highlighted") ;
                         done();
                     },100);
@@ -513,15 +515,15 @@ describe('Agent API Test', function () {
     }
 
 
-    function searchByLabel(ind, label) {
+    function searchByLabel(cyId, ind, label) {
         it('agent.searchByLabel', function (done) {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
-                let id = modelManager.getModelNodesArr()[ind].id;
+                let id = modelManager.getModelNodesArr(cyId)[ind].id;
 
-                agent.sendRequest("agentSearchByLabelRequest", {label:label}, function() {
+                agent.sendRequest("agentSearchByLabelRequest", {label:label, cyId:cyId}, function() {
                     setTimeout(function () { //should wait here as well
-                        var vStatus = modelManager.getModelNodeAttribute("highlightStatus", id);
+                        var vStatus = modelManager.getModelNodeAttribute("highlightStatus", id, cyId);
                         expect(vStatus).to.equal("highlighted") ;
                         done();
                     },100);
@@ -532,14 +534,14 @@ describe('Agent API Test', function () {
     }
 
 
-    function expandCollapse(ind) {
+    function expandCollapse(cyId, ind) {
         it('agent.collapse', function (done) {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
-                let id = modelManager.getModelNodesArr()[ind].id;
-                agent.sendRequest("agentUpdateExpandCollapseStatusRequest", {val:"collapse", elementIds:[id]}, function(){
+                let id = modelManager.getModelNodesArr(cyId)[ind].id;
+                agent.sendRequest("agentUpdateExpandCollapseStatusRequest", {val:"collapse",cyId:cyId, elementIds:[id]}, function(){
                     setTimeout(function () { //should wait here as well
-                        var status = modelManager.getModelNodeAttribute("expandCollapseStatus", id);
+                        var status = modelManager.getModelNodeAttribute("expandCollapseStatus", id, cyId);
                         expect(status).to.equal("collapse") ;
                         done();
                     },100);
@@ -550,10 +552,10 @@ describe('Agent API Test', function () {
         it('agent.expand', function (done) {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
-                let id = modelManager.getModelNodesArr()[ind].id;
-                agent.sendRequest("agentUpdateExpandCollapseStatusRequest", {val:"expand", elementIds:[id]}, function(out){
+                let id = modelManager.getModelNodesArr(cyId)[ind].id;
+                agent.sendRequest("agentUpdateExpandCollapseStatusRequest", {val:"expand", elementIds:[id], cyId:cyId}, function(out){
                     setTimeout(function () { //should wait here as well
-                        var status = modelManager.getModelNodeAttribute("expandCollapseStatus", id);
+                        var status = modelManager.getModelNodeAttribute("expandCollapseStatus", id, cyId);
                         expect(status).to.not.equal("collapse") ;
                         done();
                     },100);
@@ -561,26 +563,26 @@ describe('Agent API Test', function () {
             });
         });
     }
-    function merge(){
+    function merge(cyId){
      it('agent.merge', function(done) {
         expect(globalTestData.sbgnData).to.be.ok;
 
-        agent.sendRequest('agentMergeGraphRequest', {type: 'sbgn', graph: globalTestData.sbgnData}, function (data) {
+        agent.sendRequest('agentMergeGraphRequest', {type: 'sbgn', graph: globalTestData.sbgnData, cyId:cyId}, function (data) {
             expect(data).to.be.ok;
             done();
         });
      });
     }
 
-    function newFile(){
-        it('agent.newFileRequest', function(done) {
+    function newFile(cyId){
+        it('agent.cleanAllRequest', function(done) {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
                 let jQuery = window.jQuery;
 
-                agent.sendRequest("agentNewFileRequest", null, function(){
+                agent.sendRequest("agentCleanAllRequest", {}, function(){
                     setTimeout(function () { //should wait here as well
-                        let cy = modelManager.getModelCy();
+                        let cy = modelManager.getModelCy(cyId);
                         expect(jQuery.isEmptyObject(window.appUtilities.getActiveCy().nodes) && jQuery.isEmptyObject(window.appUtilities.getActiveCy().edges)).to.equal(true);
                         done();
                     },100);
@@ -603,54 +605,55 @@ describe('Agent API Test', function () {
 
     }
 
+    let cyId  = 0;
     newAgent();
     checkAgentProperties();
     loadModel();
     changeName();
     sendMessage();
 
-    addNodeRequest({position: {x: 30, y: 40 }, data:{class: "macromolecule"}});
-    addNodeRequest({position: {x: 50, y: 60 }, data:{class: "macromolecule"}});
-    addNodeRequest({position: {x: 90, y: 100} , data:{class: "process"}});
-    addEdgeRequest({data:{class: "consumption"}}, 0, 2);
+    addNodeRequest(cyId, {position: {x: 30, y: 40 }, data:{class: "macromolecule"}});
+    addNodeRequest(cyId, {position: {x: 50, y: 60 }, data:{class: "macromolecule"}});
+    addNodeRequest(cyId, {position: {x: 90, y: 100} , data:{class: "process"}});
+    addEdgeRequest(cyId, {data:{class: "consumption"}}, 0, 2);
 
 
-    addCompound("compartment", [0,1]); //complexes cannot have edges
-    addCompound("complex", [1,2]); //complexes cannot have edges
+    addCompound(cyId, "compartment", [0,1]); //complexes cannot have edges
+    addCompound(cyId, "complex", [1,2]); //complexes cannot have edges
 
-    undoAddCompound(2);
-    undoAddCompound(1);
+    undoAddCompound(cyId, 2);
+    undoAddCompound(cyId, 1);
 
-    moveNodeRequest({x:100, y:80});
-    alignRequest();
-    layoutRequest();
-
-
-
-    changeNodeAttributes(1);
-    changeEdgeAttributes(0);
+    moveNodeRequest(cyId, {x:100, y:80});
+    alignRequest(cyId);
+    layoutRequest(cyId);
 
 
-    hideShow();
-    highlight();
-    searchByLabel(1, "abc");
 
-    deleteElesRequest("simple", 0, 0, 1);
-    undoDeleteRequest();
-
-    deleteElesRequest("smart", 0, 1, 2);
-    undoDeleteRequest();
-    redoDeleteRequest();
+    changeNodeAttributes(cyId, 1);
+    changeEdgeAttributes(cyId, 0);
 
 
-    addNodeRequest({position: {x: 30, y: 40 }, data:{class: "macromolecule"}});
-    addNodeRequest({position: {x: 50, y: 60 }, data:{class: "macromolecule"}});
-    addCompound("complex", [0,1]); //complexes cannot have edges
-    expandCollapse(2); //we can only expand collapse compound nodes
+    hideShow(cyId);
+    highlight(cyId);
+    searchByLabel(cyId, 1, "abc");
 
-    newFile();
+    deleteElesRequest(cyId, "simple", 0, 0, 1);
+    undoDeleteRequest(cyId);
 
-    merge();
+    deleteElesRequest(cyId, "smart", 0, 1, 2);
+    undoDeleteRequest(cyId);
+    redoDeleteRequest(cyId);
+
+
+    addNodeRequest(cyId, {position: {x: 30, y: 40 }, data:{class: "macromolecule"}});
+    addNodeRequest(cyId, {position: {x: 50, y: 60 }, data:{class: "macromolecule"}});
+    addCompound(cyId, "complex", [0,1]); //complexes cannot have edges
+    expandCollapse(cyId, 2); //we can only expand collapse compound nodes
+
+    newFile(cyId);
+
+    merge(cyId);
     disconnect();
 
 

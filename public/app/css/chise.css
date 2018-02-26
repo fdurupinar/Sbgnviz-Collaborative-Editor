@@ -187,6 +187,7 @@ body {
 .network-panel {
   height: 680px;
   width: 800px;
+    position:absolute;
 }
 
 #sbgn-inspector-and-canvas {

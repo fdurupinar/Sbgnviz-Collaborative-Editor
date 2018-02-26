@@ -16,7 +16,7 @@
 <script src="./agentAPI.js"></script>
 <script src="ContextAgent.js"></script>
 <!--<script src="CausalityAgentMemory.js"></script>-->
-<script src="CausalityAgent.js"></script>
+<script src="AgentAPI.js"></script>
 
 <form>
     <input type="button" value="Delete Cookies" onclick=deleteAllCookies()>
@@ -669,7 +669,7 @@
     }
 
     function newFile(){
-        agent.sendRequest("agentNewFileRequest",{param:null});
+        agent.sendRequest("agentCleanAllRequest",{param:null});
     }
     function loadFile(){
         if ($("#fileInput").val() == "") {

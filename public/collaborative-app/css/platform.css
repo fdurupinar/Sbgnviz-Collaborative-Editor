@@ -35,6 +35,9 @@
     /*float: left;*/
 }
 
+#canvas-tab-area .ui-icon-gripsmall-diagonal-se {
+  z-index: 1000 !important;
+}
 
 #canvas-tabs{
     position: absolute;
@@ -62,7 +65,15 @@
 #network-panels-container {
     margin: auto;
     border:none;
+    height: var(--canvas-height);
+    width: var(--canvas-width);
+}
 
+/*Setting sizes of network panels would not be needed here
+if PR(https://github.com/iVis-at-Bilkent/newt/pull/223) is merged*/
+.network-panel {
+    height: 100%;
+    width: 100%;
 }
 
 #sbgn-inspector-and-canvas {
@@ -121,7 +132,7 @@
     margin: auto;
     border: 1px solid #ddd;
     height: var(--canvas-height);
-    width: 400px;
+    width: 500px;
     overflow: hidden;
     border-radius: 0.25em;
     /*padding-left: 2px;*/
@@ -382,9 +393,8 @@ input[type="file"] {
     margin-bottom: 5px;
     /*padding:  10px;*/
 
-
-
 }
+
 
 
 .td{
@@ -521,10 +531,21 @@ input[type="file"] {
 }
 #factoidBox{
     width: 100%;
+    overflow: scroll;
 }
 
 .factoid-button{
     margin: 5px;
+}
+
+
+.user{
+    font-size: medium;
+    margin: 5px 5px 5px 5px;
+    padding: 5px;
+    border-radius: 10%;
+    word-wrap: break-word;
+
 }
 
 
@@ -537,6 +558,15 @@ input[type="file"] {
 
 
 #provenance-messages{
-    font-size: small;
+    /*font-size: small;*/
+    padding: 10px;
+    margin-left: 10px;
+    font-size: medium;
+}
+
+.visTable{
+    margin: 10px;
+}
+.visTable td{
     padding: 10px;
 }
