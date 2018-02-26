@@ -78,8 +78,8 @@ VisHandler.prototype.moveNode = function(data) {
     let state = data.state;
     let location = data.location;
 
-    const extensionX = 120;
-    const extensionY = 80;
+    const extensionX = 80;
+    const extensionY = 40;
 
 
     let cy = appUtilities.getCyInstance(data.cyId);
@@ -99,14 +99,18 @@ VisHandler.prototype.moveNode = function(data) {
     bBox.y1 -= extensionY;
     bBox.y2 += extensionY;
 
-    if(location.indexOf('top')> -1)
+    if(location.toUpperCase().indexOf('TOP')> -1)
         posToMove = {x: (bBox.x1 + bBox.x2) / 2, y: bBox.y1};
-    else if(location.indexOf('bottom')> -1)
+    else if(location.toUpperCase().indexOf('BOTTOM')> -1)
         posToMove = {x: (bBox.x1 + bBox.x2) / 2, y: bBox.y2};
-    else if(location.indexOf('left')> -1)
+    else if(location.toUpperCase().indexOf('LEFT')> -1)
         posToMove = {x: bBox.x1, y: (bBox.y1 + bBox.y2) / 2};
-    else if(location.indexOf('right')> -1)
+    else if(location.toUpperCase().indexOf('RIGHT')> -1)
         posToMove = {x: bBox.x2, y: (bBox.y1 + bBox.y2) / 2};
+
+    console.log(location);
+    console.log(posToMove);
+
 
     //move node -- no need to update the model for now
     nodeToMove.position(posToMove);
@@ -137,14 +141,15 @@ VisHandler.prototype.moveNode = function(data) {
         bBox.y1 -= extensionY;
         bBox.y2 += extensionY;
 
-        if(location.indexOf('top')> -1)
+        if(location.toUpperCase().indexOf('TOP')> -1)
             posToMove = {x: (bBox.x1 + bBox.x2) / 2, y: bBox.y1};
-        else if(location.indexOf('bottom')> -1)
+        else if(location.toUpperCase().indexOf('BOTTOM')> -1)
             posToMove = {x: (bBox.x1 + bBox.x2) / 2, y: bBox.y2};
-        else if(location.indexOf('left')> -1)
+        else if(location.toUpperCase().indexOf('LEFT')> -1)
             posToMove = {x: bBox.x1, y: (bBox.y1 + bBox.y2) / 2};
-        else if(location.indexOf('right')> -1)
+        else if(location.toUpperCase().indexOf('RIGHT')> -1)
             posToMove = {x: bBox.x2, y: (bBox.y1 + bBox.y2) / 2};
+
 
         //move node -- no need to update the model for now
         nodeToMove.position(posToMove);
@@ -236,8 +241,8 @@ VisHandler.prototype.moveSelected = function(nodesSelected, data){
 
 
     let posUpdate = {};
-    posUpdate.x = Math.abs(bBoxSelected.x - bBoxRest.x);
-    posUpdate.y = Math.abs(bBoxSelected.y - bBoxRest.y);
+    posUpdate.x = Math.abs(bBoxSelected.x1 - bBoxRest.x1);
+    posUpdate.y = Math.abs(bBoxSelected.y1 - bBoxRest.y1);
     //unselect again
     cy.elements().unselect();
 
@@ -245,13 +250,14 @@ VisHandler.prototype.moveSelected = function(nodesSelected, data){
     let paramList = [];
     nodesSelected.forEach(function(ele){
         let currPos = ele.position();
-        if(data.location.indexOf('top')> -1)  //move up
+
+        if(data.location.toUpperCase().indexOf('TOP')> -1)  //move up
             currPos.y -= 2 * Math.abs(currPos.y - bBoxRest.y1);
-        else if(data.location.indexOf('bottom')> -1)
+        else if(data.location.toUpperCase().indexOf('BOTTOM')> -1)
             currPos.y += 2 * Math.abs(currPos.y - bBoxRest.y2);
-        else if(data.location.indexOf('left')> -1)
+        else if(data.location.toUpperCase().indexOf('LEFt')> -1)
             currPos.x -= 2 * Math.abs(currPos.x - bBoxRest.x1);
-        else if(data.location.indexOf('right')> -1)
+        else if(data.location.toUpperCase().indexOf('RIGHT')> -1)
             currPos.x += 2 * Math.abs(currPos.x - bBoxRest.x2);
 
         ele.position(currPos);
