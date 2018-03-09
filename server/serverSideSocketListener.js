@@ -980,7 +980,8 @@ module.exports.start = function(io, model, cancerDataOrganizer){
 
             request.post({
                 //url: "http://localhost:8080/PaxtoolsServlet",
-                url: "http://104.198.75.85:8080/paxtools/PaxtoolsServlet",
+                // url: "http://104.198.75.85:8080/paxtools/PaxtoolsServlet",
+                url: "http://causalpath.org:8080/paxtools/PaxtoolsServlet",
                 headers: responseHeaders,
                 form: {reqType: reqType, content: fileContent}
             }, function (error, response, body) {
