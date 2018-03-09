@@ -95,12 +95,9 @@ module.exports = function(modelManager, socket, userId, app){
         modelManager.closeCy(cyId, "me");
     });
 
-
     $("#file-input").change(function () {
-
         if ($(this).val() != "") {
             var file = this.files[0];
-
 
             var extension = file.name.split('.').pop().toLowerCase();
 
@@ -110,18 +107,19 @@ module.exports = function(modelManager, socket, userId, app){
 
                 reader.onload = function (e) {
 
-                    socket.emit('BioPAXRequest', this.result, "sbgn", function(sbgnData){ //convert to sbgn
-
-
-                        appUtilites.getActiveSbgnvizInstance().loadSBGNMLText(sbgnData.graph);
+                    socket.emit('BioPAXRequest', this.result, "sbgn", function (sbgnData) { //convert to sbgn
+                        appUtilities.getActiveSbgnvizInstance().loadSBGNMLText(sbgnData.graph)
                     });
                 };
                 reader.readAsText(file);
 
 
             }
-        }
+            else {
 
+                appUtilities.getActiveChiseInstance().loadSBGNMLFile(file);
+            }
+        }
         setTimeout(function () {
             //remove annotations view first
             // appUtilities.getActiveCy().elements().forEach(function(ele){
@@ -135,8 +133,51 @@ module.exports = function(modelManager, socket, userId, app){
 
         }, 1000);
 
-    });
+        });
 
+
+    //TODO: doesn't catch it here?????
+    // $("#file-input").change(function () {
+    //
+    //     if ($(this).val() != "") {
+    //         var file = this.files[0];
+    //
+    //
+    //         var extension = file.name.split('.').pop().toLowerCase();
+    //
+    //         if (extension === "owl") {
+    //
+    //             var reader = new FileReader();
+    //
+    //             reader.onload = function (e) {
+    //
+    //                 socket.emit('BioPAXRequest', this.result, "sbgn", function(sbgnData){ //convert to sbgn
+    //
+    //
+    //                     appUtilites.getActiveSbgnvizInstance().loadSBGNMLText(sbgnData.graph);
+    //                 });
+    //             };
+    //             reader.readAsText(file);
+    //
+    //
+    //         }
+    //     }
+    //
+    //     setTimeout(function () {
+    //         //remove annotations view first
+    //         // appUtilities.getActiveCy().elements().forEach(function(ele){
+    //         //     ele.data("annotationsView", null);
+    //         //     ele._private.data.annotationsView = null;
+    //         // });
+    //         modelManager.initModel(appUtilities.getActiveCy().nodes(), appUtilities.getActiveCy().edges(),
+    //             appUtilities.getActiveNetworkId(), appUtilities, "me");
+    //
+    //
+    //
+    //     }, 1000);
+    //
+    // });
+    //
 
 
     $(document).on("createNewNetwork", function (e, cy, cyId) {

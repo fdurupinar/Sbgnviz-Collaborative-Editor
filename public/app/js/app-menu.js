@@ -142,7 +142,7 @@ module.exports = function () {
 
         // menu behavior: on first click, triggers the other menus on hover.
         var isMenuHoverMode = false;
-        $('ul.navbar-nav > li.dropdown').on('mouseenter', function(e){
+        $('ul.navbar-nav > li.dropdown').on('mouseenter', function (e) {
             if (isMenuHoverMode) {
                 if ($(this).is('.open')) {
                     return;
@@ -190,9 +190,9 @@ module.exports = function () {
             var node = $(this).data('node');
             var lines = $(this).val();
 
-            if ($(this).val().includes("\\n")){
+            if ($(this).val().includes("\\n")) {
                 lines = $(this).val().split("\\n");
-                lines = $.map(lines, function(x) {
+                lines = $.map(lines, function (x) {
                     x = x.trim();
                     if (x) return (x);
                 });
@@ -227,7 +227,7 @@ module.exports = function () {
             //     promptConfirmationView.render(appUtilities.closeActiveNetwork.bind(appUtilities));
             // }
             // else {
-                appUtilities.closeActiveNetwork();
+            appUtilities.closeActiveNetwork();
             // }
         });
 
@@ -235,32 +235,38 @@ module.exports = function () {
             $("#file-input").trigger('click');
         });
 
-        $("#file-input").change(function () {
+        //FUNDA
+        // $("#file-input").change(function () {
 
-            // use the active chise instance
-            var chiseInstance = appUtilities.getActiveChiseInstance();
 
-            // use cy instance assocated with chise instance
-            var cy = appUtilities.getActiveCy();
 
-            if ($(this).val() != "") {
-                var file = this.files[0];
-                var loadCallbackSBGNMLValidity = function (text) {
-                    //funda validateSBGNML(text);
-                }
-                var loadCallbackInvalidityWarning  = function () {
-                    //FUNDA promptInvalidFileView.render();
-                }
-                if(cy.elements().length != 0) {
-                    promptConfirmationView.render(function(){chiseInstance.loadSBGNMLFile(file, loadCallbackSBGNMLValidity, loadCallbackInvalidityWarning)});
-                }
-                else {
-                    chiseInstance.loadSBGNMLFile(file, loadCallbackSBGNMLValidity, loadCallbackInvalidityWarning);
-                }
-                $(this).val("");
-            }
-        });
+            // // use the active chise instance
+            // var chiseInstance = appUtilities.getActiveChiseInstance();
+            //
+            // // use cy instance assocated with chise instance
+            // var cy = appUtilities.getActiveCy();
 
+            // if ($(this).val() != "") {
+            //     var file = this.files[0];
+
+
+                // var loadCallbackSBGNMLValidity = function (text) {
+                //     //funda validateSBGNML(text);
+                // }
+                // var loadCallbackInvalidityWarning = function () {
+                //     //FUNDA promptInvalidFileView.render();
+                // }
+                // if (cy.elements().length != 0) {
+                //     promptConfirmationView.render(function () {
+                //         chiseInstance.loadSBGNMLFile(file, loadCallbackSBGNMLValidity, loadCallbackInvalidityWarning)
+                //     });
+                // }
+                // else {
+                //     chiseInstance.loadSBGNMLFile(file, loadCallbackSBGNMLValidity, loadCallbackInvalidityWarning);
+                // }
+                // $(this).val("");
+            // }
+        // });
         // get and set map properties from file
         $( document ).on( "sbgnvizLoadFileEnd sbgnvizLoadSampleEnd", function(evt, filename, cy){
 

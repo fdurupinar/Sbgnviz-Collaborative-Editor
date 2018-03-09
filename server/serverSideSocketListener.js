@@ -998,6 +998,7 @@ module.exports.start = function(io, model, cancerDataOrganizer){
                         }
 
                         if(callback) {
+                            console.log("Biopax model successfully converted to sbgn.");
                             callback({graph: body});
                         }
                     }
