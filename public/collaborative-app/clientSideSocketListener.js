@@ -25,7 +25,6 @@ module.exports =  function(app) {
                     if(callback) callback();
 
                 }
-
             });
 
 

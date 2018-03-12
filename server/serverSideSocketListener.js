@@ -979,9 +979,8 @@ module.exports.start = function(io, model, cancerDataOrganizer){
         socket.on('BioPAXRequest', function(fileContent, reqType, callback){
 
             request.post({
-                //url: "http://localhost:8080/PaxtoolsServlet",
-                // url: "http://104.198.75.85:8080/paxtools/PaxtoolsServlet",
-                url: "http://causalpath.org:8080/paxtools/PaxtoolsServlet",
+                // url: "http://causalpath.org:8080/paxtools/PaxtoolsServlet",
+                url: "http://localhost:8080/PaxtoolsServlet",
                 headers: responseHeaders,
                 form: {reqType: reqType, content: fileContent}
             }, function (error, response, body) {
@@ -994,16 +993,19 @@ module.exports.start = function(io, model, cancerDataOrganizer){
 
                         if(reqType === "partialBiopax"){
                             io.in(socket.room).emit("processToIntegrate", body);
-
                         }
 
                         if(callback) {
-                            console.log("Biopax model successfully converted to sbgn.");
+
+                                // console.log(body);
+                            // console.log("Biopax model successfully converted to " + reqType + ".");
                             callback({graph: body});
                         }
                     }
-                    else
+                    else {
+                        console.log("error")
                         socket.emit("Paxtools Server Error", "error");
+                    }
 
 
                 }
