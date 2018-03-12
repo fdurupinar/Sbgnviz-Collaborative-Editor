@@ -979,8 +979,8 @@ module.exports.start = function(io, model, cancerDataOrganizer){
         socket.on('BioPAXRequest', function(fileContent, reqType, callback){
 
             request.post({
-                // url: "http://causalpath.org:8080/paxtools/PaxtoolsServlet",
-                url: "http://localhost:8080/PaxtoolsServlet",
+                url: "http://causalpath.org:8080/paxtools/PaxtoolsServlet",
+                // url: "http://localhost:8080/PaxtoolsServlet",
                 headers: responseHeaders,
                 form: {reqType: reqType, content: fileContent}
             }, function (error, response, body) {
