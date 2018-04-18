@@ -978,13 +978,25 @@ module.exports.start = function(io, model, cancerDataOrganizer){
 
         socket.on('BioPAXRequest', function(fileContent, reqType, callback){
 
-            request.post({
+
+            let headers = responseHeaders;
+
+            console.log(fileContent);
+
+            //
+            // if(reqType==='sbgn')
+            //     headers["Content-Type"] = "text/html";
+            request({
                 url: "http://causalpath.org:8080/paxtools/PaxtoolsServlet",
-                // url: "http://localhost:8080/PaxtoolsServlet",
+                // url: "http://localhost:8080/paxtools/PaxtoolsServlet",
+                // url: "http://localhost:8081/PaxtoolsServlet",
+                // url: "http://localhost:8081/PaxtoolsServlet",
+                method:"POST",
                 headers: responseHeaders,
                 form: {reqType: reqType, content: fileContent}
             }, function (error, response, body) {
 
+                console.log(response.statusCode);
                 if (error) {
                     console.log(error);
                 } else { //only open the window if a proper response is returned
@@ -995,18 +1007,22 @@ module.exports.start = function(io, model, cancerDataOrganizer){
                             io.in(socket.room).emit("processToIntegrate", body);
                         }
 
-                        if(callback) {
+                        if(reqType === "biopax"){
+                            tripsGeneralInterfaceInstance.sendModelToTrips(body);
+                        }
 
-                                // console.log(body);
+                        if(callback) {
+                            // console.log(body);
                             // console.log("Biopax model successfully converted to " + reqType + ".");
+                            console.log(body);
                             callback({graph: body});
                         }
                     }
                     else {
-                        console.log("error")
+                        console.log(body);
+                        console.log("Paxtools Server Error " + response.statusCode);
                         socket.emit("Paxtools Server Error", "error");
                     }
-
 
                 }
             });

@@ -222,6 +222,9 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
         });
     }
 
+    sendModelToTrips(biopaxModel){
+
+    }
 
 
     displaySbgn(text) {
