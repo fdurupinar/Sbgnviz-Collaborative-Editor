@@ -979,9 +979,9 @@ module.exports.start = function(io, model, cancerDataOrganizer){
         socket.on('BioPAXRequest', function(fileContent, reqType, callback){
 
             request({
-                // url: "http://causalpath.org:8080/paxtools/PaxtoolsServlet",
+                url: "http://causalpath.org:8080/paxtools/PaxtoolsServlet",
                 // url: "http://localhost:8080/paxtools/PaxtoolsServlet",
-                url: "http://localhost:8081/PaxtoolsServlet",
+                // url: "http://localhost:8081/PaxtoolsServlet",
                 method:"POST",
                 headers: responseHeaders,
                 form: {reqType: reqType, content: fileContent}
@@ -999,7 +999,8 @@ module.exports.start = function(io, model, cancerDataOrganizer){
                         }
 
                         if(reqType === "biopax"){
-                            tripsGeneralInterfaceInstance.sendModelToTrips(body);
+                            if(tripsGeneralInterfaceInstance && tripsGeneralInterfaceInstance.isConnectedToTrips())
+                                tripsGeneralInterfaceInstance.sendModelToTrips(body);
                         }
 
                         if(callback) {

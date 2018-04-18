@@ -421,8 +421,9 @@ app.proto.convertToBiopax = function(){
     let cyId = appUtilities.getActiveNetworkId();
     let chiseInst =  appUtilities.getChiseInstance(cyId);
 
-    chiseInst.setPortsOrdering(chiseInst.getCy().nodes(), 'none');
     //get rid of ports
+    // chiseInst.setPortsOrdering(chiseInst.getCy().nodes(), 'none');
+
     chiseInst.getCy().nodes().forEach(function(node){
        chiseInst.elementUtilities.removePorts(node);
     });
