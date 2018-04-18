@@ -978,19 +978,10 @@ module.exports.start = function(io, model, cancerDataOrganizer){
 
         socket.on('BioPAXRequest', function(fileContent, reqType, callback){
 
-
-            let headers = responseHeaders;
-
-            console.log(fileContent);
-
-            //
-            // if(reqType==='sbgn')
-            //     headers["Content-Type"] = "text/html";
             request({
-                url: "http://causalpath.org:8080/paxtools/PaxtoolsServlet",
+                // url: "http://causalpath.org:8080/paxtools/PaxtoolsServlet",
                 // url: "http://localhost:8080/paxtools/PaxtoolsServlet",
-                // url: "http://localhost:8081/PaxtoolsServlet",
-                // url: "http://localhost:8081/PaxtoolsServlet",
+                url: "http://localhost:8081/PaxtoolsServlet",
                 method:"POST",
                 headers: responseHeaders,
                 form: {reqType: reqType, content: fileContent}
@@ -1012,16 +1003,11 @@ module.exports.start = function(io, model, cancerDataOrganizer){
                         }
 
                         if(callback) {
-                            // console.log(body);
-                            // console.log("Biopax model successfully converted to " + reqType + ".");
-                            console.log(body);
                             callback({graph: body});
                         }
                     }
                     else {
-                        console.log(body);
                         console.log("Paxtools Server Error " + response.statusCode);
-                        socket.emit("Paxtools Server Error", "error");
                     }
 
                 }

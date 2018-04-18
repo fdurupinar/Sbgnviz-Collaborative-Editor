@@ -715,7 +715,8 @@ appUtilities.defaultGeneralProperties = {
   rearrangeAfterExpandCollapse: true,
   animateOnDrawingChanges: true,
   adjustNodeLabelFontSizeAutomatically: false,
-  enablePorts: true,
+  // enablePorts: true,
+  enablePorts: false, //FUNDA
   allowCompoundNodeResize: false,
   mapColorScheme: 'black_white',
   defaultInfoboxHeight: 12,

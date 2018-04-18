@@ -108,6 +108,7 @@ module.exports = function(modelManager, socket, userId, app){
                 reader.onload = function (e) {
 
                     socket.emit('BioPAXRequest', this.result, "sbgn", function (sbgnData) { //convert to sbgn
+                        console.log(sbgnData);
                         appUtilities.getActiveSbgnvizInstance().loadSBGNMLText(sbgnData.graph);
                     });
                 };
