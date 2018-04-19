@@ -422,7 +422,7 @@ app.proto.convertToBiopax = function(){
     let chiseInst =  appUtilities.getChiseInstance(cyId);
 
     //get rid of ports
-    // chiseInst.setPortsOrdering(chiseInst.getCy().nodes(), 'none');
+    chiseInst.setPortsOrdering(chiseInst.getCy().nodes(), 'none');
 
     chiseInst.getCy().nodes().forEach(function(node){
        chiseInst.elementUtilities.removePorts(node);
@@ -437,6 +437,8 @@ app.proto.convertToBiopax = function(){
 
 
     self.socket.emit('BioPAXRequest', sbgn, "biopax", function(biopax) {
+
+        console.log("sending biopax req");
         self.model.set('_page.doc.pysb.' + cyId + '.biopax', biopax.graph);
         console.log(biopax.graph);
     });
@@ -475,8 +477,15 @@ app.proto.listenToNodeOperations = function(model){
 
                 self.socket.emit('resetConversationRequest');
 
-                self.convertToBiopax();
+
             }
+        }
+        else {
+            let node  = model.get('_page.doc.cy.' + cyId + '.nodes.' + id);
+            if(!node || !node.id) //node is deleted
+                self.convertToBiopax();
+
+
         }
     });
 
@@ -500,9 +509,12 @@ app.proto.listenToNodeOperations = function(model){
             let parentEl = appUtilities.getCyInstance(parseInt(cyId)).getElementById(parent);
             newNode.move({"parent":parentEl});
 
-            self.convertToBiopax();
 
 
+        }
+        else {
+
+                self.convertToBiopax();
         }
     });
 
@@ -693,9 +705,14 @@ app.proto.listenToEdgeOperations = function(model){
             if(!edge|| !edge.id){ //edge is deleted
                 appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).remove();
 
-                self.convertToBiopax();
 
             }
+        }
+        else{
+            let edge  = model.get('_page.doc.cy.' + cyId +'.edges.' + id); //check
+            if(!edge|| !edge.id) //edge is deleted
+                self.convertToBiopax();
+
         }
     });
 
@@ -709,8 +726,10 @@ app.proto.listenToEdgeOperations = function(model){
 
             self.modelManager.initModelEdge(newEdge, cyId, "me", true);
 
-            self.convertToBiopax();
+
         }
+        else
+            self.convertToBiopax();
     });
 
     model.on('all', '_page.doc.cy.*.edges.*.data', function(cyId, id, op, data,prev, passed){
