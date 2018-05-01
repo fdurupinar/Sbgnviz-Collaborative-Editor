@@ -77,10 +77,19 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
 
         });
 
-
         pattern = {0: 'request', 1: '&key', content: ['display-sbgn', '.', '*']};
         self.tm.addHandler(pattern, function (text) {
             self.displaySbgn(text);
+        });
+
+        pattern = {0: 'request', 1: '&key', content: ['open-query-window', '.', '*']};
+        self.tm.addHandler(pattern, function (text) {
+            self.openQueryWindow(text);
+        });
+
+        pattern = {0: 'tell', 1: '&key', content: ['open-query-window', '.', '*']};
+        self.tm.addHandler(pattern, function (text) {
+            self.openQueryWindow(text);
         });
 
         pattern = {0: 'request', 1: '&key', content: ['clean-model', '.', '*']};
@@ -222,7 +231,28 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
         });
     }
 
+    openQueryWindow(){
+        let self = this;
+        let contentObj = KQML.keywordify(text.content);
+        if (contentObj) {
 
+            let sbgnModel = contentObj.graph;
+
+
+            sbgnModel = trimDoubleQuotes(sbgnModel);
+
+            sbgnModel = sbgnModel.replace(/(\\")/g, '"');
+            sbgnModel = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n" + sbgnModel;
+
+            //The socket connection is between the interface and the agent, so we cannot directly emit messages
+            //we must ask the client with the browser to do it for us
+            self.askHuman(self.agentId, self.room, "openPCQueryWindow", {graph: sbgnModel, cyId: contentObj.cyId}, function (val) {
+
+                // self.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
+            });
+        }
+
+    }
 
     displaySbgn(text) {
 
@@ -241,7 +271,7 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
             //The socket connection is between the interface and the agent, so we cannot directly emit messages
             //we must ask the client with the browser to do it for us
             //TODO: get the cyId from TRIPS
-            self.askHuman(self.agentId, self.room, "displaySbgn", {sbgn: sbgnModel, cyId: "0"}, function (val) {
+            self.askHuman(self.agentId, self.room, "displaySbgn", {sbgn: sbgnModel, cyId: contentObj.cyId || "0"}, function (val) {
 
                 // self.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
             });
