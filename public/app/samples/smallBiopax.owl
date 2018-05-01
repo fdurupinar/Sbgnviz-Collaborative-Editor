@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns:owl="http://www.w3.org/2002/07/owl#"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+ xmlns:bp="http://www.biopax.org/release/biopax-level3.owl#">
+<owl:Ontology rdf:about="">
+ <owl:imports rdf:resource="http://www.biopax.org/release/biopax-level3.owl#" />
+</owl:Ontology>
+
+<bp:Conversion rdf:about="nwtN_1902e06f-dccd-4ecb-8c54-1f5c52f949dd">
+</bp:Conversion>
+
+<bp:Protein rdf:about="nwtN_1073acad-f704-4356-a84a-7292211fd926">
+</bp:Protein>
+
+<bp:Protein rdf:about="nwtN_88132d7c-476d-4cd7-a816-2336d4d3a322">
+</bp:Protein>
+</rdf:RDF>

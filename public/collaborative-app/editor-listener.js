@@ -108,15 +108,13 @@ module.exports = function(modelManager, socket, userId, app){
                 reader.onload = function (e) {
 
                     socket.emit('BioPAXRequest', this.result, "sbgn", function (sbgnData) { //convert to sbgn
-                        appUtilities.getActiveSbgnvizInstance().loadSBGNMLText(sbgnData.graph)
+                        console.log(sbgnData);
+                        appUtilities.getActiveSbgnvizInstance().loadSBGNMLText(sbgnData.graph);
                     });
                 };
-                reader.readAsText(file);
-
-
+                reader.readAsText(file, 'UTF-8');
             }
             else {
-
                 appUtilities.getActiveChiseInstance().loadSBGNMLFile(file);
             }
         }
@@ -136,7 +134,7 @@ module.exports = function(modelManager, socket, userId, app){
         });
 
 
-   
+
 
 
     $(document).on("createNewNetwork", function (e, cy, cyId) {

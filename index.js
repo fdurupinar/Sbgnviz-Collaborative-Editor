@@ -237,7 +237,46 @@ app.proto.create = function (model) {
     $(document).trigger('createNewNetwork', [appUtilities.getActiveCy(), appUtilities.getActiveNetworkId()]);
 
     this.atBottom = true;
-
+    //
+    // $("#file-input").change(function () {
+    //     if ($(this).val() != "") {
+    //         var file = this.files[0];
+    //
+    //         var extension = file.name.split('.').pop().toLowerCase();
+    //
+    //         if (extension === "owl") {
+    //
+    //             var reader = new FileReader();
+    //
+    //             reader.onload = function (e) {
+    //
+    //                 self.socket.emit('BioPAXRequest', this.result, "sbgn", function (sbgnData) { //convert to sbgn
+    //                     appUtilities.getActiveSbgnvizInstance().loadSBGNMLText(sbgnData.graph);
+    //                 });
+    //             };
+    //             reader.readAsText(file);
+    //
+    //
+    //         }
+    //         else {
+    //
+    //             appUtilities.getActiveChiseInstance().loadSBGNMLFile(file);
+    //         }
+    //     }
+    //     setTimeout(function () {
+    //         //remove annotations view first
+    //         // appUtilities.getActiveCy().elements().forEach(function(ele){
+    //         //     ele.data("annotationsView", null);
+    //         //     ele._private.data.annotationsView = null;
+    //         // });
+    //         self.modelManager.initModel(appUtilities.getActiveCy().nodes(), appUtilities.getActiveCy().edges(),
+    //             appUtilities.getActiveNetworkId(), appUtilities, "me");
+    //
+    //
+    //
+    //     }, 1000);
+    //
+    //     });
 
 
     setTimeout(()=>{
@@ -380,17 +419,33 @@ app.proto.convertToBiopax = function(){
     let self= this;
 
     let cyId = appUtilities.getActiveNetworkId();
+    let chiseInst =  appUtilities.getChiseInstance(cyId);
+
+    //get rid of ports
+    chiseInst.setPortsOrdering(chiseInst.getCy().nodes(), 'none');
+
+    chiseInst.getCy().nodes().forEach(function(node){
+       chiseInst.elementUtilities.removePorts(node);
+    });
+
     let sbgn = appUtilities.getChiseInstance(cyId).createSbgnml();
+
+
+
     sbgn = sbgn.replace("unknown", "process description");
     sbgn = sbgn.replace("libsbgn/0.3", "libsbgn/0.2");
 
 
-
     self.socket.emit('BioPAXRequest', sbgn, "biopax", function(biopax) {
+
+        console.log("sending biopax req");
         self.model.set('_page.doc.pysb.' + cyId + '.biopax', biopax.graph);
         console.log(biopax.graph);
     });
 }
+
+
+
 
 app.proto.listenToNodeOperations = function(model){
 
@@ -398,23 +453,20 @@ app.proto.listenToNodeOperations = function(model){
 
     //Update inspector
 
-    model.on('all', '_page.doc.cy.*.nodes.**', function(cyId, id, op, val, prev, passed){
-        //TODO: Open later
-    //     inspectorUtilities.handleSBGNInspector();
-
-        //Update biopax model stored in pysb
-        // let sbgn = appUtilities.getChiseInstance(cyId).createSbgnml();
-        // sbgn = sbgn.replace("unknown", "process description");
-        // sbgn = sbgn.replace("libsbgn/0.3", "libsbgn/0.2");
-        //
-        //
-        //
-        // self.socket.emit('BioPAXRequest', sbgn, "biopax", function(biopax) {
-        //     self.model.set('_page.doc.pysb.' + cyId + '.biopax', biopax.graph);
-        //     console.log(biopax);
-        // });
-
-    });
+    // model.on('all', '_page.doc.cy.*.nodes.**', function(cyId, id, op, val, prev, passed){
+    //     //TODO: Open later
+    // //     inspectorUtilities.handleSBGNInspector();
+    //
+    //     //Update biopax model stored in pysb
+    //     let sbgn = appUtilities.getChiseInstance(cyId).createSbgnml();
+    //     sbgn = sbgn.replace("unknown", "process description");
+    //     sbgn = sbgn.replace("libsbgn/0.3", "libsbgn/0.2");
+    //     //
+    //     self.socket.emit('BioPAXRequest', sbgn, "biopax", function(biopax) {
+    //         self.model.set('_page.doc.pysb.' + cyId + '.biopax', biopax.graph);
+    //     });
+    //
+    // });
 
     model.on('all', '_page.doc.cy.*.nodes.*', function(cyId, id, op, val, prev, passed){
 
@@ -424,7 +476,16 @@ app.proto.listenToNodeOperations = function(model){
                 appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).remove();
 
                 self.socket.emit('resetConversationRequest');
+
+
             }
+        }
+        else {
+            let node  = model.get('_page.doc.cy.' + cyId + '.nodes.' + id);
+            if(!node || !node.id) //node is deleted
+                self.convertToBiopax();
+
+
         }
     });
 
@@ -449,6 +510,11 @@ app.proto.listenToNodeOperations = function(model){
             newNode.move({"parent":parentEl});
 
 
+
+        }
+        else {
+
+                self.convertToBiopax();
         }
     });
 
@@ -593,9 +659,24 @@ app.proto.listenToEdgeOperations = function(model){
 
     //Update inspector
     //TODO: open later
-    // model.on('all', '_page.doc.cy.edges.**', function(id, op, val, prev, passed){
-    //     inspectorUtilities.handleSBGNInspector();
+
+    // model.on('all', '_page.doc.cy.*.edges.**', function(cyId, id, op, val, prev, passed){
+    //     //TODO: Open later
+    //     //     inspectorUtilities.handleSBGNInspector();
+    //
+    //     //Update biopax model stored in pysb
+    //     let sbgn = appUtilities.getChiseInstance(cyId).createSbgnml();
+    //     sbgn = sbgn.replace("unknown", "process description");
+    //     sbgn = sbgn.replace("libsbgn/0.3", "libsbgn/0.2");
+    //     //
+    //     self.socket.emit('BioPAXRequest', sbgn, "biopax", function(biopax) {
+    //         self.model.set('_page.doc.pysb.' + cyId + '.biopax', biopax.graph);
+    //
+    //     });
+    //
     // });
+
+
 
 
     model.on('all', '_page.doc.cy.*.edges.*.highlightColor', function(cyId, id, op, val,prev, passed){
@@ -624,7 +705,14 @@ app.proto.listenToEdgeOperations = function(model){
             if(!edge|| !edge.id){ //edge is deleted
                 appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).remove();
 
+
             }
+        }
+        else{
+            let edge  = model.get('_page.doc.cy.' + cyId +'.edges.' + id); //check
+            if(!edge|| !edge.id) //edge is deleted
+                self.convertToBiopax();
+
         }
     });
 
@@ -637,7 +725,11 @@ app.proto.listenToEdgeOperations = function(model){
             let newEdge = appUtilities.getChiseInstance(cyId).elementUtilities.addEdge(source, target, sbgnclass, id, visibility);
 
             self.modelManager.initModelEdge(newEdge, cyId, "me", true);
+
+
         }
+        else
+            self.convertToBiopax();
     });
 
     model.on('all', '_page.doc.cy.*.edges.*.data', function(cyId, id, op, data,prev, passed){
