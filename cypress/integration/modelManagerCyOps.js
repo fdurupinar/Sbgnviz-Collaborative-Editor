@@ -651,13 +651,13 @@ describe('modelManager Cytoscape Operations Test', function () {
         changeModelNodeAttribute(cyId, "node1");
         changeModelEdgeAttribute(cyId, "node1-node2");
 
-        deleteModelNode(cyId, "node3");
-        undoDeleteModelNode(cyId, "node3");
-        redoDeleteModelNode(cyId, "node3");
-
-        deleteModelEdge(cyId, "node1-node2");
-        undoDeleteModelEdge(cyId, "node1-node2");
-        redoDeleteModelEdge(cyId, "node1-node2");
+        // deleteModelNode(cyId, "node3");
+        // undoDeleteModelNode(cyId, "node3");
+        // redoDeleteModelNode(cyId, "node3");
+        //
+        // deleteModelEdge(cyId, "node1-node2");
+        // undoDeleteModelEdge(cyId, "node1-node2");
+        // redoDeleteModelEdge(cyId, "node1-node2");
 
 
     });

@@ -237,46 +237,6 @@ app.proto.create = function (model) {
     $(document).trigger('createNewNetwork', [appUtilities.getActiveCy(), appUtilities.getActiveNetworkId()]);
 
     this.atBottom = true;
-    //
-    // $("#file-input").change(function () {
-    //     if ($(this).val() != "") {
-    //         var file = this.files[0];
-    //
-    //         var extension = file.name.split('.').pop().toLowerCase();
-    //
-    //         if (extension === "owl") {
-    //
-    //             var reader = new FileReader();
-    //
-    //             reader.onload = function (e) {
-    //
-    //                 self.socket.emit('BioPAXRequest', this.result, "sbgn", function (sbgnData) { //convert to sbgn
-    //                     appUtilities.getActiveSbgnvizInstance().loadSBGNMLText(sbgnData.graph);
-    //                 });
-    //             };
-    //             reader.readAsText(file);
-    //
-    //
-    //         }
-    //         else {
-    //
-    //             appUtilities.getActiveChiseInstance().loadSBGNMLFile(file);
-    //         }
-    //     }
-    //     setTimeout(function () {
-    //         //remove annotations view first
-    //         // appUtilities.getActiveCy().elements().forEach(function(ele){
-    //         //     ele.data("annotationsView", null);
-    //         //     ele._private.data.annotationsView = null;
-    //         // });
-    //         self.modelManager.initModel(appUtilities.getActiveCy().nodes(), appUtilities.getActiveCy().edges(),
-    //             appUtilities.getActiveNetworkId(), appUtilities, "me");
-    //
-    //
-    //
-    //     }, 1000);
-    //
-    //     });
 
 
     setTimeout(()=>{
@@ -491,9 +451,7 @@ app.proto.listenToNodeOperations = function(model){
 
 
     model.on('all', '_page.doc.cy.*.nodes.*.addedLater', function(cyId, id, op, idName, prev, passed){ //this property must be something that is only changed during insertion
-        console.log(cyId);
-        console.log(id);
-        console.log(op);
+
 
         if(docReady && !passed.user) {
             let pos = model.get('_page.doc.cy.' + cyId +'.nodes.'+ id + '.position');

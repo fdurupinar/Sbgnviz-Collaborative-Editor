@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns:owl="http://www.w3.org/2002/07/owl#"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+ xmlns:bp="http://www.biopax.org/release/biopax-level3.owl#">
+<owl:Ontology rdf:about="">
+ <owl:imports rdf:resource="http://www.biopax.org/release/biopax-level3.owl#" />
+</owl:Ontology>
+
+<bp:Conversion rdf:about="id_5">
+ <bp:right rdf:resource="id_4" />
+ <bp:left rdf:resource="id_1" />
+ <bp:left rdf:resource="id_0" />
+ <bp:conversionDirection rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">LEFT_TO_RIGHT</bp:conversionDirection>
+</bp:Conversion>
+
+<bp:Complex rdf:about="id_4">
+ <bp:component rdf:resource="id_4id_2" />
+ <bp:component rdf:resource="id_4id_3" />
+</bp:Complex>
+
+<bp:Conversion rdf:about="id_9">
+ <bp:right rdf:resource="id_1" />
+ <bp:right rdf:resource="id_0" />
+ <bp:left rdf:resource="id_4" />
+ <bp:conversionDirection rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">LEFT_TO_RIGHT</bp:conversionDirection>
+</bp:Conversion>
+
+<bp:Protein rdf:about="nwtN_1428d350-6a60-418c-a65a-b3af056d95d1">
+</bp:Protein>
+
+<bp:Protein rdf:about="id_4id_2">
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">ERK</bp:displayName>
+</bp:Protein>
+
+<bp:Protein rdf:about="id_4id_3">
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">RAF</bp:displayName>
+</bp:Protein>
+
+<bp:Protein rdf:about="id_1">
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">ERK</bp:displayName>
+</bp:Protein>
+
+<bp:Protein rdf:about="id_0">
+ <bp:displayName rdf:datatype = "http://www.w3.org/2001/XMLSchema#string">RAF</bp:displayName>
+</bp:Protein>
+</rdf:RDF>
