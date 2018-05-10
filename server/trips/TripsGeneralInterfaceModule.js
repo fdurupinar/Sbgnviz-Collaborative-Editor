@@ -231,7 +231,7 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
         });
     }
 
-    openQueryWindow(){
+    openQueryWindow(text){
         let self = this;
         let contentObj = KQML.keywordify(text.content);
         if (contentObj) {
@@ -246,7 +246,7 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
 
             //The socket connection is between the interface and the agent, so we cannot directly emit messages
             //we must ask the client with the browser to do it for us
-            self.askHuman(self.agentId, self.room, "openPCQueryWindow", {graph: sbgnModel, cyId: contentObj.cyId}, function (val) {
+            self.askHuman(self.agentId, self.room, "openPCQueryWindow", {graph: sbgnModel}, function (val) {
 
                 // self.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
             });

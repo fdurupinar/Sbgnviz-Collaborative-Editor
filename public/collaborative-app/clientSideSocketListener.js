@@ -308,12 +308,13 @@ module.exports =  function(app) {
 
                 let chiseInst = appUtilities.createNewNetwork(); //opens a new tab
 
-                let json = chiseInst.convertSbgnmlTextToJson(data.graph);
+
+                let jsonObj = chiseInst.convertSbgnmlTextToJson(data.graph);
 
                 chiseInst.updateGraph(jsonObj, function(){
-                    app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(), data.cyId, appUtilities, "me");
+                    app.modelManager.initModel(appUtilities.getCyInstance(chiseInst.cyId).nodes(), appUtilities.getCyInstance(chiseInst.cyId).edges(), chiseInst.cyId, appUtilities, "me");
 
-                    appUtilities.setActiveNetwork(data.cyId);
+                    appUtilities.setActiveNetwork(chiseInst.cyId);
 
                     $("#perform-layout").trigger('click');
 
