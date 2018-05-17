@@ -73,7 +73,11 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
         self.tm.addHandler(pattern, function (text) {
             self.highlightGeneStream(text);
         });
+
+
+
     }
+
 
 
     moveGene(text) {

@@ -1364,6 +1364,7 @@ function networkIdsTest () {
 
 describe('CWC Test', function(){
 
+
     // create a new network/tab
     createNewNetworkTest();
 

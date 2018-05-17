@@ -292,8 +292,8 @@ describe('Agent API Test', function () {
                 agent.sendRequest("agentUndoRequest", null, function (undoActionStr) {
                     setTimeout(function () { //should wait here as well
                         let arr = modelManager.getModelNodesArr(cyId);
-                        expect(arr[ind].data.parent).to.not.be.ok;
 
+                        expect(arr[ind].data.parent).to.not.be.ok;
 
                         done();
                     }, 500);
@@ -617,42 +617,39 @@ describe('Agent API Test', function () {
     addNodeRequest(cyId, {position: {x: 90, y: 100} , data:{class: "process"}});
     addEdgeRequest(cyId, {data:{class: "consumption"}}, 0, 2);
 
-
     addCompound(cyId, "compartment", [0,1]); //complexes cannot have edges
     addCompound(cyId, "complex", [1,2]); //complexes cannot have edges
-
-    undoAddCompound(cyId, 2);
-    undoAddCompound(cyId, 1);
-
+    //
+    // undoAddCompound(cyId, 2);
+    // undoAddCompound(cyId, 1);
+    //
     moveNodeRequest(cyId, {x:100, y:80});
     alignRequest(cyId);
     layoutRequest(cyId);
 
-
-
     changeNodeAttributes(cyId, 1);
     changeEdgeAttributes(cyId, 0);
-
-
+    //
+    //
     hideShow(cyId);
     highlight(cyId);
     searchByLabel(cyId, 1, "abc");
-
+    //
     deleteElesRequest(cyId, "simple", 0, 0, 1);
-    undoDeleteRequest(cyId);
-
-    deleteElesRequest(cyId, "smart", 0, 1, 2);
-    undoDeleteRequest(cyId);
-    redoDeleteRequest(cyId);
-
-
-    addNodeRequest(cyId, {position: {x: 30, y: 40 }, data:{class: "macromolecule"}});
-    addNodeRequest(cyId, {position: {x: 50, y: 60 }, data:{class: "macromolecule"}});
-    addCompound(cyId, "complex", [0,1]); //complexes cannot have edges
-    expandCollapse(cyId, 2); //we can only expand collapse compound nodes
+    // undoDeleteRequest(cyId);
+    //
+    // deleteElesRequest(cyId, "smart", 0, 1, 2);
+    // undoDeleteRequest(cyId);
+    // redoDeleteRequest(cyId);
+    //
+    //
+    // addNodeRequest(cyId, {position: {x: 30, y: 40 }, data:{class: "macromolecule"}});
+    // addNodeRequest(cyId, {position: {x: 50, y: 60 }, data:{class: "macromolecule"}});
+    // addCompound(cyId, "complex", [0,1]); //complexes cannot have edges
+    // expandCollapse(cyId, 2); //we can only expand collapse compound nodes
 
     newFile(cyId);
-
+    //
     merge(cyId);
     disconnect();
 

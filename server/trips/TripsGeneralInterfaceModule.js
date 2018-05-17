@@ -51,7 +51,6 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
 
         });
 
-
     }
 
     setHandlers() {
@@ -59,94 +58,117 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
 
         //Listen to spoken sentences
         let pattern = {0: 'tell', 1: '&key', content: ['spoken', '.', '*']};
-        self.tm.addHandler(pattern, function (text) {
+        this.tm.addHandler(pattern, (text) => {
             let contentObj = KQML.keywordify(text.content);
 
             if (contentObj) {
-                let msg = {userName: self.agentName, userId: self.agentId, room: self.room, date: +(new Date)};
+                let msg = {userName: this.agentName, userId: this.agentId, room: this.room, date: +(new Date)};
                 msg.comment = trimDoubleQuotes(contentObj.what);
-                self.model.add('documents.' + msg.room + '.messages', msg);
+                this.model.add('documents.' + msg.room + '.messages', msg);
             }
 
         });
 
 
         pattern = {0: 'tell', 1: '&key', content: ['display-sbgn', '.', '*']};
-        self.tm.addHandler(pattern, function (text) {
-            self.displaySbgn(text);
+        this.tm.addHandler(pattern,  (text) => {
+            this.displaySbgn(text);
 
         });
 
         pattern = {0: 'request', 1: '&key', content: ['display-sbgn', '.', '*']};
-        self.tm.addHandler(pattern, function (text) {
-            self.displaySbgn(text);
+        this.tm.addHandler(pattern,  (text) => {
+            this.displaySbgn(text);
         });
 
         pattern = {0: 'request', 1: '&key', content: ['open-query-window', '.', '*']};
-        self.tm.addHandler(pattern, function (text) {
-            self.openQueryWindow(text);
+        this.tm.addHandler(pattern, (text) => {
+            this.openQueryWindow(text);
         });
 
         pattern = {0: 'tell', 1: '&key', content: ['open-query-window', '.', '*']};
-        self.tm.addHandler(pattern, function (text) {
-            self.openQueryWindow(text);
+        this.tm.addHandler(pattern, (text) => {
+            this.openQueryWindow(text);
         });
 
         pattern = {0: 'request', 1: '&key', content: ['clean-model', '.', '*']};
-        self.tm.addHandler(pattern, function (text) {
-            self.cleanModel(text);
+        this.tm.addHandler(pattern, (text) => {
+            this.cleanModel(text);
         });
 
         pattern = {0: 'tell', 1: '&key', content: ['clean-model', '.', '*']};
-        self.tm.addHandler(pattern, function (text) {
-            self.cleanModel(text);
+        this.tm.addHandler(pattern, (text) =>{
+            this.cleanModel(text);
         });
 
         pattern = {0: 'tell', 1: '&key', content: ['display-image', '.', '*']};
-        self.tm.addHandler(pattern, function (text) {
-            self.displayImage(text);
+        this.tm.addHandler(pattern, (text) => {
+            this.displayImage(text);
         });
 
         pattern = {0: 'request', 1: '&key', content: ['display-image', '.', '*']};
-        self.tm.addHandler(pattern, function (text) {
-            self.displayImage(text);
+        this.tm.addHandler(pattern, (text) => {
+            this.displayImage(text);
         });
 
 
         pattern = {0: 'tell', 1: '&key', content: ['add-provenance', '.', '*']};
-        self.tm.addHandler(pattern, function (html) {
-            self.addProvenance(html);
+        this.tm.addHandler(pattern, (html) => {
+            this.addProvenance(html);
 
         });
 
         pattern = {0: 'request', 1: '&key', content: ['add-provenance', '.', '*']};
-        self.tm.addHandler(pattern, function (text) {
-            self.addProvenance(text);
+        this.tm.addHandler(pattern, (text) => {
+            this.addProvenance(text);
 
         });
 
 
 
+
+        pattern = {0: 'request', 1: '&key', content: ['get-common-cellular-location', '.', '*']};
+        this.tm.addHandler(pattern, (text) => {
+
+            this.tm.sendMsg({0: 'request', content: {0: 'FIND-CELLULAR-LOCATION-FROM-NAMES', genes: ['AKT1', 'BRAF']}});
+
+            let patternXml = {0: 'reply', 1: '&key', content: ['success', '.', '*'], sender: 'CAUSALA'};
+
+            this.tm.addHandler(patternXml, (response) => {
+
+                this.tm.replyToMsg(text, {0: 'reply', content: {0: 'success', 'location': response.content[2]}});
+
+                //Relay this to BA
+                // this.tm.replyToMsg(text, patternXml);
+                // this.tm.sendMsg({0: 'tell', content: {0: 'PROPOSE-CELLULAR-LOCATION', location: response.content[2]}});
+                console.log(response.content[2]);
+            });
+
+
+
+        });
+
+        
+        
+            //Listen to model json request from MRA
+        // pattern = {0: 'reply', 1: '&key', content: ['success', '.', '*'], sender: 'MRA'};
         //
-        // //Listen to model id response from MRA
-        pattern = {0: 'reply', 1: '&key', content: ['success', '.', '*'], sender: 'MRA'};
-
-        self.tm.addHandler(pattern, function (text) { //listen to requests
-            let contentObj = KQML.keywordify(text.content);
-
-
-            if (contentObj.modelId) {
-
-                self.modelId = contentObj.modelId;
-                self.model.set('documents.' + self.room + '.pysb.modelId', self.modelId);
-                self.model.set('documents.' + self.room + '.pysb.model', contentObj.model);
-
-
-                console.log("New model started: " + self.modelId);
-
-                //console.log(self.model.get('documents.' + socket.room + '.pysb.model'));
-            }
-        });
+        // self.tm.addHandler(pattern, function (text) { //listen to requests
+        //     let contentObj = KQML.keywordify(text.content);
+        //
+        //
+        //     if (contentObj.modelId) {
+        //
+        //         self.modelId = contentObj.modelId;
+        //         self.model.set('documents.' + self.room + '.pysb.modelId', self.modelId);
+        //         self.model.set('documents.' + self.room + '.pysb.model', contentObj.model);
+        //
+        //
+        //         console.log("New model started: " + self.modelId);
+        //
+        //         //console.log(self.model.get('documents.' + socket.room + '.pysb.model'));
+        //     }
+        // });
     }
 
     displayImage(text) {
@@ -197,6 +219,8 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
         }
     }
 
+
+
     //TODO: to be deleted
     /***
      * Gets the standardized name of the gene from an EKB XML string
@@ -230,6 +254,7 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
             }
         });
     }
+
 
     openQueryWindow(text){
         let self = this;

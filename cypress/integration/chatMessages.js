@@ -6,6 +6,8 @@
 describe('Chat Test', function () {
 
 
+
+
     function sendMessage(text) {
 
         it('Send message', function (done) {
@@ -42,7 +44,6 @@ describe('Chat Test', function () {
         });
 
     }
-
 
     sendMessage("test1");
     sendMessage("test2");

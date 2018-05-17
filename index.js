@@ -75,7 +75,6 @@ app.get('/', function (page, model, params) {
 app.get('/:docId', function (page, model, arg, next) {
     let  room;
 
-    let self = this;
     room = arg.docId;
 
     model.subscribe('documents', function () {
@@ -113,44 +112,46 @@ app.get('/:docId', function (page, model, arg, next) {
             let provenance = model.at((docPath + '.provenance'));
             let pcQuery = model.at((docPath + '.pcQuery'));
             let noTrips = model.at((docPath + '.noTrips'));
+            let biopaxMode = model.at((docPath + '.biopaxMode'));
 
-            pysb.subscribe(function () {
+            pysb.subscribe(() =>{
             });
 
-            cy.subscribe(function () {
+            cy.subscribe(() => {
             });
 
-            history.subscribe(function () {
+            history.subscribe(() => {
             });
 
-            undoIndex.subscribe(function () {
+            undoIndex.subscribe(() => {
             });
 
-            context.subscribe(function () {
+            context.subscribe(() => {
             });
 
-            images.subscribe(function () {
+            images.subscribe(() => {
             });
 
-            messages.subscribe(function () {
+            messages.subscribe(() => {
             });
 
-            provenance.subscribe(function(){
+            provenance.subscribe(() => {
             });
 
-            pcQuery.subscribe(function(){
+            pcQuery.subscribe(() => {
             });
 
-            noTrips.subscribe(function(){
+            biopaxMode.subscribe(()=>{
+            });
+            noTrips.subscribe(() => {
 
             });
 
-            userIds.subscribe(function () {
+            userIds.subscribe(() => {
 
             });
 
-            users.subscribe(function () {
-
+            users.subscribe(() => {
 
                 return page.render();
             });
@@ -176,61 +177,61 @@ app.proto.changeDuration = function () {
  */
 
 app.proto.create = function (model) {
-    let self = this;
     docReady = true;
 
-    self.socket = io();
-    self.notyView = window.noty({layout: "bottom",theme:"bootstrapTheme", text: "Please wait while model is loading."});
+    this.socket = io();
+    this.notyView = window.noty({layout: "bottom",theme:"bootstrapTheme", text: "Please wait while model is loading."});
 
-    self.listenToUIOperations(model);
+    this.listenToUIOperations(model);
 
     let id = model.get('_session.userId');
 
 
     // Make modelManager instance accessible through window object as testModelManager to use it in Cypress tests
     let ModelManager = require('./public/collaborative-app/modelManager.js');
-    self.modelManager = window.testModelManager = new ModelManager(model, model.get('_page.room'));
+    this.modelManager = window.testModelManager = new ModelManager(model, model.get('_page.room'));
     this.docId = model.get('_page.doc.id');
     window.testApp = this;
     window.sessionUserId = model.get('_session.userId');
 
 
-    self.modelManager.addUser(model.get('_session.userId'));
+    this.modelManager.addUser(model.get('_session.userId'));
 
-    // self.modelManager.setName( model.get('_session.userId'),name);
+    // this.modelManager.setName( model.get('_session.userId'),name);
 
 
-    self.dynamicResize();
+    this.dynamicResize();
 
     //Notify server about the client connection
-    self.socket.emit("subscribeHuman", { userName:name, room:  model.get('_page.room'), userId: id});
+    this.socket.emit("subscribeHuman", { userName:name, room:  model.get('_page.room'), userId: id});
 
-    self.agentSocket = require('./public/collaborative-app/clientSideSocketListener')(this);
-    self.agentSocket.listen();
+    this.agentSocket = require('./public/collaborative-app/clientSideSocketListener')(this);
+    this.agentSocket.listen();
 
 
-    self.factoidHandler = require('./public/collaborative-app/factoid/factoid-handler')(this) ;
-    self.factoidHandler.initialize();
+    this.factoidHandler = require('./public/collaborative-app/factoid/factoid-handler')(this) ;
+    this.factoidHandler.initialize();
 
     //
     //Loading cytoscape and clients
 
-    let cyIds = self.modelManager.getCyIds();
+    let cyIds = this.modelManager.getCyIds();
 
-    cyIds.forEach(function(cyId) {
+    cyIds.forEach((cyId) => {
         if(parseInt(cyId) !== parseInt(appUtilities.getActiveNetworkId())) //tab 0: initial tab
             appUtilities.createNewNetwork(parseInt(cyId)); //opens a new tab
-        self.loadCyFromModel(cyId, function (isModelEmpty) {
+        this.loadCyFromModel(cyId, function (isModelEmpty) {
         });
     });
 
     if(cyIds.length === 0) //no previous model -- first time loading the document
-        self.modelManager.openCy(appUtilities.getActiveNetworkId(), "me");
+        this.modelManager.openCy(appUtilities.getActiveNetworkId(), "me");
 
-    self.notyView.close();
+    this.notyView.close();
 
 
-    self.editorListener = require('./public/collaborative-app/editor-listener.js')(self.modelManager,self.socket, id, self);
+    //To initialize the editor
+    this.editorListener = require('./public/collaborative-app/editor-listener.js')(this.modelManager,this.socket, id, this);
 
     //HACK: This is normally called when a new network is created, but the initial network is created before editor-listener
     //Lets editor-listener to subscribe to UI operations
@@ -240,14 +241,14 @@ app.proto.create = function (model) {
 
 
     setTimeout(()=>{
-        let userIds = self.modelManager.getUserIds();
+        let userIds = this.modelManager.getUserIds();
         let noTrips = model.get('_page.doc.noTrips');
         if(!noTrips &&  userIds.indexOf(BobId) < 0) {
 
             // console.log("Connection requested " + noTrips + " " + op);
-            self.connectTripsAgent();
+            this.connectTripsAgent();
 
-            self.connectVisualizationHandler(self.modelManager);
+            this.connectVisualizationHandler(this.modelManager);
         }
     }, 500); // wait a little while for the server to update user list and handle disconnections
 
@@ -378,30 +379,32 @@ app.proto.loadCyFromModel = function(cyId, callback){
 app.proto.convertToBiopax = function(){
     let self= this;
 
-    let cyId = appUtilities.getActiveNetworkId();
-    let chiseInst =  appUtilities.getChiseInstance(cyId);
+    if(this.model.get('_page.doc.biopaxMode')) {
 
-    //get rid of ports
-    chiseInst.setPortsOrdering(chiseInst.getCy().nodes(), 'none');
+        let cyId = appUtilities.getActiveNetworkId();
+        let chiseInst = appUtilities.getChiseInstance(cyId);
 
-    chiseInst.getCy().nodes().forEach(function(node){
-       chiseInst.elementUtilities.removePorts(node);
-    });
+        //get rid of ports
+        chiseInst.setPortsOrdering(chiseInst.getCy().nodes(), 'none');
 
-    let sbgn = appUtilities.getChiseInstance(cyId).createSbgnml();
+        chiseInst.getCy().nodes().forEach(function (node) {
+            chiseInst.elementUtilities.removePorts(node);
+        });
 
-
-
-    sbgn = sbgn.replace("unknown", "process description");
-    sbgn = sbgn.replace("libsbgn/0.3", "libsbgn/0.2");
+        let sbgn = appUtilities.getChiseInstance(cyId).createSbgnml();
 
 
-    self.socket.emit('BioPAXRequest', sbgn, "biopax", function(biopax) {
+        sbgn = sbgn.replace("unknown", "process description");
+        sbgn = sbgn.replace("libsbgn/0.3", "libsbgn/0.2");
 
-        console.log("sending biopax req");
-        self.model.set('_page.doc.pysb.' + cyId + '.biopax', biopax.graph);
-        console.log(biopax.graph);
-    });
+
+        self.socket.emit('BioPAXRequest', sbgn, "biopax", function (biopax) {
+
+            console.log("sending biopax req");
+            self.model.set('_page.doc.pysb.' + cyId + '.biopax', biopax.graph);
+            console.log(biopax.graph);
+        });
+    }
 }
 
 
@@ -856,7 +859,12 @@ app.proto.listenToModelOperations = function(model){
             triggerContentChange('messages');
 
         if (docReady && com[com.length - 1].userId != myId)
-            $('#notificationAudio')[0].play();
+            try {
+                $('#notificationAudio')[0].play();
+            }
+            catch(e){
+                console.log("Cannot play audio. " + e);
+            }
 
     });
 

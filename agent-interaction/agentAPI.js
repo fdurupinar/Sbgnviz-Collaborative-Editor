@@ -272,8 +272,6 @@ Agent.prototype.sendRequest = function(reqName, paramSent, callback){ //model op
     this.socket.emit(reqName, param, function(data){
         if(callback)
             callback(data);
-        else
-            console.log(data);
     });
 
 };

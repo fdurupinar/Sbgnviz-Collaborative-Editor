@@ -5,6 +5,7 @@
  *	Author: Funda Durupinar Babur<f.durupinar@gmail.com>
  */
 
+const Promise = require('bluebird');
 
 
 class ModelManager{
@@ -404,7 +405,6 @@ class ModelManager{
                 nodeArr.push(nodes[att]);
         }
 
-        console.log(nodeArr);
         return nodeArr;
     }
 

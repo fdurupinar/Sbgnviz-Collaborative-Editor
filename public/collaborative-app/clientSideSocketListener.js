@@ -57,7 +57,6 @@ module.exports =  function(app) {
 
 
                     //notifies other clients
-
                     app.modelManager.addModelNode(newNode.id(), param.cyId, param, "me");
                     app.modelManager.initModelNode(newNode, param.cyId, "me");
 
@@ -106,25 +105,6 @@ module.exports =  function(app) {
 
                     if (callback) callback(status);
 
-                }
-                catch (e) {
-                    console.log(e);
-                    if(callback) callback();
-
-                }
-            });
-
-
-            app.socket.on('addEdge', function (data, callback) {
-                try {
-                    //does not trigger cy events
-                    let newEdge = appUtilities.getChiseInstance(data.cyId).elementUtilities.addEdge(source, target, sbgnclass, id, visibility);
-
-                    //notifies other clients
-                    app.modelManager.addModelEdge(newNode.id(), data.cyId, data, "me");
-                    // app.modelManager.initModelEdge(newEdge, cyId, "me");
-
-                    if (callback) callback(newEdge.id());
                 }
                 catch (e) {
                     console.log(e);
@@ -309,6 +289,7 @@ module.exports =  function(app) {
                 let chiseInst = appUtilities.createNewNetwork(); //opens a new tab
 
 
+
                 let jsonObj = chiseInst.convertSbgnmlTextToJson(data.graph);
 
                 chiseInst.updateGraph(jsonObj, function(){
@@ -327,20 +308,26 @@ module.exports =  function(app) {
             app.socket.on("displaySbgn", function(data, callback){
 
 
-                let jsonObj = appUtilities.getChiseInstance(data.cyId).convertSbgnmlTextToJson(data.sbgn);
+
+                appUtilities.getCyInstance(data.cyId).remove(appUtilities.getCyInstance(data.cyId).elements());
 
                 //get another sbgncontainer and display the new SBGN model.
-                app.modelManager.newModel("me", true);
+                app.modelManager.newModel(data.cyId, "me", true);
 
-                appUtilities.getChiseInstance(data.cyId).updateGraph(jsonObj, function(){
-                    app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(), data.cyId, appUtilities, "me");
 
-                    appUtilities.setActiveNetwork(data.cyId);
+                    let jsonObj = appUtilities.getChiseInstance(data.cyId).convertSbgnmlTextToJson(data.sbgn);
 
-                    $("#perform-layout").trigger('click');
 
-                    if (callback) callback("success");
-                });
+
+                    appUtilities.getChiseInstance(data.cyId).updateGraph(jsonObj, function(){
+                        app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(), data.cyId, appUtilities, "me");
+
+                        appUtilities.setActiveNetwork(data.cyId);
+
+                        $("#perform-layout").trigger('click');
+
+                        if (callback) callback("success");
+                    });
 
             });
 

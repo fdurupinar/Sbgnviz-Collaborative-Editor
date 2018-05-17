@@ -2251,7 +2251,12 @@
                         <select id = "test-messages" on-change="updateTripsMessage()">
 
 
+
                             <option selected = "selected" >Let's build a model.</option>
+                            <option>AKT1 phosphorylates MAPK1.</option>
+
+                            <option>What is the most likely cellular location of AKT1, BRAF?</option>
+
                             <option>Let's show akt1 on the top.</option>
                             <option>Let's show phosphorylated akt1 on the top.</option>
                             <option>Let's show the downstream of erk on the top.</option>
@@ -2259,7 +2264,7 @@
                             <option>Let's highlight the upstream of p-ERK.</option>
                             <option>How does BRAF activate MAPK1?</option>
                             <option>What is the path between BRAF and MAPK1?</option>
-                            <option>AKT1 phosphorylates MAPK1.</option>
+
                             <option>How does MAPK1 affect JUND?</option>
                             <option>AKT1 activates BRAF.</option>
                             <option>Let's learn about AKT1.</option>
@@ -2279,7 +2284,7 @@
                             <option>How does KRAS activate MAPK3?</option>
 
 
-                            <option>What is the most likely cellular location of AKT1, BRAF?</option>
+
 
                             <option>What are the common upstreams of AKT1, BRAF?</option>
                             <option>Are there common upstreams of AKT1, BRAF?</option>
@@ -2388,6 +2393,8 @@
         <!--TODO: Close this-->
         <p></p>
         <button id = "convert-to-biopax" class = "btn-mini" on-click = "convertToBiopax()">Convert to Biopax</button>
+        <p>Biopax mode <input type="checkbox" unchecked> {{_page.doc.biopaxMode}}<br>
+        </p>
         <!--<button id = "connect-visualization-agent" class = "btn-mini" on-click = "connectVisAgent()">VisA</button>-->
         <!--<button id = "connect-causality-agent" class = "btn  btn-mini" on-click = "connectCausalityAgent()">CA</button>-->
         <!--<button id = "test-image-tab" class = "btn  btn-mini" on-click = "testImageTab()">Test image tab</button>-->
