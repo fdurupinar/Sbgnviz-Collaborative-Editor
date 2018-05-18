@@ -99,7 +99,7 @@ describe('Agent API Test', function () {
                 let modelManager = window.testApp.modelManager;
                 props.cyId = cyId;
                 agent.sendRequest("agentAddNodeRequest", props,   function (nodeId) {
-                    setTimeout(function () { //should wait here as well
+                    setTimeout(function () { //should wait here to synchronize server and client model
                         let val = modelManager.getModelNode(nodeId, cyId);
 
                         expect(val).to.be.ok;

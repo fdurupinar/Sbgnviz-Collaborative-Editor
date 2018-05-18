@@ -260,6 +260,7 @@ module.exports =  function(app) {
 
             });
 
+
             app.socket.on('clone', function (data, callback) {
                 try {
                     appUtilities.getCyInstance(data.cyId).elements().unselect();
@@ -356,7 +357,6 @@ module.exports =  function(app) {
 
         listenToVisAgentRequests: function () {
 
-
             app.socket.on('moveGene', function ( data, callback) {
 
                 app.visHandler.moveNode(data);
@@ -384,6 +384,50 @@ module.exports =  function(app) {
                 else
                     appUtilities.getCyInstance(data.cyId).getElementById(data.id).unlock();
             });
+
+
+            app.socket.on('addCellularLocation', function (data, callback) {
+                try {
+
+                    if(!data.cyId)
+                        data.cyId = appUtilities.getActiveNetworkId();
+
+                    let cy = appUtilities.getCyInstance(data.cyId);
+
+                    let elements = [];
+
+
+                    data.genes.forEach((gene)=>{
+                        let els = app.visHandler.findAllNodesFromLabel(gene, cy.nodes());
+                        els.forEach((el) => elements.push(el));
+                    });
+
+                    console.log(elements);
+
+                    //unselect all others
+                    cy.elements().unselect();
+
+                    elements.forEach( (el) => {
+                        if(el.isNode())
+                            el.select();
+                    });
+
+                    appUtilities.getChiseInstance(data.cyId).createCompoundForGivenNodes(cy.nodes(':selected'), "compartment");
+
+                    //unselect back
+                    cy.elements().unselect();
+
+
+                    if (callback) callback("success");
+                }
+                catch (e) {
+                    console.log(e);
+                    if (callback) callback();
+
+                }
+
+            });
+
 
         },
 

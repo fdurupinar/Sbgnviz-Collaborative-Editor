@@ -46,7 +46,7 @@ module.exports = function(){
 
             let jsonObj = jsonMerger.mergeJsons(jsonGraph, sentenceNodeMap, idxCardNodeMap);
 
-            modelManager.newModel("me", true);
+            modelManager.newModel(cyId, "me", true);
 
             appUtilities.getChiseInstance(cyId).updateGraph(jsonObj, function(){
 

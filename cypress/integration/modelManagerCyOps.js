@@ -628,7 +628,7 @@ describe('modelManager Cytoscape Operations Test', function () {
     // array that is traversed here should be updated accordingly.
     // initialNetworkIds.forEach( function (cyId) {
 
-    return;
+    // return;
     let cyId = 0;
         addModelNode(cyId, "node1");
         initModelNode(cyId, "node1");
@@ -660,9 +660,9 @@ describe('modelManager Cytoscape Operations Test', function () {
         undoDeleteModelNode(cyId, "node3");
         redoDeleteModelNode(cyId, "node3");
 
-        deleteModelEdge(cyId, "node1-node2");
-        undoDeleteModelEdge(cyId, "node1-node2");
-        redoDeleteModelEdge(cyId, "node1-node2");
+        // deleteModelEdge(cyId, "node1-node2");
+        // undoDeleteModelEdge(cyId, "node1-node2");
+        // redoDeleteModelEdge(cyId, "node1-node2");
 
 
     // });

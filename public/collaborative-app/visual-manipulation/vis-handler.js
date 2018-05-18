@@ -21,10 +21,39 @@ const possibleStates = {
     "ont::phosphorylation": ["p", "phosphorylation", "phospho", "phosphorylated"]
 }
 
+
 /***
+ * Stateless nodes
+ * @param name
+ * @param nodes
+ */
+VisHandler.prototype.findAllNodesFromLabel = function(name,  nodes){
+
+    let myNode = null;
+
+    let possibleNodes = [];
+
+    nodes.forEach(function(node) {
+        let label = node.data("label");
+
+        if(label) {
+            label = label.replace('-', '');
+            name = name.replace('-', '');
+            if (label && label.toLowerCase() === name.toLowerCase()) {
+                possibleNodes.push(node);
+            }
+        }
+    });
+
+    return possibleNodes;
+}
+
+
+/***
+ * Compares the state
  * @param name
  */
-//TODO: look at state
+
 VisHandler.prototype.findNodeFromLabel = function(name, state, nodes) {
 
     let myNode = null;
@@ -33,13 +62,19 @@ VisHandler.prototype.findNodeFromLabel = function(name, state, nodes) {
 
     nodes.forEach(function(node) {
         let label = node.data("label");
-        if (label && label.toLowerCase() === name.toLowerCase()) {
-            possibleNodes.push(node);
+
+        if(label) {
+            label = label.replace('-', '');
+            name = name.replace('-', '');
+            if (label && label.toLowerCase() === name.toLowerCase()) {
+                possibleNodes.push(node);
+            }
         }
     });
 
-    if(state == null && nodes.length > 0) //no need to compare
-        myNode = nodes[0];
+    if(state == null && nodes.length > 0){ //no need to compare
+            myNode = nodes[0];
+    }
     else{
 
 
@@ -156,9 +191,7 @@ VisHandler.prototype.moveNode = function(data) {
 
         //make sure model is updated accordingly
         self.modelManager.changeModelNodeAttribute("position", nodeToMove.data("id"), data.cyId, posToMove, "me");
-
     });
-
 }
 
 

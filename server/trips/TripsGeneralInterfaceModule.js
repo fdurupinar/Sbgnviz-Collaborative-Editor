@@ -125,30 +125,6 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
         });
 
 
-
-
-        pattern = {0: 'request', 1: '&key', content: ['get-common-cellular-location', '.', '*']};
-        this.tm.addHandler(pattern, (text) => {
-
-            this.tm.sendMsg({0: 'request', content: {0: 'FIND-CELLULAR-LOCATION-FROM-NAMES', genes: ['AKT1', 'BRAF']}});
-
-            let patternXml = {0: 'reply', 1: '&key', content: ['success', '.', '*'], sender: 'CAUSALA'};
-
-            this.tm.addHandler(patternXml, (response) => {
-
-                this.tm.replyToMsg(text, {0: 'reply', content: {0: 'success', 'location': response.content[2]}});
-
-                //Relay this to BA
-                // this.tm.replyToMsg(text, patternXml);
-                // this.tm.sendMsg({0: 'tell', content: {0: 'PROPOSE-CELLULAR-LOCATION', location: response.content[2]}});
-                console.log(response.content[2]);
-            });
-
-
-
-        });
-
-        
         
             //Listen to model json request from MRA
         // pattern = {0: 'reply', 1: '&key', content: ['success', '.', '*'], sender: 'MRA'};
@@ -219,41 +195,6 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
         }
     }
 
-
-
-    //TODO: to be deleted
-    /***
-     * Gets the standardized name of the gene from an EKB XML string
-     * by sending a request to sense prioritization agent
-     * @param termStr : EKB XML string
-     * @param callback : Called when sense prioritization agent returns an answer
-     */
-    getTermName(termStr, callback) {
-
-        let self = this;
-        this.tm.sendMsg({0: 'request', content: {0: 'CHOOSE-SENSE', 'ekb-term': termStr}});
-
-
-        let patternXml = {0: 'reply', 1: '&key', content: ['SUCCESS', '.', '*']};
-
-        self.tm.addHandler(patternXml, function (textXml) {
-
-            if(textXml.content && textXml.content.length >= 2 && textXml.content[2].length > 0) {
-
-                let termNames = [];
-                for(let i = 0; i < textXml.content[2].length; i++) {
-                    let contentObj = KQML.keywordify(textXml.content[2][i]);
-                    let termName = trimDoubleQuotes(contentObj.name);
-                    termNames.push(termName);
-                }
-
-                if(termNames.length == 1 && callback)
-                    callback(termNames[0]);
-                else if(callback)
-                    callback(termNames);
-            }
-        });
-    }
 
 
     openQueryWindow(text){
