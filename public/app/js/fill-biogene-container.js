@@ -32,35 +32,48 @@ var fillBioGeneContainer = function (node) {
   var queryScriptURL = "http://www.pathwaycommons.org/biogene/retrieve.do";
   var geneName = node.data('label');
 
+    let responseHeaders = {
+        "access-control-allow-origin": "*",
+        "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "access-control-allow-headers": "content-type, accept",
+        "access-control-max-age": 10,
+        "Content-Type": "application/json"
+    };
+
   // set the query parameters
   var queryParams = {
     query: geneName,
     org: "human",
     format: "json",
+    headers: responseHeaders,
   };
-  
+
   $.ajax({
-    type: "GET", //"POST",
-    url: queryScriptURL,
-    async: true,
-    data: queryParams,
+      type: "GET", //"POST",
+      url: queryScriptURL,
+      async: true,
+      data: queryParams,
   })
-          .then(function (queryResult) {
-            // - json parse is not required when no PHP involved
-            if (queryResult.count > 0 && queryParams.query != "" && typeof queryParams.query != 'undefined')
-            {
+      .then(function (queryResult) {
+
+          console.log(queryResult);
+          // - json parse is not required when no PHP involved
+          if (queryResult.count > 0 && queryParams.query != "" && typeof queryParams.query != 'undefined') {
               var info = (new BioGeneView(
-                      {
-                        el: '#biogene-container',
-                        model: queryResult.geneInfo[0]
-                      })).render();
-            }
-            else {
+                  {
+                      el: '#biogene-container',
+                      model: queryResult.geneInfo[0]
+                  })).render();
+          }
+          else {
+
               $('#biogene-container').html("<span style='padding-left: 3px;'>No additional information available &#013; for the selected node!</span>");
-            }
-          }, function (xhr, status, error) {
-            $('#biogene-container').html("<span style='padding-left: 3px;'>Error retrieving data: " + error + "</span>");
-          });
+          }
+      }, function (xhr, status, error) {
+
+          $('#biogene-container').html("<span style='padding-left: 3px;'>Error retrieving data: " + error + "</span>");
+      });
+
   $('#biogene-title').html("<b>" + node.data('label') + "</b>");
 };
 

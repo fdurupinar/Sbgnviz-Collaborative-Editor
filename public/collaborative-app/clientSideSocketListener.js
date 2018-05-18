@@ -393,29 +393,56 @@ module.exports =  function(app) {
                         data.cyId = appUtilities.getActiveNetworkId();
 
                     let cy = appUtilities.getCyInstance(data.cyId);
+                    let chiseInst = appUtilities.getChiseInstance(data.cyId);
 
                     let elements = [];
 
 
-                    data.genes.forEach((gene)=>{
-                        let els = app.visHandler.findAllNodesFromLabel(gene, cy.nodes());
-                        els.forEach((el) => elements.push(el));
-                    });
+                    if(data.genes === 'ont::all'){
+                        cy.elements().select();
+                    }
+                    else {
+                        data.genes.forEach((gene) => {
+                            let els = app.visHandler.findAllNodesFromLabel(gene, cy.nodes());
+                            els.forEach((el) => elements.push(el));
+                        });
 
-                    console.log(elements);
+                        console.log(elements);
 
-                    //unselect all others
-                    cy.elements().unselect();
+                        //unselect all others
+                        elements.forEach((el) => {
+                            if (el.isNode()) {
+                                el.select();
+                            }
+                        });
 
-                    elements.forEach( (el) => {
-                        if(el.isNode())
-                            el.select();
-                    });
+                        let nodes = cy.nodes(':selected');
 
-                    appUtilities.getChiseInstance(data.cyId).createCompoundForGivenNodes(cy.nodes(':selected'), "compartment");
+                        let extendedNodes = chiseInst.elementUtilities.extendNodeList(nodes);
+                        extendedNodes.forEach((el) => el.select());
+
+                    }
+                    //also selects them
+                    // chiseInst.highlightProcesses(nodes);
+
+                    let eles = chiseInst.createCompoundForGivenNodes(cy.nodes(':selected'), "compartment");
+
+                    //format label, eliminate any w:: or ont:: i
+                    let compartmentLabel = data.compartment.replace("W::", '');
+                    compartmentLabel = compartmentLabel.replace("ONT::", '');
+
+                    let compoundId = cy.nodes(':selected')[0].data("parent");
+                    cy.getElementById(compoundId)._private.data.label = compartmentLabel;
+
+
+
+
 
                     //unselect back
-                    cy.elements().unselect();
+                    // cy.elements().unselect();
+
+                    //remove highlights
+                    // chiseInst.removeHighlights();
 
 
                     if (callback) callback("success");

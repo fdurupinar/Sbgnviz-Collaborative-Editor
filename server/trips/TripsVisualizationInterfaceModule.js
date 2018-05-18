@@ -78,45 +78,49 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
         pattern = {0: 'request', 1: '&key', content: ['put-into-compartment', '.', '*']};
         this.tm.addHandler(pattern, (text) => {
 
+            let genes;
             let termStr =  text.content[2];
 
-            let genes = this.extractGeneNamesFromEkb(termStr);
+            if(termStr.toLowerCase() === 'ont::all')
+                genes = "ont::all";
+            else
+                genes = this.extractGeneNamesFromEkb(termStr);
 
-            //find elements from labels
+            this.askHuman(this.agentId, this.room, "addCellularLocation", {genes: genes, compartment:text.content[4]},  () => {
+                //should return a response to let the ba know
+                self.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
 
-            this.askHuman(this.agentId, this.room, "addCellularLocation", {genes: genes},  () => {
-                // self.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
             });
 
         });
 
 
-        pattern = {0: 'request', 1: '&key', content: ['get-common-cellular-location', '.', '*']};
-        this.tm.addHandler(pattern, (text) => {
-
-            this.modelGetJson((jsonModel)=> {
-                let geneList = this.getGeneList(jsonModel);
-                if(geneList.length > 0) {
-                    this.tm.sendMsg({
-                        0: 'request',
-                        content: {0: 'FIND-CELLULAR-LOCATION-FROM-NAMES', genes: geneList}
-                    });
-
-                    let patternXml = {0: 'reply', 1: '&key', content: ['success', '.', '*'], sender: 'CAUSALA'};
-
-                    this.tm.addHandler(patternXml, (response) => {
-
-                        this.tm.replyToMsg(text, {
-                            0: 'reply',
-                            content: {0: 'success', location: response.content[2], genes: geneList}
-                        });
-
-                        console.log(response.content[2]);
-                    });
-                }
-            });
-
-        });
+        // pattern = {0: 'request', 1: '&key', content: ['get-common-cellular-location', '.', '*']};
+        // this.tm.addHandler(pattern, (text) => {
+        //
+        //     this.modelGetJson((jsonModel)=> {
+        //         let geneList = this.getGeneList(jsonModel);
+        //         if(geneList.length > 0) {
+        //             this.tm.sendMsg({
+        //                 0: 'request',
+        //                 content: {0: 'FIND-CELLULAR-LOCATION-FROM-NAMES', genes: geneList}
+        //             });
+        //
+        //             let patternXml = {0: 'reply', 1: '&key', content: ['success', '.', '*'], sender: 'CAUSALA'};
+        //
+        //             this.tm.addHandler(patternXml, (response) => {
+        //
+        //                 this.tm.replyToMsg(text, {
+        //                     0: 'reply',
+        //                     content: {0: 'success', location: response.content[2], genes: geneList}
+        //                 });
+        //
+        //                 console.log(response.content[2]);
+        //             });
+        //         }
+        //     });
+        //
+        // });
 
 
 
@@ -182,61 +186,61 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
         }
     }
 
-
-
+    /***
+     * Find the variables between <name></name> tags
+     * @param termStr: ekb string
+     * @returns {Array} of gene names
+     */
     extractGeneNamesFromEkb(termStr){
-        let cleanStr = trimDoubleQuotes(termStr);
-
-        cleanStr = cleanStr.replace(/(\\")/g, '"');
 
         var re = new RegExp(/<name>\s*(.*?)\s*<\/name>/g);
 
         var genes = [];
-        let m = re.exec(cleanStr);
+        let m = re.exec(termStr);
         while (m) {
             genes.push(m[1]);
-            m = re.exec(cleanStr);
+            m = re.exec(termStr);
         }
 
         return genes;
     }
-    getGeneList(jsonModel){
-
-        let geneList = [];
-        jsonModel.forEach((interaction) => {
-            if (interaction.enz)
-                geneList.push(interaction.enz.name);
-            if (interaction.sub)
-                geneList.push(interaction.sub.name);
-            if (interaction.subj)
-                geneList.push(interaction.subj.name);
-            if (interaction.obj)
-                geneList.push(interaction.obj.name);
-        });
-
-        return geneList;
-
-    }
-    /***
-     * Gets the INDRA model in json format
-     */
-    modelGetJson(callback){
-
-        this.tm.sendMsg({0: 'request', content: {0: 'MODEL-GET-JSON'}});
-
-
-        let patternXml = {0: 'reply', 1: '&key', content: ['success', '.', '*'], sender: 'MRA'};
-
-        this.tm.addHandler(patternXml, (response) => {
-
-            let jsonStr = trimDoubleQuotes(response.content[2]);
-
-            jsonStr = jsonStr.replace(/(\\")/g, '"');
-            let jsonModel = JSON.parse(jsonStr);
-
-            if(callback) callback(jsonModel);
-        });
-    }
+    // getGeneList(jsonModel){
+    //
+    //     let geneList = [];
+    //     jsonModel.forEach((interaction) => {
+    //         if (interaction.enz)
+    //             geneList.push(interaction.enz.name);
+    //         if (interaction.sub)
+    //             geneList.push(interaction.sub.name);
+    //         if (interaction.subj)
+    //             geneList.push(interaction.subj.name);
+    //         if (interaction.obj)
+    //             geneList.push(interaction.obj.name);
+    //     });
+    //
+    //     return geneList;
+    //
+    // }
+    // /***
+    //  * Gets the INDRA model in json format
+    //  */
+    // modelGetJson(callback){
+    //
+    //     this.tm.sendMsg({0: 'request', content: {0: 'MODEL-GET-JSON'}});
+    //
+    //
+    //     let patternXml = {0: 'reply', 1: '&key', content: ['success', '.', '*'], sender: 'MRA'};
+    //
+    //     this.tm.addHandler(patternXml, (response) => {
+    //
+    //         let jsonStr = trimDoubleQuotes(response.content[2]);
+    //
+    //         jsonStr = jsonStr.replace(/(\\")/g, '"');
+    //         let jsonModel = JSON.parse(jsonStr);
+    //
+    //         if(callback) callback(jsonModel);
+    //     });
+    // }
 
 }
 
