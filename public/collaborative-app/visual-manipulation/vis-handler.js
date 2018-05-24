@@ -72,7 +72,7 @@ VisHandler.prototype.findNodeFromLabel = function(name, state, nodes) {
         }
     });
 
-    if(state == null && nodes.length > 0){ //no need to compare
+    if(!state && nodes.length > 0){ //no need to compare
             myNode = nodes[0];
     }
     else{
