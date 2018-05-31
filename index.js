@@ -442,9 +442,12 @@ app.proto.listenToNodeOperations = function(model){
             if(!node || !node.id){ //node is deleted
                 appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).remove();
 
-                self.socket.emit('resetConversationRequest');
+                if(node.data.class === "compartment"){
+                    this.removeCellularLocation(node.data.class);
+                }
 
-
+                // why was this open??
+                // self.socket.emit('resetConversationRequest');
             }
         }
         else {
@@ -984,7 +987,13 @@ app.proto.addCellularLocation = function(genes, compartment, cyId) {
 }
 
 
+app.proto.removeCellularLocation = function(location) {
+    this.modelManager.removeModelCellularLocation(location);
+}
 
+/***
+ * Add locations at each model update
+ */
 app.proto.updateCellularLocations = function() {
 
     let cyId = appUtilities.getActiveNetworkId();
@@ -1047,18 +1056,16 @@ app.proto.updateTripsMessage = function(){
 app.proto.resetConversationOnTrips = function(){
     //directly ask the server as this client may not have a tripsAgent
     this.socket.emit('resetConversationRequest');
-
 };
-
 
 app.proto.connectVisualizationHandler = function(modelManager){
     let self = this;
-
 
     let VisHandler = require('./public/collaborative-app/visual-manipulation/vis-handler.js');
     this.visHandler = new VisHandler(modelManager);
 
 };
+
 app.proto.findLabelAndStateOfSelectedNode = function() {
 
     if (appUtilities.getActiveCy().nodes(":selected").length <= 0)

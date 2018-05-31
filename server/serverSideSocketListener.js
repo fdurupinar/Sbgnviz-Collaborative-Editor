@@ -388,6 +388,7 @@ module.exports.start = function(io, model, cancerDataOrganizer){
             });
             p.then((val) => {
                 tripsGeneralInterfaceInstance.cleanModel();
+
             });
 
 

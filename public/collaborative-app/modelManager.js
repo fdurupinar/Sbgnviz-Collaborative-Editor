@@ -630,9 +630,6 @@ class ModelManager{
         this.changeModelElementGroupAttribute("data.parent", childrenList, cyId, prevParentList,   user, true);
         this.deleteModelNode(compoundId, cyId, user, true);
 
-
-
-
         if (!noHistUpdate)
             this.updateHistory({
                 opName: 'delete',
@@ -1275,6 +1272,11 @@ class ModelManager{
     addModelCellularLocation(genes, location, user, noHistUpdate) {
 
         this.model.pass({user:user}).set('documents.' + this.docId +'.cellularLocations.'+ location, genes);
+    }
+
+    removeModelCellularLocation(location, user, noHistUpdate) {
+        this.model.pass({user:user}).remove('documents.' + this.docId +'.cellularLocations', location);
+
     }
 
 }
