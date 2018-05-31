@@ -15,12 +15,12 @@ function TripsGeneralInterfaceAgent(agentName, id) {
     this.tripsUttNum = 1;
 }
 TripsGeneralInterfaceAgent.prototype.init = function(){
-    var self = this;
 
-    this.sendRequest('agentConnectToTripsRequest', {isInterfaceAgent: true, userName: this.agentName }, function(result){
+    this.sendRequest('agentConnectToTripsRequest', {isInterfaceAgent: true, userName: this.agentName }, (result) => {
         if(!result)
-            self.disconnect();
-    }); //interfaceAgent
+            this.disconnect();
+    });
+
     this.listenToMessages();
 }
 
@@ -28,25 +28,21 @@ TripsGeneralInterfaceAgent.prototype.relayMessage = function(text){
 
     this.sendRequest('relayMessageToTripsRequest', {text: '"' + text +'"', uttNum: this.tripsUttNum});
     this.tripsUttNum++;
-
 }
 
 /***
  * Listen to messages from other actors and act accordingly
  * @param callback
  */
-TripsGeneralInterfaceAgent.prototype.listenToMessages = function(callback){
-    var self = this;
+TripsGeneralInterfaceAgent.prototype.listenToMessages = function(){
 
-    this.socket.on('message', function(data){
+    this.socket.on('message', (data) => {
 
-        if(data.userId != self.agentId) {
-
-
-            self.relayMessage(data.comment);
-
+        if(data.userId != this.agentId) {
+            this.relayMessage(data.comment);
         }
-
     });
 }
+
+
 

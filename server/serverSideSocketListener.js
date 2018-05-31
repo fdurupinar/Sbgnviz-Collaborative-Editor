@@ -393,10 +393,6 @@ module.exports.start = function(io, model, cancerDataOrganizer){
 
         });
 
-        //Run a shell script to run CausalityAgent.py
-        socket.on('connectToCausalityAgentRequest', function(){
-            executeCommandLineProcess(("python ../CausalityAgent/causality_sbgnviz_interface.py '../CausalityAgent/resources'"));
-        });
 
     };
 

@@ -14,6 +14,7 @@ function VisHandler(modelManager){
 
     this.modelManager = modelManager;
 
+
 }
 
 
@@ -143,16 +144,12 @@ VisHandler.prototype.moveNode = function(data) {
     else if(location.toUpperCase().indexOf('RIGHT')> -1)
         posToMove = {x: bBox.x2, y: (bBox.y1 + bBox.y2) / 2};
 
-    console.log(location);
-    console.log(posToMove);
-
 
     //move node -- no need to update the model for now
     nodeToMove.position(posToMove);
 
     //make sure model is updated accordingly
    self.modelManager.changeModelNodeAttribute("position", nodeToMove.data("id"), data.cyId, posToMove, "me");
-
 
 
    nodeToMove.lock();

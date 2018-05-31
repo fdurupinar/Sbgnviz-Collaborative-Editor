@@ -101,6 +101,7 @@ app.get('/:docId', function (page, model, arg, next) {
             // create a reference to the document
             let pysb = model.at((docPath + '.pysb'));
             let cy = model.at((docPath + '.cy'));
+            let cellularLocations = model.at((docPath + '.cellularLocations'));
             let history = model.at((docPath + '.history'));
             let undoIndex = model.at((docPath + '.undoIndex'));
             let context = model.at((docPath + '.context'));
@@ -151,6 +152,9 @@ app.get('/:docId', function (page, model, arg, next) {
 
             });
 
+            cellularLocations.subscribe(() => {
+
+            });
             users.subscribe(() => {
 
                 return page.render();
@@ -771,6 +775,14 @@ app.proto.listenToModelOperations = function(model){
     let self = this;
 
 
+    model.on('all', '_page.doc.cellularLocations.*', function(location, op, names, prev, passed){
+
+
+        if(docReady &&  !passed.user) {
+            self.addCellularLocation(names, location);
+        }
+    });
+
     //Listen to other model operations
     model.on('all', '_page.doc.factoid.*', function(id, op, val, prev, passed){
         if(docReady &&  !passed.user) {
@@ -877,6 +889,119 @@ app.proto.listenToModelOperations = function(model){
 
 };
 
+
+app.proto.addCellularLocation = function(genes, compartment, cyId) {
+    if(!cyId)
+       cyId = appUtilities.getActiveNetworkId();
+
+
+
+    let cy = appUtilities.getCyInstance(cyId);
+    let chiseInst = appUtilities.getChiseInstance(cyId);
+
+
+    //make sure they are unselected
+    cy.elements().unselect();
+
+    let elements = [];
+
+
+    if(genes === 'ont::all'){
+        cy.elements().select();
+    }
+    else {
+        genes.forEach((gene) => {
+            let els = this.visHandler.findAllNodesFromLabel(gene, cy.nodes());
+            els.forEach((el) => elements.push(el));
+        });
+
+        //unselect all others
+        elements.forEach((el) => {
+            if (el.isNode()) {
+                el.select();
+
+                //select its parents as well
+                let parentId = el.data('parent');
+                while(parentId){
+                    let parentEl = cy.getElementById(parentId);
+                    parentEl.select();
+                    parentId = parentEl.data('parent');
+                }
+            }
+        });
+
+        let nodes = cy.nodes(':selected');
+
+        // let extendedNodes = chiseInst.elementUtilities.getNeighboursOfNodes(nodes);
+        // // let extendedNodes = chiseInst.elementUtilities.extendNodeList(nodes); //processes
+        // extendedNodes.forEach((el) => el.select());
+
+
+    }
+
+
+
+    //also selects them
+    // chiseInst.highlightProcesses(nodes);
+
+
+    if(cy.nodes(":selected").size()> 0) {
+        chiseInst.createCompoundForGivenNodes(cy.nodes(':selected'), "compartment");
+
+
+        //format label, eliminate any w:: or ont:: i
+        let compartmentLabel = compartment.replace("W::", '');
+        compartmentLabel = compartmentLabel.replace("ONT::", '');
+
+
+        if(cy.nodes(':selected').size() > 0){
+            //find topmost parent
+
+            let parentId = cy.nodes(':selected')[0].data('parent');
+
+            let compoundId;
+
+            while(parentId){
+                compoundId = parentId;
+                let parentEl = cy.getElementById(compoundId);
+                parentEl.select();
+                parentId = parentEl.data('parent');
+            }
+            cy.getElementById(compoundId)._private.data.label = compartmentLabel;
+
+            setTimeout(()=>{
+                $("#perform-layout").trigger('click');
+            }, 200);
+
+        }
+    }
+
+    //unselect back
+    cy.elements().unselect();
+
+
+
+}
+
+
+
+app.proto.updateCellularLocations = function() {
+
+    let cyId = appUtilities.getActiveNetworkId();
+
+    let cy = appUtilities.getCyInstance(cyId);
+    let chiseInst = appUtilities.getChiseInstance(cyId);
+
+    let cellularLocations = this.model.get('_page.doc.cellularLocations');
+
+
+
+    for(let loc in cellularLocations){
+        if(cellularLocations.hasOwnProperty(loc))
+            this.addCellularLocation(cellularLocations[loc], loc)
+    }
+}
+
 ////////////////////////////////////////////////////////////////////////////
 // UI events
 ////////////////////////////////////////////////////////////////////////////
@@ -925,10 +1050,6 @@ app.proto.resetConversationOnTrips = function(){
 
 };
 
-
-app.proto.connectCausalityAgent = function(){
-    this.socket.emit('connectToCausalityAgentRequest');
-};
 
 app.proto.connectVisualizationHandler = function(modelManager){
     let self = this;
@@ -1083,10 +1204,10 @@ app.proto.connectTripsAgent = function(){
     self.tripsAgent = new TripsGeneralInterfaceAgent("Bob", BobId);
 
     console.log("Bob connected");
-    self.tripsAgent.connectToServer("http://localhost:3000/", function(){
-        self.tripsAgent.loadModel(function () {
+    self.tripsAgent.connectToServer("http://localhost:3000/", () => {
+        self.tripsAgent.loadModel(() => {
             self.tripsAgent.init();
-            self.tripsAgent.loadChatHistory(function () {
+            self.tripsAgent.loadChatHistory(() => {
             });
         });
     });

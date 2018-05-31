@@ -1224,6 +1224,7 @@ class ModelManager{
         nodes.forEach(function (node) {
             self.initModelNode(node, cyId, user, true);
 
+            console.log(node.id());
         });
 
         edges.forEach(function (edge) {
@@ -1271,6 +1272,10 @@ class ModelManager{
 
     }
 
+    addModelCellularLocation(genes, location, user, noHistUpdate) {
+
+        this.model.pass({user:user}).set('documents.' + this.docId +'.cellularLocations.'+ location, genes);
+    }
 
 }
 

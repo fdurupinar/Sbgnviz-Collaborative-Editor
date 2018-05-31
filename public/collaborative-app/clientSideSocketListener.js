@@ -308,8 +308,6 @@ module.exports =  function(app) {
 
             app.socket.on("displaySbgn", function(data, callback){
 
-
-
                 appUtilities.getCyInstance(data.cyId).remove(appUtilities.getCyInstance(data.cyId).elements());
 
                 //get another sbgncontainer and display the new SBGN model.
@@ -317,7 +315,6 @@ module.exports =  function(app) {
 
 
                     let jsonObj = appUtilities.getChiseInstance(data.cyId).convertSbgnmlTextToJson(data.sbgn);
-
 
 
                     appUtilities.getChiseInstance(data.cyId).updateGraph(jsonObj, function(){
@@ -329,6 +326,9 @@ module.exports =  function(app) {
 
                         if (callback) callback("success");
                     });
+
+                    //update cellular locations
+                    app.updateCellularLocations();
 
             });
 
@@ -389,53 +389,9 @@ module.exports =  function(app) {
             app.socket.on('addCellularLocation', function (data, callback) {
                 try {
 
-                    if(!data.cyId)
-                        data.cyId = appUtilities.getActiveNetworkId();
+                    app.addCellularLocation(data.genes, data.compartment, data.cyId);
 
-                    let cy = appUtilities.getCyInstance(data.cyId);
-                    let chiseInst = appUtilities.getChiseInstance(data.cyId);
-
-                    let elements = [];
-
-
-                    if(data.genes === 'ont::all'){
-                        cy.elements().select();
-                    }
-                    else {
-                        data.genes.forEach((gene) => {
-                            let els = app.visHandler.findAllNodesFromLabel(gene, cy.nodes());
-                            els.forEach((el) => elements.push(el));
-                        });
-
-                        console.log(elements);
-
-                        //unselect all others
-                        elements.forEach((el) => {
-                            if (el.isNode()) {
-                                el.select();
-                            }
-                        });
-
-                        let nodes = cy.nodes(':selected');
-
-                        let extendedNodes = chiseInst.elementUtilities.extendNodeList(nodes);
-                        extendedNodes.forEach((el) => el.select());
-
-                    }
-                    //also selects them
-                    // chiseInst.highlightProcesses(nodes);
-
-                    let eles = chiseInst.createCompoundForGivenNodes(cy.nodes(':selected'), "compartment");
-
-                    //format label, eliminate any w:: or ont:: i
-                    let compartmentLabel = data.compartment.replace("W::", '');
-                    compartmentLabel = compartmentLabel.replace("ONT::", '');
-
-                    let compoundId = cy.nodes(':selected')[0].data("parent");
-                    cy.getElementById(compoundId)._private.data.label = compartmentLabel;
-
-
-
+                    app.modelManager.addModelCellularLocation(data.genes, data.compartment, "me");
 
 
                     //unselect back

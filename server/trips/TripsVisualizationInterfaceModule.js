@@ -89,8 +89,9 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
             this.askHuman(this.agentId, this.room, "addCellularLocation", {genes: genes, compartment:text.content[4]},  () => {
                 //should return a response to let the ba know
                 self.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
-
             });
+
+
 
         });
 
