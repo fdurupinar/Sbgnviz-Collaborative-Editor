@@ -1222,13 +1222,19 @@ app.proto.connectTripsAgent = function(){
 
 
 app.proto.enterMessage = function(event){
-    let self = this;
 
-    if (event.keyCode === 13 && !event.shiftKey) {
-       self.add(event);
+    if (event.keyCode === 13 && !event.shiftKey) { //enter
+       this.add(event);
         // prevent default behavior
         event.preventDefault();
     }
+
+    //todo
+    if(event.onEscapeKeyUp){ //esc
+        model.del('_page.newComment'); //to clear  the input box
+    }
+
+
 };
 
 app.proto.add = function (event, model) {
@@ -1267,9 +1273,9 @@ app.proto.add = function (event, model) {
     };
 
 
-    let filteredMsgs = model.filter('_page.doc.messages', 'myMessages').get();
 
-    self.lastMsgInd = filteredMsgs.length; //new message will be added next
+
+
 
     //also lets server know that a client message is entered.
     self.socket.emit('getDate', msg, function(date){ //get the date from the server
@@ -1277,6 +1283,9 @@ app.proto.add = function (event, model) {
 
         model.add('_page.doc.messages', msg);
         event.preventDefault();
+
+        let filteredMsgs = model.filter('_page.doc.messages', 'myMessages').get();
+        self.lastMsgInd = filteredMsgs.length - 1;
 
         //change scroll position
         var scrollHeight = $('#messages')[0].scrollHeight

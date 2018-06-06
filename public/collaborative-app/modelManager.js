@@ -302,17 +302,13 @@ class ModelManager{
                 this.changeModelEdgeAttribute(cmd.opAttr, cmd.elId, cmd.cyId, cmd.param, null);
             else if (cmd.opTarget == "element group") {
                 this.changeModelElementGroupAttribute(cmd.opAttr, cmd.elId, cmd.cyId, cmd.param, null);
-
             }
-
         }
         else if (cmd.opName == "add" ||cmd.opName == "restore") {
             if (cmd.opTarget == "element")
                 this.restoreModelElement(cmd.elType, cmd.elId, cmd.cyId, cmd.param);
             else if (cmd.opTarget == "compound")
                 this.addModelCompound(cmd.elId, cmd.cyId, cmd.param.compoundAtts, cmd.param.childrenList, cmd.param.paramList);
-
-
         }
         else if (cmd.opName == "delete") {
             if (cmd.opTarget == "element" && cmd.elType == "node")
