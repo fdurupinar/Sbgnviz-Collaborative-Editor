@@ -118,7 +118,6 @@ class ModelManager{
                 let maxId = 0;
                 for(let att in users){
                     if(users.hasOwnProperty(att)){
-                        console.log(users[att].name);
                         if(users[att].name && users[att].name.indexOf('User') > -1) {
                             let idNumber = Number(users[att].name.slice(4));
                             if (idNumber > maxId)
@@ -984,7 +983,6 @@ class ModelManager{
     restoreModel (modelCy, cyId, user, noHistUpdate) {
         let cyPathStr = this.getModelCyPathStr(cyId);
         let prevParam = this.model.get(cyPathStr);
-        console.log(prevParam);
         this.model.pass({user: user}).set(cyPathStr , modelCy);
 
 
@@ -1216,8 +1214,6 @@ class ModelManager{
 
         nodes.forEach(function (node) {
             self.initModelNode(node, cyId, user, true);
-
-            console.log(node.id());
         });
 
         edges.forEach(function (edge) {

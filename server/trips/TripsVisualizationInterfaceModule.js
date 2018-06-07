@@ -16,10 +16,9 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
 
        super('Visualization-Interface-Agent',agentId, agentName, socket,  model);
 
-       let self = this;
+       this.askHuman = askHuman;
 
-       self.askHuman = askHuman;
-
+       this.geneList = []; //list of molecules in the current pysb model
    }
 
     /***
@@ -96,33 +95,38 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
         });
 
 
-        // pattern = {0: 'request', 1: '&key', content: ['get-common-cellular-location', '.', '*']};
-        // this.tm.addHandler(pattern, (text) => {
-        //
-        //     this.modelGetJson((jsonModel)=> {
-        //         let geneList = this.getGeneList(jsonModel);
-        //         if(geneList.length > 0) {
-        //             this.tm.sendMsg({
-        //                 0: 'request',
-        //                 content: {0: 'FIND-CELLULAR-LOCATION-FROM-NAMES', genes: geneList}
-        //             });
-        //
-        //             let patternXml = {0: 'reply', 1: '&key', content: ['success', '.', '*'], sender: 'CAUSALA'};
-        //
-        //             this.tm.addHandler(patternXml, (response) => {
-        //
-        //                 this.tm.replyToMsg(text, {
-        //                     0: 'reply',
-        //                     content: {0: 'success', location: response.content[2], genes: geneList}
-        //                 });
-        //
-        //                 console.log(response.content[2]);
-        //             });
-        //         }
-        //     });
-        //
-        // });
+        pattern = {0: 'request', 1: '&key', content: ['get-common-cellular-location', '.', '*']};
+        this.tm.addHandler(pattern, (text) => {
 
+            let modelId = text.content[2];
+            this.modelGetJson(modelId, (jsonModel)=> {
+
+                let geneList = this.getGeneList(jsonModel);
+
+
+                if(geneList.length > 0 && areListsDifferent(geneList, this.geneList)) {
+
+                    this.geneList = geneList;
+                    this.tm.sendMsg({
+                        0: 'request',
+                        content: {0: 'FIND-CELLULAR-LOCATION-FROM-NAMES', genes: geneList}
+                    });
+
+                    let patternXml = {0: 'reply', 1: '&key', content: ['success', '.', '*'], sender: 'CAUSALA'};
+
+                    this.tm.addHandler(patternXml, (response) => {
+
+                        console.log(response);
+                        this.tm.replyToMsg(text, {
+                            0: 'reply',
+                            content: {0: 'success', components: response.content[2], genes: geneList}
+                        });
+
+                    });
+                }
+            });
+
+        });
 
     }
 
@@ -203,43 +207,50 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
 
         return genes;
     }
-    // getGeneList(jsonModel){
-    //
-    //     let geneList = [];
-    //     jsonModel.forEach((interaction) => {
-    //         if (interaction.enz)
-    //             geneList.push(interaction.enz.name);
-    //         if (interaction.sub)
-    //             geneList.push(interaction.sub.name);
-    //         if (interaction.subj)
-    //             geneList.push(interaction.subj.name);
-    //         if (interaction.obj)
-    //             geneList.push(interaction.obj.name);
-    //     });
-    //
-    //     return geneList;
-    //
-    // }
-    // /***
-    //  * Gets the INDRA model in json format
-    //  */
-    // modelGetJson(callback){
-    //
-    //     this.tm.sendMsg({0: 'request', content: {0: 'MODEL-GET-JSON'}});
-    //
-    //
-    //     let patternXml = {0: 'reply', 1: '&key', content: ['success', '.', '*'], sender: 'MRA'};
-    //
-    //     this.tm.addHandler(patternXml, (response) => {
-    //
-    //         let jsonStr = trimDoubleQuotes(response.content[2]);
-    //
-    //         jsonStr = jsonStr.replace(/(\\")/g, '"');
-    //         let jsonModel = JSON.parse(jsonStr);
-    //
-    //         if(callback) callback(jsonModel);
-    //     });
-    // }
+
+    getGeneList(jsonModel){
+
+        let geneList = [];
+        jsonModel.forEach((interaction) => {
+            if (interaction.enz)
+                geneList.push(interaction.enz.name);
+            if (interaction.sub)
+                geneList.push(interaction.sub.name);
+            if (interaction.subj)
+                geneList.push(interaction.subj.name);
+            if (interaction.obj)
+                geneList.push(interaction.obj.name);
+        });
+
+
+        //unique elements
+        geneList = geneList.filter(function(elem, index, self) {
+            return index === self.indexOf(elem);
+        });
+
+        return geneList;
+
+    }
+    /***
+     * Gets the INDRA model in json format
+     */
+    modelGetJson(modelId, callback){
+
+        this.tm.sendMsg({0: 'request', content: {0: 'MODEL-GET-JSON', 'MODEL-ID': modelId}});
+
+
+        let patternXml = {0: 'reply', 1: '&key', content: ['success', '.', '*'], sender: 'MRA'};
+
+        this.tm.addHandler(patternXml, (response) => {
+
+            let jsonStr = trimDoubleQuotes(response.content[2]);
+
+            jsonStr = jsonStr.replace(/(\\")/g, '"');
+            let jsonModel = JSON.parse(jsonStr);
+
+            if(callback) callback(jsonModel);
+        });
+    }
 
 }
 
@@ -261,3 +272,12 @@ function trimDoubleQuotes(str){
 
 }
 
+
+function areListsDifferent(list1, list2){
+
+    Array.prototype.diff = function(a) {
+        return this.filter(function(i) {return a.indexOf(i) < 0;});
+    };
+
+    return((list1.diff(list2)).length > 0 || (list2.diff(list1)).length > 0 )
+}

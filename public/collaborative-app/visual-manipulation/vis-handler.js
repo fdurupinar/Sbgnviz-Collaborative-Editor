@@ -66,9 +66,11 @@ VisHandler.prototype.findNodeFromLabel = function(name, state, nodes) {
 
         if(label) {
             label = label.replace('-', '');
-            name = name.replace('-', '');
-            if (label && label.toLowerCase() === name.toLowerCase()) {
-                possibleNodes.push(node);
+            if(name) {
+                name = name.replace('-', '');
+                if (label && label.toLowerCase() === name.toLowerCase()) {
+                    possibleNodes.push(node);
+                }
             }
         }
     });
@@ -86,9 +88,10 @@ VisHandler.prototype.findNodeFromLabel = function(name, state, nodes) {
             for (var i = 0; i < statesandinfos.length; i++) {
                 var sbgnstateandinfo = statesandinfos[i];
                 if (sbgnstateandinfo.clazz == "state variable") {
-                    var value = sbgnstateandinfo.state.value;
+                    let value = sbgnstateandinfo.state.value;
+
                     if (value && value.toLowerCase() === state.toLowerCase() ||
-                        value && possibleStates[state.toLowerCase()] && possibleStates[state.toLowerCase()].indexOf(value.toLowerCase()) || !value && state === '') //if any state matches this
+                        value && possibleStates[state.toLowerCase()] && possibleStates[state.toLowerCase()].indexOf(value.toLowerCase()) > -1 || !value && state === '') //if any state matches this
                         myNode = node;
                 }
             }
@@ -114,8 +117,8 @@ VisHandler.prototype.moveNode = function(data) {
     let state = data.state;
     let location = data.location;
 
-    const extensionX = 80;
-    const extensionY = 40;
+    const extensionX = 40;
+    const extensionY = 20;
 
 
     let cy = appUtilities.getCyInstance(data.cyId);
