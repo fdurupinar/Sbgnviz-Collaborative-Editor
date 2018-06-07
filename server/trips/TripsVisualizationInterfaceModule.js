@@ -124,8 +124,6 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
         // });
 
 
-
-
     }
 
 
