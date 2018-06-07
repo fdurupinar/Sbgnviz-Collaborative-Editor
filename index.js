@@ -318,6 +318,10 @@ app.proto.listenToUIOperations = function(model){
             }
         }
 
+        if(e.keyCode === 27){ //esc
+            model.del('_page.newComment'); //to clear  the input box
+        }
+
     });
 
 
@@ -1229,11 +1233,6 @@ app.proto.enterMessage = function(event){
         event.preventDefault();
     }
 
-    //todo
-    if(event.onEscapeKeyUp){ //esc
-        model.del('_page.newComment'); //to clear  the input box
-    }
-
 
 };
 
@@ -1271,9 +1270,6 @@ app.proto.add = function (event, model) {
         userName: msgUserName,
         comment: comment
     };
-
-
-
 
 
 
