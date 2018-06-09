@@ -389,6 +389,7 @@ module.exports =  function(app) {
             app.socket.on('addCellularLocation', function (data, callback) {
                 try {
 
+
                     app.addCellularLocation(data.genes, data.compartment, data.cyId);
 
                     app.modelManager.addModelCellularLocation(data.genes, data.compartment, "me");

@@ -39,9 +39,11 @@ VisHandler.prototype.findAllNodesFromLabel = function(name,  nodes){
 
         if(label) {
             label = label.replace('-', '');
-            name = name.replace('-', '');
-            if (label && label.toLowerCase() === name.toLowerCase()) {
-                possibleNodes.push(node);
+            if(name && (typeof name === 'string' || name instanceof String)) {
+                name = name.replace('-', '');
+                if (label && label.toLowerCase() === name.toLowerCase()) {
+                    possibleNodes.push(node);
+                }
             }
         }
     });
@@ -66,7 +68,7 @@ VisHandler.prototype.findNodeFromLabel = function(name, state, nodes) {
 
         if(label) {
             label = label.replace('-', '');
-            if(name) {
+            if(name && (typeof name === 'string' || name instanceof String)) {
                 name = name.replace('-', '');
                 if (label && label.toLowerCase() === name.toLowerCase()) {
                     possibleNodes.push(node);
