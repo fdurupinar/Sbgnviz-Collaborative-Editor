@@ -898,13 +898,15 @@ app.proto.listenToModelOperations = function(model){
 
 
 app.proto.addCellularLocation = function(genes, compartment, cyId) {
-    if(!cyId)
-       cyId = appUtilities.getActiveNetworkId();
-
+    if (!cyId)
+        cyId = appUtilities.getActiveNetworkId();
 
 
     let cy = appUtilities.getCyInstance(cyId);
     let chiseInst = appUtilities.getChiseInstance(cyId);
+
+
+    //check if compartment already exists among the children, and remove if so
 
 
     //make sure they are unselected
@@ -913,8 +915,9 @@ app.proto.addCellularLocation = function(genes, compartment, cyId) {
     let elements = [];
 
 
-    if(genes === 'ont::all'){
+    if (genes === 'ont::all') {
         cy.elements().select();
+        cy.nodes().forEach((el) => elements.push(el));
     }
     else {
         genes.forEach((gene) => {
@@ -929,9 +932,10 @@ app.proto.addCellularLocation = function(genes, compartment, cyId) {
 
                 //select its parents as well
                 let parentId = el.data('parent');
-                while(parentId){
+                while (parentId) {
                     let parentEl = cy.getElementById(parentId);
                     parentEl.select();
+                    elements.push(parentEl);
                     parentId = parentEl.data('parent');
                 }
             }
@@ -947,36 +951,59 @@ app.proto.addCellularLocation = function(genes, compartment, cyId) {
     }
 
 
-
-    //also selects them
-    // chiseInst.highlightProcesses(nodes);
-
-
-    if(cy.nodes(":selected").size()> 0) {
-        chiseInst.createCompoundForGivenNodes(cy.nodes(':selected'), "compartment");
+    //format label, eliminate any w:: or ont:: i
+    let compartmentLabel = compartment.replace("W::", '');
+    compartmentLabel = compartmentLabel.replace("ONT::", '');
 
 
-        //format label, eliminate any w:: or ont:: i
-        let compartmentLabel = compartment.replace("W::", '');
-        compartmentLabel = compartmentLabel.replace("ONT::", '');
+    //check if compartment already exists
+    let existingCompartment;
+    cy.nodes().forEach((node) => {
+        if (node.data("label") === compartmentLabel && node.isParent()) {
+            existingCompartment = node; //they should all be the same compartment as this process eliminates duplicates
+        }
+    });
 
+    if (existingCompartment) {
+        let descs = existingCompartment.descendants();
 
-        if(cy.nodes(':selected').size() > 0){
-            //find topmost parent
+        elements.forEach((el) => {
 
-            let parentId = cy.nodes(':selected')[0].data('parent');
+            if (!descs.contains(el)) { //el is not a descendant of this node, so add it into this
+                el.move({"parent": existingCompartment.id()});
+                el.updateStyle();
 
-            let compoundId;
-
-            while(parentId){
-                compoundId = parentId;
-                let parentEl = cy.getElementById(compoundId);
-                parentEl.select();
-                parentId = parentEl.data('parent');
             }
-            cy.getElementById(compoundId)._private.data.label = compartmentLabel;
+        });
+    }
+    else {
 
-            setTimeout(()=>{
+
+        if (cy.nodes(":selected").size() > 0) {
+
+
+            chiseInst.createCompoundForGivenNodes(cy.nodes(':selected'), "compartment");
+
+
+            if (cy.nodes(':selected').size() > 0) {
+                //find topmost parent
+
+                let parentId = cy.nodes(':selected')[0].data('parent');
+
+                let compoundId;
+
+                while (parentId) {
+                    compoundId = parentId;
+                    let parentEl = cy.getElementById(compoundId);
+                    parentEl.select();
+                    parentId = parentEl.data('parent');
+                }
+                cy.getElementById(compoundId)._private.data.label = compartmentLabel;
+
+
+            }
+
+            setTimeout(() => {
                 $("#perform-layout").trigger('click');
             }, 200);
 
@@ -1060,6 +1087,8 @@ app.proto.updateTripsMessage = function(){
 app.proto.resetConversationOnTrips = function(){
     //directly ask the server as this client may not have a tripsAgent
     this.socket.emit('resetConversationRequest');
+
+    this.model.del('_page.doc.cellularLocations');
 };
 
 app.proto.connectVisualizationHandler = function(modelManager){

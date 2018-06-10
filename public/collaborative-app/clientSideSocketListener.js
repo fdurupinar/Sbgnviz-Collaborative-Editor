@@ -369,7 +369,7 @@ module.exports =  function(app) {
             });
 
             app.socket.on('highlightGeneStream', function ( data, callback) {
-                console.log(data);
+
                 app.visHandler.highlightNodeStream(data);
             });
 

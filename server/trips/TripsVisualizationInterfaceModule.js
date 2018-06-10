@@ -116,7 +116,6 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
 
                     this.tm.addHandler(patternXml, (response) => {
 
-                        console.log(response);
                         this.tm.replyToMsg(text, {
                             0: 'reply',
                             content: {0: 'success', components: response.content[2], genes: geneList}
@@ -139,6 +138,7 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
             self.getTermName(contentObj.name, function (geneName) {
                 let state = trimDoubleQuotes(contentObj.state);
                 let location = trimDoubleQuotes(contentObj.location);
+
                 self.askHuman(self.agentId, self.room, "moveGene", {name: geneName, state: state, location: location, cyId: "0"}, function (val) {
 
                     // self.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});

@@ -77,8 +77,8 @@ VisHandler.prototype.findNodeFromLabel = function(name, state, nodes) {
         }
     });
 
-    if(!state && nodes.length > 0){ //no need to compare
-            myNode = nodes[0];
+    if(!state && possibleNodes.length > 0){ //no need to compare
+            myNode = possibleNodes[0];
     }
     else{
 
@@ -234,6 +234,7 @@ VisHandler.prototype.selectNodeStream = function(data){
     nodeIds.forEach(function(id) {
         cy.getElementById(id).select();
     });
+
 
 }
 
