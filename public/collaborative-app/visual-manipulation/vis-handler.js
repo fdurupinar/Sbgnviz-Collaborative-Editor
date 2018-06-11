@@ -63,6 +63,7 @@ VisHandler.prototype.findNodeFromLabel = function(name, state, nodes) {
 
     let possibleNodes = [];
 
+
     nodes.forEach(function(node) {
         let label = node.data("label");
 
@@ -104,13 +105,34 @@ VisHandler.prototype.findNodeFromLabel = function(name, state, nodes) {
     return myNode;
 }
 
+
+/***
+ * Local function to update children's positions with node
+ * @param positionDiff
+ * @param node
+ */
+VisHandler.prototype.moveNodeAndChildren = function(positionDiff, node, cyId) {
+    let oldX = node.position("x");
+    let oldY = node.position("y");
+    node.position({
+        x: oldX + positionDiff.x,
+        y: oldY + positionDiff.y
+    });
+
+    this.modelManager.changeModelNodeAttribute("position", node.data("id"), cyId, node.position(), "me");
+
+    let children = node.children();
+    children.forEach((child) => {
+        this.moveNodeAndChildren(positionDiff, child, true);
+    });
+}
+
 /***
  *
  * @param name
  * @param location
  */
 VisHandler.prototype.moveNode = function(data) {
-    let self = this;
 
     let nodeToMove;
     let posToMove;
@@ -120,7 +142,7 @@ VisHandler.prototype.moveNode = function(data) {
     let location = data.location;
 
     const extensionX = 40;
-    const extensionY = 20;
+    const extensionY = 40;
 
 
     let cy = appUtilities.getCyInstance(data.cyId);
@@ -128,7 +150,7 @@ VisHandler.prototype.moveNode = function(data) {
 
     let nodes = appUtilities.getCyInstance(data.cyId).nodes();
 
-    nodeToMove = self.findNodeFromLabel(name, state, nodes);
+    nodeToMove = this.findNodeFromLabel(name, state, nodes);
 
     //move our node first
 
@@ -153,8 +175,14 @@ VisHandler.prototype.moveNode = function(data) {
     //move node -- no need to update the model for now
     nodeToMove.position(posToMove);
 
+    if(nodeToMove.isParent()){
+        let posDiff = {x: posToMove.x - nodeToMove.position("x"), y: posToMove.y - nodeToMove.position("y")};
+        this.moveNodeAndChildren(posDiff, nodeToMove);
+    }
+
     //make sure model is updated accordingly
-   self.modelManager.changeModelNodeAttribute("position", nodeToMove.data("id"), data.cyId, posToMove, "me");
+   this.modelManager.changeModelNodeAttribute("position", nodeToMove.data("id"), data.cyId, posToMove, "me");
+   
 
 
    nodeToMove.lock();
@@ -165,7 +193,7 @@ VisHandler.prototype.moveNode = function(data) {
     let layoutCose = cy.layout({'name': 'cose', idealEdgeLength:5, edgeElasticity:5});
     layoutCose.run();
 
-    cy.on('layoutstop', function() {
+    cy.on('layoutstop', () => {
         nodeToMove.unlock();
 
         //move again
@@ -188,11 +216,16 @@ VisHandler.prototype.moveNode = function(data) {
             posToMove = {x: bBox.x2, y: (bBox.y1 + bBox.y2) / 2};
 
 
+        if(nodeToMove.isParent()){
+            let posDiff = {x: posToMove.x - nodeToMove.position("x"), y: posToMove.y - nodeToMove.position("y")};
+            this.moveNodeAndChildren(posDiff, nodeToMove);
+        }
+
         //move node -- no need to update the model for now
         nodeToMove.position(posToMove);
 
         //make sure model is updated accordingly
-        self.modelManager.changeModelNodeAttribute("position", nodeToMove.data("id"), data.cyId, posToMove, "me");
+        this.modelManager.changeModelNodeAttribute("position", nodeToMove.data("id"), data.cyId, posToMove, "me");
     });
 }
 

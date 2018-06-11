@@ -63,6 +63,10 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
             self.moveGene(text);
         });
 
+        pattern = {0: 'request', 1: '&key', content: ['move-compartment', '.', '*']};
+        self.tm.addHandler(pattern, function (text) {
+            self.moveCompartment(text);
+        });
         pattern = {0: 'request', 1: '&key', content: ['move-gene-stream', '.', '*']};
         self.tm.addHandler(pattern, function (text) {
             self.moveGeneStream(text);
@@ -132,27 +136,36 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
 
 
     moveGene(text) {
-        let self = this;
         let contentObj = KQML.keywordify(text.content);
         if (contentObj) {
-            self.getTermName(contentObj.name, function (geneName) {
+            this.getTermName(contentObj.name,  (geneName) => {
                 let state = trimDoubleQuotes(contentObj.state);
                 let location = trimDoubleQuotes(contentObj.location);
 
-                self.askHuman(self.agentId, self.room, "moveGene", {name: geneName, state: state, location: location, cyId: "0"}, function (val) {
+                this.askHuman(this.agentId, this.room, "moveGene", {name: geneName, state: state, location: location, cyId: "0"}, function (val) {
 
-                    // self.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
+                    // this.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
                 });
             });
         }
     }
-
-
-    moveGeneStream(text) {
-        let self = this;
+    moveCompartment(text) {
         let contentObj = KQML.keywordify(text.content);
         if (contentObj) {
-            self.getTermName(contentObj.name, function (geneName) {
+            let compartmentName = trimDoubleQuotes(contentObj.name).replace("W::", '');
+            compartmentName = compartmentName.replace("ONT::", '');
+            let location = trimDoubleQuotes(contentObj.location);
+
+            this.askHuman(this.agentId, this.room, "moveGene", {name: compartmentName, state: "", location: location, cyId: "0"}, function (val) {
+
+            });
+        }
+    }
+
+    moveGeneStream(text) {
+        let contentObj = KQML.keywordify(text.content);
+        if (contentObj) {
+            this.getTermName(contentObj.name,  (geneName) => {
                 let state = trimDoubleQuotes(contentObj.state);
                 let location = trimDoubleQuotes(contentObj.location);
                 let direction = trimDoubleQuotes(contentObj.direction);
@@ -160,10 +173,7 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
                     direction = "up";
                 else if(direction.toLowerCase().indexOf("downstream")> 0)
                     direction = "down";
-                self.askHuman(self.agentId, self.room, "moveGeneStream", {name: geneName, state: state, location:location, cyId: "0", direction: direction}, function (val) {
-
-
-
+                this.askHuman(this.agentId, this.room, "moveGeneStream", {name: geneName, state: state, location:location, cyId: "0", direction: direction}, function (val) {
                 });
             });
         }
@@ -171,17 +181,16 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
 
 
     highlightGeneStream(text) {
-        let self = this;
         let contentObj = KQML.keywordify(text.content);
         if (contentObj) {
-            self.getTermName(contentObj.name, function (geneName) {
+            this.getTermName(contentObj.name,  (geneName) => {
                 let state = trimDoubleQuotes(contentObj.state);
                 let direction = trimDoubleQuotes(contentObj.direction);
                 if(direction.toLowerCase().indexOf("upstream")> 0)
                     direction = "up";
                 else if(direction.toLowerCase().indexOf("downstream")> 0)
                     direction = "down";
-                self.askHuman(self.agentId, self.room, "highlightGeneStream", {name: geneName, state: state, cyId: "0", direction: direction}, function (val) {
+                this.askHuman(this.agentId, this.room, "highlightGeneStream", {name: geneName, state: state, cyId: "0", direction: direction}, function (val) {
 
 
                 });
