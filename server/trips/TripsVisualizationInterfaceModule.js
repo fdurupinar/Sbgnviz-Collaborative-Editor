@@ -59,22 +59,26 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
         let self = this;
 
         let pattern = {0: 'request', 1: '&key', content: ['move-gene', '.', '*']};
-        self.tm.addHandler(pattern, function (text) {
+        this.tm.addHandler(pattern,  (text) =>{
             self.moveGene(text);
+            this.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
         });
 
         pattern = {0: 'request', 1: '&key', content: ['move-compartment', '.', '*']};
-        self.tm.addHandler(pattern, function (text) {
+        self.tm.addHandler(pattern,  (text) => {
             self.moveCompartment(text);
+            this.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
         });
         pattern = {0: 'request', 1: '&key', content: ['move-gene-stream', '.', '*']};
-        self.tm.addHandler(pattern, function (text) {
+        self.tm.addHandler(pattern,  (text) => {
             self.moveGeneStream(text);
+            this.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
         });
 
         pattern = {0: 'request', 1: '&key', content: ['highlight-gene-stream', '.', '*']};
-        self.tm.addHandler(pattern, function (text) {
+        self.tm.addHandler(pattern,  (text) => {
             self.highlightGeneStream(text);
+            this.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
         });
 
 
@@ -90,8 +94,7 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
                 genes = this.extractGeneNamesFromEkb(termStr);
 
             this.askHuman(this.agentId, this.room, "addCellularLocation", {genes: genes, compartment:text.content[4]},  () => {
-                //should return a response to let the ba know
-                self.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
+                this.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
             });
 
 
@@ -142,7 +145,7 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
                 let state = trimDoubleQuotes(contentObj.state);
                 let location = trimDoubleQuotes(contentObj.location);
 
-                this.askHuman(this.agentId, this.room, "moveGene", {name: geneName, state: state, location: location, cyId: "0"}, function (val) {
+                this.askHuman(this.agentId, this.room, "moveGene", {name: geneName, state: state, location: location, cyId: "0"},  (val) => {
 
                     // this.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
                 });
@@ -156,7 +159,7 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
             compartmentName = compartmentName.replace("ONT::", '');
             let location = trimDoubleQuotes(contentObj.location);
 
-            this.askHuman(this.agentId, this.room, "moveGene", {name: compartmentName, state: "", location: location, cyId: "0"}, function (val) {
+            this.askHuman(this.agentId, this.room, "moveGene", {name: compartmentName, state: "", location: location, cyId: "0"},  (val)  => {
 
             });
         }
@@ -173,7 +176,7 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
                     direction = "up";
                 else if(direction.toLowerCase().indexOf("downstream")> 0)
                     direction = "down";
-                this.askHuman(this.agentId, this.room, "moveGeneStream", {name: geneName, state: state, location:location, cyId: "0", direction: direction}, function (val) {
+                this.askHuman(this.agentId, this.room, "moveGeneStream", {name: geneName, state: state, location:location, cyId: "0", direction: direction},  (val) => {
                 });
             });
         }
@@ -190,7 +193,7 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
                     direction = "up";
                 else if(direction.toLowerCase().indexOf("downstream")> 0)
                     direction = "down";
-                this.askHuman(this.agentId, this.room, "highlightGeneStream", {name: geneName, state: state, cyId: "0", direction: direction}, function (val) {
+                this.askHuman(this.agentId, this.room, "highlightGeneStream", {name: geneName, state: state, cyId: "0", direction: direction},  (val) => {
 
 
                 });
