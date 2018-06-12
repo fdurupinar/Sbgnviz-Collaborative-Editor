@@ -64,8 +64,10 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
             if (contentObj) {
                 let msg = {userName: this.agentName, userId: this.agentId, room: this.room, date: +(new Date)};
                 msg.comment = trimDoubleQuotes(contentObj.what);
-                this.model.add('documents.' + msg.room + '.messages', msg);
-            }
+                if (msg.comment) {
+                    this.model.add('documents.' + msg.room + '.messages', msg);
+                }
+           }
 
         });
 
