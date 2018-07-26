@@ -1244,7 +1244,10 @@ app.proto.connectTripsAgent = function(){
     self.tripsAgent = new TripsGeneralInterfaceAgent("Bob", BobId);
 
     console.log("Bob connected");
-    self.tripsAgent.connectToServer("http://localhost:3000/", () => {
+    // Here we get the address and port we are actually at and connect to that
+    var pathArray = window.location.href.split(':');
+    var hostPort = pathArray[2].substring(0, 4);
+    self.tripsAgent.connectToServer(pathArray[0] + ':' + pathArray[1] + ':' + hostPort, () => {
         self.tripsAgent.loadModel(() => {
             self.tripsAgent.init();
             self.tripsAgent.loadChatHistory(() => {
