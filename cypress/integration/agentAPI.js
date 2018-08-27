@@ -565,9 +565,9 @@ describe('Agent API Test', function () {
     }
     function merge(cyId){
      it('agent.merge', function(done) {
-        expect(globalTestData.sbgnData).to.be.ok;
+        expect(globalTestData.sbgnData2).to.be.ok;
 
-        agent.sendRequest('agentMergeGraphRequest', {type: 'sbgn', graph: globalTestData.sbgnData, cyId:cyId}, function (data) {
+        agent.sendRequest('agentMergeGraphRequest', {type: 'sbgn', graph: globalTestData.sbgnData2, cyId:cyId}, function (data) {
             expect(data).to.be.ok;
             done();
         });

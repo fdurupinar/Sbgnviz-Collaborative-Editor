@@ -239,7 +239,9 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
             //we must ask the client with the browser to do it for us
             //TODO: get the cyId from TRIPS
             this.askHuman(this.agentId, this.room, "displaySbgn", {sbgn: sbgnModel, cyId: contentObj.cyId || "0"},  (val) => {
-                // this.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
+            // this.askHuman(this.agentId, this.room, "mergeSbgn", {graph: sbgnModel,  type:'sbgn', cyId: contentObj.cyId || "0"},  (val) => {
+
+            // this.tm.replyToMsg(text, {0: 'reply', content: {das: 'success'}});
             });
         }
     }
