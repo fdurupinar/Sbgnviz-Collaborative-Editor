@@ -290,7 +290,6 @@ module.exports =  function(app) {
                 let chiseInst = appUtilities.createNewNetwork(); //opens a new tab
 
 
-
                 let jsonObj = chiseInst.convertSbgnmlTextToJson(data.graph);
 
                 chiseInst.updateGraph(jsonObj, function(){
@@ -308,14 +307,15 @@ module.exports =  function(app) {
 
             app.socket.on("displaySbgn", function(data, callback){
 
+                if(!data.cyId)
+                    data.cyId = appUtilities.getActiveNetworkId();
+
                 appUtilities.getCyInstance(data.cyId).remove(appUtilities.getCyInstance(data.cyId).elements());
 
                 //get another sbgncontainer and display the new SBGN model.
                 app.modelManager.newModel(data.cyId, "me", true);
 
-
                     let jsonObj = appUtilities.getChiseInstance(data.cyId).convertSbgnmlTextToJson(data.sbgn);
-
 
                     appUtilities.getChiseInstance(data.cyId).updateGraph(jsonObj, function(){
                         app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(), data.cyId, appUtilities, "me");
@@ -334,9 +334,10 @@ module.exports =  function(app) {
 
             app.socket.on("mergeSbgn", function (data, callback) {
 
-                let newJson = appUtilities.getChiseInstance(data.cyId).convertSbgnmlTextToJson(data.graph);
                 if(!data.cyId)
                     data.cyId = appUtilities.getActiveNetworkId();
+
+                let newJson = appUtilities.getChiseInstance(data.cyId).convertSbgnmlTextToJson(data.graph);
 
                 modelMergeFunctions.mergeJsonWithCurrent(newJson, data.cyId, app.modelManager, callback);
 
