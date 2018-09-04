@@ -336,7 +336,7 @@ module.exports =  function(app) {
             });
 
             app.socket.on("mergeSbgn", function (data, callback) {
-
+                console.log("merging sbgn");
                 if(!data.cyId)
                     data.cyId = appUtilities.getActiveNetworkId();
 
