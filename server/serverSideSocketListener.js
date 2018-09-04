@@ -569,8 +569,7 @@ module.exports.start = function(io, model, cancerDataOrganizer){
         });
 
 
-        socket.on('agentDisplayGraphRequest', function(data, callback){
-
+        socket.on('agentDisplaySbgnRequest', function(data, callback){
 
             let requestStr = "displaySbgn";
 
