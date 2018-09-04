@@ -553,11 +553,26 @@ module.exports.start = function(io, model, cancerDataOrganizer){
 
 
         socket.on('agentMergeGraphRequest', function(data, callback){
+
+
             let requestStr;
             if(data.type === "sbgn")
                 requestStr = "mergeSbgn";
             else //default is json
                 requestStr = "mergeJsonWithCurrent";
+
+
+            askHuman(data.userId, data.room,  requestStr, data, function(val){
+
+                if (callback) callback(val);
+            });
+        });
+
+
+        socket.on('agentDisplayGraphRequest', function(data, callback){
+
+
+            let requestStr = "displaySbgn";
 
 
             askHuman(data.userId, data.room,  requestStr, data, function(val){
@@ -748,6 +763,7 @@ module.exports.start = function(io, model, cancerDataOrganizer){
 
         socket.on('agentSendImageRequest', function(data, callback){
             try {
+
                 let status = modelManagerList[socket.room].addImage(data);
                 if (callback) callback(status);
             }

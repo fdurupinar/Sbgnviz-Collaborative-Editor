@@ -99,6 +99,9 @@ module.exports =  function(app) {
             app.socket.on('addImage', function (data, callback) {
                 try {
 
+
+                    console.log(data.img);
+
                     let status = app.modelManager.addImage(data);
                     let images = app.modelManager.getImages();
                     app.dynamicResize();
