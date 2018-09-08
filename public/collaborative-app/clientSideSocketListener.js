@@ -310,13 +310,14 @@ module.exports =  function(app) {
 
             app.socket.on("displaySbgn", function(data, callback){
 
+
+                console.log(data.sbgn);
                 if(!data.cyId)
                     data.cyId = appUtilities.getActiveNetworkId();
 
                 appUtilities.getCyInstance(data.cyId).remove(appUtilities.getCyInstance(data.cyId).elements());
 
                 //get another sbgncontainer and display the new SBGN model.
-                app.modelManager.newModel(data.cyId, "me", true);
 
                     let jsonObj = appUtilities.getChiseInstance(data.cyId).convertSbgnmlTextToJson(data.sbgn);
 
@@ -336,6 +337,10 @@ module.exports =  function(app) {
             });
 
             app.socket.on("mergeSbgn", function (data, callback) {
+
+
+                console.log(data.graph);
+
                 console.log("merging sbgn");
                 if(!data.cyId)
                     data.cyId = appUtilities.getActiveNetworkId();

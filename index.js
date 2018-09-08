@@ -1263,6 +1263,8 @@ app.proto.enterMessage = function(event){
        this.add(event);
         // prevent default behavior
         event.preventDefault();
+
+        this.lastMsgInd = this.lastMsgInd > 0 ? this.lastMsgInd - 1 : 0;
     }
 
 
