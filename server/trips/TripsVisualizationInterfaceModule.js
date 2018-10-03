@@ -176,9 +176,9 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
                 let state = trimDoubleQuotes(contentObj.state);
                 let location = trimDoubleQuotes(contentObj.location);
                 let direction = trimDoubleQuotes(contentObj.direction);
-                if(direction.toLowerCase().indexOf("upstream")> 0)
+                if(direction.toLowerCase().indexOf("upstream")> -1)
                     direction = "up";
-                else if(direction.toLowerCase().indexOf("downstream")> 0)
+                else if(direction.toLowerCase().indexOf("downstream")> -1)
                     direction = "down";
                 this.askHuman(this.agentId, this.room, "moveGeneStream", {name: geneName, state: state, location:location, cyId: "0", direction: direction},  (val) => {
                 });
@@ -193,10 +193,17 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
             this.getTermName(contentObj.name,  (geneName) => {
                 let state = trimDoubleQuotes(contentObj.state);
                 let direction = trimDoubleQuotes(contentObj.direction);
-                if(direction.toLowerCase().indexOf("upstream")> 0)
+
+                if(direction.toLowerCase().indexOf("upstream")> -1)
                     direction = "up";
-                else if(direction.toLowerCase().indexOf("downstream")> 0)
+                else if(direction.toLowerCase().indexOf("downstream")> -1)
                     direction = "down";
+
+                console.log(direction.toLowerCase().indexOf("downstream"));
+                console.log(direction);
+                console.log(state);
+                console.log(geneName);
+
                 this.askHuman(this.agentId, this.room, "highlightGeneStream", {name: geneName, state: state, cyId: "0", direction: direction},  (val) => {
 
 
