@@ -199,10 +199,6 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
                 else if(direction.toLowerCase().indexOf("downstream")> -1)
                     direction = "down";
 
-                console.log(direction.toLowerCase().indexOf("downstream"));
-                console.log(direction);
-                console.log(state);
-                console.log(geneName);
 
                 this.askHuman(this.agentId, this.room, "highlightGeneStream", {name: geneName, state: state, cyId: "0", direction: direction},  (val) => {
 
