@@ -99,9 +99,6 @@ module.exports =  function(app) {
             app.socket.on('addImage', function (data, callback) {
                 try {
 
-
-                    console.log(data.img);
-
                     let status = app.modelManager.addImage(data);
                     let images = app.modelManager.getImages();
                     app.dynamicResize();
@@ -311,7 +308,7 @@ module.exports =  function(app) {
             app.socket.on("displaySbgn", function(data, callback){
 
 
-                console.log(data.sbgn);
+
                 if(!data.cyId)
                     data.cyId = appUtilities.getActiveNetworkId();
 
@@ -339,7 +336,7 @@ module.exports =  function(app) {
             app.socket.on("mergeSbgn", function (data, callback) {
 
 
-                console.log(data.graph);
+
 
                 console.log("merging sbgn");
                 if(!data.cyId)

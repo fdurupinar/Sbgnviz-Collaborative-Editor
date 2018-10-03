@@ -162,6 +162,7 @@ VisHandler.prototype.moveNode = function(data) {
     bBox.y1 -= extensionY;
     bBox.y2 += extensionY;
 
+
     if(location.toUpperCase().indexOf('TOP')> -1)
         posToMove = {x: (bBox.x1 + bBox.x2) / 2, y: bBox.y1};
     else if(location.toUpperCase().indexOf('BOTTOM')> -1)

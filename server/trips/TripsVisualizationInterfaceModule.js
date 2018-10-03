@@ -66,6 +66,7 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
 
         pattern = {0: 'request', 1: '&key', content: ['move-compartment', '.', '*']};
         self.tm.addHandler(pattern,  (text) => {
+
             self.moveCompartment(text);
             this.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
         });
@@ -93,7 +94,8 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
             else
                 genes = this.extractGeneNamesFromEkb(termStr);
 
-            this.askHuman(this.agentId, this.room, "addCellularLocation", {genes: genes, compartment:text.content[4]},  () => {
+            let compartment = trimDoubleQuotes(text.content[4]);
+            this.askHuman(this.agentId, this.room, "addCellularLocation", {genes: genes, compartment:compartment},  () => {
                 this.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
             });
 
@@ -158,6 +160,8 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
             let compartmentName = trimDoubleQuotes(contentObj.name).replace("W::", '');
             compartmentName = compartmentName.replace("ONT::", '');
             let location = trimDoubleQuotes(contentObj.location);
+
+
 
             this.askHuman(this.agentId, this.room, "moveGene", {name: compartmentName, state: "", location: location, cyId: "0"},  (val)  => {
 
