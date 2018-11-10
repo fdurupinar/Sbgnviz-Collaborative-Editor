@@ -10,6 +10,7 @@ let KQML = require('./KQML/kqml.js');
 let TripsInterfaceModule = require('./TripsInterfaceModule.js');
 
 
+
 class TripsGeneralInterfaceModule extends TripsInterfaceModule {
 
     constructor(agentId, agentName, socket, model, askHuman){
@@ -63,8 +64,11 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
 
             if (contentObj) {
                 let msg = {userName: this.agentName, userId: this.agentId, room: this.room, date: +(new Date)};
+
                 msg.comment = trimDoubleQuotes(contentObj.what);
+
                 if (msg.comment) {
+
                     this.model.add('documents.' + msg.room + '.messages', msg);
                 }
            }
@@ -289,6 +293,8 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
      * @param text
      */
     addProvenance(text){
+
+        console.log("add provenance");
         let self = this;
         let contentObj = KQML.keywordify(text.content);
         if(contentObj.html)
@@ -297,9 +303,11 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
             contentObj.pc = trimDoubleQuotes(contentObj.pc);
         //we can directly update the model
         if(contentObj.pc)
-            self.model.push('documents.' + this.room + '.provenance', {html:contentObj.html, pc: contentObj.pc, userName: self.agentName});
+            self.model.push('documents.' + this.room + '.provenance', {html:contentObj.html, pc: contentObj.pc, title: contentObj.title, userName: self.agentName});
+        else if (contentObj.title)
+            self.model.push('documents.' + this.room + '.provenance', {html:contentObj.html,  title: contentObj.title, userName: self.agentName});
         else
-            self.model.push('documents.' + this.room + '.provenance', {html:contentObj.html, userName: self.agentName});
+            self.model.push('documents.' + this.room + '.provenance', {html:contentObj.html,  userName: self.agentName});
 
     }
 
