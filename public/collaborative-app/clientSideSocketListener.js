@@ -307,8 +307,6 @@ module.exports =  function(app) {
 
             app.socket.on("displaySbgn", function(data, callback){
 
-
-
                 if(!data.cyId)
                     data.cyId = appUtilities.getActiveNetworkId();
 
@@ -324,6 +322,12 @@ module.exports =  function(app) {
                         appUtilities.setActiveNetwork(data.cyId);
 
                         $("#perform-layout").trigger('click');
+
+                        //open the network view and rerender it otherwise the graph becomes invisible
+                        $("#defaultOpen").trigger('click');
+                        app.dynamicResize();
+
+
 
                         if (callback) callback("success");
                     });
