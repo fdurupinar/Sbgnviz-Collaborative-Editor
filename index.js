@@ -216,6 +216,9 @@ app.proto.create = function (model) {
     this.factoidHandler = require('./public/collaborative-app/factoid/factoid-handler')(this) ;
     this.factoidHandler.initialize();
 
+    this.oncoprintHandler = require('./public/collaborative-app/oncoprint/oncoprint-handler')(this) ;
+    this.oncoprintHandler.initialize($('#oncoprint-container').width());
+
     //
     //Loading cytoscape and clients
 
@@ -1437,6 +1440,7 @@ app.proto.dynamicResize = function () {
             });
         }
 
+
         let wInspectorTab = $("#inspector-tab-area").width();
         $("#sbgn-inspector").width(wInspectorTab);
         $("#canvas-tabs").width( wCanvasTab);
@@ -1448,6 +1452,8 @@ app.proto.dynamicResize = function () {
                 $("#static-image-container-" + img.tabIndex).height(680);
             });
         }
+
+
     }
 
     if (windowHeight > canvasHeight) {

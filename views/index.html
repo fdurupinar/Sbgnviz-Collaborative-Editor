@@ -29,6 +29,7 @@
 
         <link href="lib/css/jquery.highlighttextarea.css" rel="stylesheet">
         <link href="lib/css/jquery-ui.css" rel="stylesheet">
+        <link href="lib/css/rangeslider.css" rel="stylesheet">
 
 
         <!--This should come after chise.css -->
@@ -57,6 +58,10 @@
 
             <script src="lib/js/jquery.qtip.js"></script>
 
+            <script src="lib/js/rangeslider.js"></script>
+
+
+            <!--<script type='text/javascript' src="./collaborative-app/oncoprint/geneticrules.js"></script>-->
 
             <!---->
             <!--<script src="node_modules/ocanvas/build/dist/latest/ocanvas.min.js"></script>-->
@@ -403,7 +408,41 @@
                             <div class="tab-content">
                                 <!--focus should be here add tabindex -->
                                 <!--<div id="sbgn-network-container" tabindex="0" class = "tab-pane fade in active"></div>-->
+
                                 <div id="network-panels-container" class="tab-content" tabindex="0" class = "tab-pane fade in active"> </div>
+
+
+
+                                <div id ="oncoprint-container" class="tab-content" tabindex="0" class = "tab-pane">
+
+
+                                    <table style = "width: 200px">
+
+                                            <tbody>
+                                            <tr>
+                                                <td>
+                                                    <i class="fa fa-search-minus"></i>
+                                                </td>
+                                                <td id = "oncoprint-zoom-container">
+                                                    <input type="range", id  = 'oncoprint-zoom', value = "100", style = "width:50px"  >
+                                                </td>
+                                                <td>
+                                                    <i class="fa fa-search-plus"></i>
+                                                </td>
+                                                <td>
+                                                    <input type = "number", id="oncoprint-zoom-value", disabled = true, value = "100">
+                                                </td>
+                                                <td>
+                                                    %
+                                                </td>
+                                            </tr>
+                                            </tbody>
+
+                                    </table>
+
+                                </div>
+
+
                                 {{ each _page.doc.images as #imageFile}}
                                 <div id={{"static-image-container-"+#imageFile.tabIndex}}  class = "tab-pane" >
 
@@ -438,8 +477,8 @@
                                         </script>
                                     </section>
 
-
                                 </div>
+
                                 {{/each}}
                             </div>
                         </div>
@@ -454,12 +493,17 @@
                     <td>
                         <div id = "canvas-tabs" class = "tabbable boxed parentTabs">
                             <ul class="nav nav-tabs">
-                                <li class = "active tab-link" ><a data-toggle="tab" id = "defaultOpen" href="#network-panels-container">Networks</a></li>
+                                <li class = "active tab-link" >
+                                    <a data-toggle="tab" id = "defaultOpen" href="#network-panels-container">Networks</a></li>
                                 <div class tabbable>
                                     <ul id="network-tabs-list" class="nav nav-tabs">
                                     </ul>
 
                                 </div>
+
+                                <li class = "tab-link">
+                                    <a data-toggle="tab"  href="#oncoprint-container">Oncoprint</a></li>
+
 
                                 <!--<li class = "active tab-link" ><a data-toggle="tab" id = "defaultOpen" href="#network-panels-container">Sbgn</a></li>-->
 
