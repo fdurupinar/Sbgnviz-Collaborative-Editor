@@ -55,8 +55,8 @@ module.exports.start = function(io, model, cancerDataOrganizer){
         "Content-Type": "application/json"
     };
 
+    // io.on('connection', function(socket){ //updated to this in socket.io > 1.0
     io.sockets.on('connection', function (socket) {
-
         socket.on('error', function (error) {
             console.log(error);
         });
@@ -78,7 +78,6 @@ module.exports.start = function(io, model, cancerDataOrganizer){
                     // remove from humanlist
                     for (let i = humanList.length - 1; i >= 0; i--) {
                         if (humanList[i].userId === socket.userId) {
-
 
                             humanList.splice(i, 1);
                             break;
