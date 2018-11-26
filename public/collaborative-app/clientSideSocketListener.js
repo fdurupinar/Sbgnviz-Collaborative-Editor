@@ -1,7 +1,7 @@
 /**
  * Created by durupina on 11/14/16.
  * Human listens to agent socket and performs menu operations requested by the agent
-*/
+ */
 
 let modelMergeFunctions = require('./model-merge-functions.js')();
 
@@ -246,7 +246,7 @@ module.exports =  function(app) {
                             el.select();
                     });
 
-                      appUtilities.getChiseInstance(data.cyId).createCompoundForGivenNodes(appUtilities.getCyInstance(data.cyId).nodes(':selected'), data.val);
+                    appUtilities.getChiseInstance(data.cyId).createCompoundForGivenNodes(appUtilities.getCyInstance(data.cyId).nodes(':selected'), data.val);
 
 
 
@@ -305,9 +305,15 @@ module.exports =  function(app) {
 
             });
 
+            app.socket.on('displayOncoprint', function(data, callback){
+
+                app.oncoprintHandler.updateData(data);
+
+
+            });
+
+
             app.socket.on("displaySbgn", function(data, callback){
-
-
 
                 if(!data.cyId)
                     data.cyId = appUtilities.getActiveNetworkId();
@@ -316,26 +322,34 @@ module.exports =  function(app) {
 
                 //get another sbgncontainer and display the new SBGN model.
 
-                    let jsonObj = appUtilities.getChiseInstance(data.cyId).convertSbgnmlTextToJson(data.sbgn);
+                let jsonObj = appUtilities.getChiseInstance(data.cyId).convertSbgnmlTextToJson(data.sbgn);
 
-                    appUtilities.getChiseInstance(data.cyId).updateGraph(jsonObj, function(){
-                        app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(), data.cyId, appUtilities, "me");
+                appUtilities.getChiseInstance(data.cyId).updateGraph(jsonObj, function(){
+                    app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(), data.cyId, appUtilities, "me");
 
-                        appUtilities.setActiveNetwork(data.cyId);
+                    appUtilities.setActiveNetwork(data.cyId);
 
-                        $("#perform-layout").trigger('click');
+                    $("#perform-layout").trigger('click');
 
-                        if (callback) callback("success");
-                    });
+                    //open the network view and rerender it otherwise the graph becomes invisible
+                    $("#defaultOpen").trigger('click');
+                    app.dynamicResize();
 
-                    //update cellular locations
-                    app.updateCellularLocations();
+
+                    // appUtilities.getCyInstance(data.cyId).panzoom().fit();
+
+
+
+
+                    if (callback) callback("success");
+                });
+
+                //update cellular locations
+                app.updateCellularLocations();
 
             });
 
             app.socket.on("mergeSbgn", function (data, callback) {
-
-
 
 
                 console.log("merging sbgn");

@@ -377,6 +377,7 @@ module.exports = function(modelManager, socket, userId, app){
                     });
 
                     modelManager.changeModelElementGroupAttribute("position", modelElList, cyId, paramList,  "me");
+
                     // modelManager.changeModelElementGroupAttribute("data", modelElList,  cyId,paramListData, "me"); //bounding boxes may change
                 });
             }

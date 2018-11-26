@@ -55,8 +55,8 @@ module.exports.start = function(io, model, cancerDataOrganizer){
         "Content-Type": "application/json"
     };
 
-    io.sockets.on('connection', function (socket) {
-
+    // io.sockets.on('connection', function (socket) {
+    io.on('connection', function(socket){
         socket.on('error', function (error) {
             console.log(error);
         });
@@ -1021,7 +1021,6 @@ module.exports.start = function(io, model, cancerDataOrganizer){
                     else {
                         console.log("Paxtools Server Error " + response.statusCode);
                     }
-
                 }
             });
         });

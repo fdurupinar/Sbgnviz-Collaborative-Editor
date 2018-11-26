@@ -15,14 +15,18 @@ module.exports =  function(app) {
         initialize: function(width){
           oncoprint = new Oncoprint('#oncoprint-container', width);
 
-          this.updateData(ga_data);
+          // this.updateData(ga_data);
 
           this.listenToEvents();
         },
 
         updateData: function(data){
           let share_id = null;
+
+          if(data.length > 100)
+              return;
           for (let i = 0; i < data.length; i++) {
+
             let track_params = {
               'rule_set_params':  geneticRules.genetic_rule_set_different_colors_no_recurrence,
               'label': data[i].gene,
@@ -45,7 +49,7 @@ module.exports =  function(app) {
           }
 
           oncoprint.hideIds([], true);
-          oncoprint.keepSorted(false);
+          // oncoprint.keepSorted(false);
 
           for (let i = 0; i < data.length; i++) {
             oncoprint.setTrackData(data[i].track_id, data[i].data, 'sample');
@@ -54,7 +58,7 @@ module.exports =  function(app) {
               return "<b>Sample: " + data.sample + "</b> <p>"+ data.disp_mut + "</p>";
             });
           }
-          oncoprint.keepSorted(true);
+          // oncoprint.keepSorted(true);
           oncoprint.releaseRendering();
 
       },

@@ -3,8 +3,8 @@ module.exports = (function() {
     var net = require('net');
     var StreamPair = require('./stream-pair.js');
     var KQML = require('./KQML/kqml.js');
-    // var DefaultHost = '127.0.0.1';
-    var DefaultHost = 'causalpath.org';
+    var DefaultHost = '127.0.0.1';
+    // var DefaultHost = 'causalpath.org';
     var DefaultPort = 6200;
     var MaxPortTries = 100;
 
