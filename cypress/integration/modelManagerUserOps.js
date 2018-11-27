@@ -8,6 +8,20 @@
 describe('modelManager User Operations Test', function () {
 
 
+    function connect(){
+        it('Access global window object', function (done) {
+            cy.visit('http://localhost:3000');
+            cy.window().should(function (window) {
+                expect(window.testApp).to.be.ok;
+                expect(window.testApp.model).to.be.ok;
+                expect(window.testApp.docId).to.be.ok;
+                expect(window.$).to.be.ok;
+                expect(window.location.hostname).to.eq('localhost');
+
+                done();
+            });
+        });
+    }
     function setName(userName) {
 
         it('Set name', function () {
@@ -108,7 +122,7 @@ describe('modelManager User Operations Test', function () {
         });
     }
 
-
+    connect();
     addImage();
     setName("testUser1");
     addUser("testUser2");

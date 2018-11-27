@@ -7,6 +7,20 @@ const testData = require('../testData/globalTestData.js');
 
 describe('modelManager Cytoscape Operations Test', function () {
 
+    function connect(){
+        it('Access global window object', function (done) {
+            cy.visit('http://localhost:3000');
+            cy.window().should(function (window) {
+                expect(window.testApp).to.be.ok;
+                expect(window.testApp.model).to.be.ok;
+                expect(window.testApp.docId).to.be.ok;
+                expect(window.$).to.be.ok;
+                expect(window.location.hostname).to.eq('localhost');
+
+                done();
+            });
+        });
+    }
     // Seperating the test names by the network ids would be useful to figure out the
     // details of bugs. Therefore, we need to extend the test names with the network ids
     // where network id matters and used.
@@ -630,39 +644,40 @@ describe('modelManager Cytoscape Operations Test', function () {
 
     // return;
     let cyId = 0;
-        addModelNode(cyId, "node1");
-        initModelNode(cyId, "node1");
-        getModelNode(cyId, "node1");
+    connect();
+    addModelNode(cyId, "node1");
+    initModelNode(cyId, "node1");
+    getModelNode(cyId, "node1");
 
-        addModelNode(cyId, "node2");
-        initModelNode(cyId, "node2");
+    addModelNode(cyId, "node2");
+    initModelNode(cyId, "node2");
 
-        addModelNode(cyId, "node3");
-        initModelNode(cyId, "node3");
+    addModelNode(cyId, "node3");
+    initModelNode(cyId, "node3");
 
-        addModelNode(cyId, "node4");
-        initModelNode(cyId, "node4");
+    addModelNode(cyId, "node4");
+    initModelNode(cyId, "node4");
 
 
-        addModelEdge(cyId, "node1","node2");
-        initModelEdge(cyId, "node1-node2");
+    addModelEdge(cyId, "node1","node2");
+    initModelEdge(cyId, "node1-node2");
 
-        selectModelNode(cyId, "node1");
-        unselectModelNode(cyId, "node1");
+    selectModelNode(cyId, "node1");
+    unselectModelNode(cyId, "node1");
 
-        selectModelEdge(cyId, "node1-node2");
-        unselectModelEdge(cyId, "node1-node2");
+    selectModelEdge(cyId, "node1-node2");
+    unselectModelEdge(cyId, "node1-node2");
 
-        changeModelNodeAttribute(cyId, "node1");
-        changeModelEdgeAttribute(cyId, "node1-node2");
+    changeModelNodeAttribute(cyId, "node1");
+    changeModelEdgeAttribute(cyId, "node1-node2");
 
-        deleteModelNode(cyId, "node3");
-        undoDeleteModelNode(cyId, "node3");
-        redoDeleteModelNode(cyId, "node3");
+    deleteModelNode(cyId, "node3");
+    undoDeleteModelNode(cyId, "node3");
+    redoDeleteModelNode(cyId, "node3");
 
-        // deleteModelEdge(cyId, "node1-node2");
-        // undoDeleteModelEdge(cyId, "node1-node2");
-        // redoDeleteModelEdge(cyId, "node1-node2");
+    // deleteModelEdge(cyId, "node1-node2");
+    // undoDeleteModelEdge(cyId, "node1-node2");
+    // redoDeleteModelEdge(cyId, "node1-node2");
 
 
     // });

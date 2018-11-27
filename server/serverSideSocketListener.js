@@ -55,8 +55,8 @@ module.exports.start = function(io, model, cancerDataOrganizer){
         "Content-Type": "application/json"
     };
 
-    // io.sockets.on('connection', function (socket) {
-    io.on('connection', function(socket){
+    io.sockets.on('connection', function (socket) {
+    // io.on('connection', function(socket){ //for the new socket.io
         socket.on('error', function (error) {
             console.log(error);
         });
@@ -114,7 +114,8 @@ module.exports.start = function(io, model, cancerDataOrganizer){
         }); //returns the first match
 
 
-        if(roomMate!== null) {
+
+        if(roomMate != null) {
             let clientSocket = io.sockets.connected[roomMate.socketId];
 
             clientSocket.emit(requestStr, data, function(val){
@@ -792,6 +793,8 @@ module.exports.start = function(io, model, cancerDataOrganizer){
         });
 
         socket.on('agentMessage', function( msg, callback){
+
+            console.log("agent sent a message: " + msg);
             msg.date = +(new Date);
             msg.userName = socket.userName;
             model.add('documents.' + msg.room + '.messages', msg);

@@ -4,7 +4,20 @@
 
 
 describe('Chat Test', function () {
+    function connect(){
+        it('Access global window object', function (done) {
+            cy.visit('http://localhost:3000');
+            cy.window().should(function (window) {
+                expect(window.testApp).to.be.ok;
+                expect(window.testApp.model).to.be.ok;
+                expect(window.testApp.docId).to.be.ok;
+                expect(window.$).to.be.ok;
+                expect(window.location.hostname).to.eq('localhost');
 
+                done();
+            });
+        });
+    }
 
 
 
@@ -45,6 +58,7 @@ describe('Chat Test', function () {
 
     }
 
+    connect();
     sendMessage("test1");
     sendMessage("test2");
 
