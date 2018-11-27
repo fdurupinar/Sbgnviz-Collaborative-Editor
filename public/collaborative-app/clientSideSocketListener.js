@@ -307,7 +307,9 @@ module.exports =  function(app) {
 
             app.socket.on('displayOncoprint', function(data, callback){
 
+                document.getElementById('oncoprint-tab').style.display='block';
                 app.oncoprintHandler.updateData(data);
+
 
 
             });
@@ -327,17 +329,20 @@ module.exports =  function(app) {
                 appUtilities.getChiseInstance(data.cyId).updateGraph(jsonObj, function(){
                     app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(), data.cyId, appUtilities, "me");
 
+
                     appUtilities.setActiveNetwork(data.cyId);
 
                     $("#perform-layout").trigger('click');
 
+
                     //open the network view and rerender it otherwise the graph becomes invisible
-                    $("#defaultOpen").trigger('click');
-                    app.dynamicResize();
+                    // $("#defaultOpen").trigger('click');
+                    //
+                    // app.dynamicResize(jsonObj);
 
-
-                    // appUtilities.getCyInstance(data.cyId).panzoom().fit();
-
+                    // setTimeout(()=>{
+                    //     app.dynamicResize();
+                    // }, 2000);
 
 
 
@@ -350,7 +355,6 @@ module.exports =  function(app) {
             });
 
             app.socket.on("mergeSbgn", function (data, callback) {
-
 
                 console.log("merging sbgn");
                 if(!data.cyId)

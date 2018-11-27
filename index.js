@@ -216,10 +216,10 @@ app.proto.create = function (model) {
     this.factoidHandler = require('./public/collaborative-app/factoid/factoid-handler')(this) ;
     this.factoidHandler.initialize();
 
-    // this.oncoprintHandler = require('./public/collaborative-app/oncoprint/oncoprint-handler')(this) ;
-    // this.oncoprintHandler.initialize($('#oncoprint-container').width());
+    this.oncoprintHandler = require('./public/collaborative-app/oncoprint/oncoprint-handler')(this) ;
+    this.oncoprintHandler.initialize($('#oncoprint-container').width());
 
-    //
+
     //Loading cytoscape and clients
 
     let cyIds = this.modelManager.getCyIds();

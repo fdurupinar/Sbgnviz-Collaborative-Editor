@@ -378,6 +378,14 @@ module.exports = function(modelManager, socket, userId, app){
 
                     modelManager.changeModelElementGroupAttribute("position", modelElList, cyId, paramList,  "me");
 
+                    setTimeout(()=> {
+                        //open the network view and rerender it otherwise the graph becomes invisible
+                        $("#defaultOpen").trigger('click');
+
+                        app.dynamicResize();
+                    }, 2000);
+
+
                     // modelManager.changeModelElementGroupAttribute("data", modelElList,  cyId,paramListData, "me"); //bounding boxes may change
                 });
             }

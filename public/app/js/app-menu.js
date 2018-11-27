@@ -1,21 +1,19 @@
 var jquery = $ = require('jquery');
 var BackboneViews = require('./backbone-views');
-// var appUtilities = require('./app-utilities');
 appUtilities = window.appUtilities = require('./app-utilities'); //FUNDA made this global
 var appUndoActionsFactory = require('./app-undo-actions-factory');
 var modeHandler = require('./app-mode-handler');
 var keyboardShortcuts = require('./keyboard-shortcuts');
-// var inspectorUtilities = require('./inspector-utilities');
 inspectorUtilities = window.inspectorUtilities = require('./inspector-utilities'); //FUNDA made this global
 var _ = require('underscore');
 var collaborativeBackboneViews = require("../../collaborative-app/collaborative-backbone-views.js"); //FUNDA
 
 // Handle sbgnviz menu functions which are to be triggered on events
-module.exports = function () {
-    // var dynamicResize = appUtilities.dynamicResize.bind(appUtilities); //funda
+module.exports = function() {
+    var dynamicResize = appUtilities.dynamicResize.bind(appUtilities);
 
-    var layoutPropertiesView, generalPropertiesView, pathsBetweenQueryView, pathsByURIQueryView,  promptSaveView, promptConfirmationView,
-        promptMapTypeView, promptInvalidFileView, reactionTemplateView, gridPropertiesView, fontPropertiesView, fileSaveView;
+    var layoutPropertiesView, generalPropertiesView, neighborhoodQueryView, pathsBetweenQueryView, pathsFromToQueryView, commonStreamQueryView, pathsByURIQueryView,  promptSaveView, promptConfirmationView,
+        promptMapTypeView, promptInvalidFileView, promptFileConversionErrorView, promptInvalidURIWarning, reactionTemplateView, gridPropertiesView, fontPropertiesView, fileSaveView;
 
     function validateSBGNML(xml) {
         $.ajax({
@@ -35,21 +33,71 @@ module.exports = function () {
             }
         });
     }
+
+    function cd2sbgnml(xml) {
+
+        $.ajax({
+            type: 'post',
+            url: "http://web.newteditor.org:8080/cd2sbgnml",
+            data: xml,
+            success: function (data) {
+                var chiseInstance = appUtilities.getActiveChiseInstance();
+                var cy = appUtilities.getActiveCy();
+                chiseInstance.endSpinner("load-spinner");
+                if (cy.elements().length !== 0) {
+                    promptConfirmationView.render(function() {
+                        chiseInstance.loadSBGNMLText(data);
+                    });
+                }
+                else {
+                    chiseInstance.loadSBGNMLText(data);
+                }
+            },
+            error: function (XMLHttpRequest) {
+                var chiseInstance = appUtilities.getActiveChiseInstance();
+                chiseInstance.endSpinner("load-spinner");
+                promptFileConversionErrorView.render();
+                if (XMLHttpRequest.status === 0) {
+                    document.getElementById("file-conversion-error-message").innerText = "Conversion service is not available!";
+                }
+            }
+        })
+    }
+
+    function sbgnml2cd(xml) {
+
+        $.ajax({
+            type: 'post',
+            url: "http://web.newteditor.org:8080/sbgnml2cd",
+            data: xml,
+            success: function (data) {
+                fileSaveView.render("celldesigner", null, data);
+            },
+            error: function (XMLHttpRequest) {
+                promptFileConversionErrorView.render();
+                if (XMLHttpRequest.status === 0) {
+                    document.getElementById("file-conversion-error-message").innerText = "Conversion service is not available!";
+                }
+            }
+        })
+    }
+
     function loadSample(filename) {
 
         // use the active chise instance
         var chiseInstance = appUtilities.getActiveChiseInstance();
 
         var textXml = (new XMLSerializer()).serializeToString(chiseInstance.loadXMLDoc("app/samples/"+filename));
-        //FUNDA validateSBGNML(textXml);
+        // validateSBGNML(textXml); //funda
         return chiseInstance.loadSample(filename, 'app/samples/');
     }
 
-    console.log('init the sbgnviz template/page');
-//FUNDA
-//   $(window).on('resize', _.debounce(dynamicResize, 100));
-
-    // appUtilities.dynamicResize();
+    //FUNDA
+    // console.log('init the sbgnviz template/page');
+    //
+    // $(window).on('resize', _.debounce(dynamicResize, 100));
+    //
+    // dynamicResize();
 
     layoutPropertiesView = appUtilities.layoutPropertiesView = new BackboneViews.LayoutPropertiesView({el: '#layout-properties-table'});
     colorSchemeInspectorView = appUtilities.colorSchemeInspectorView = new BackboneViews.ColorSchemeInspectorView({el: '#color-scheme-template-container'});
@@ -57,19 +105,28 @@ module.exports = function () {
     mapTabGeneralPanel = appUtilities.mapTabGeneralPanel = new BackboneViews.MapTabGeneralPanel({el: '#map-tab-general-container'});
     mapTabLabelPanel = appUtilities.mapTabLabelPanel = new BackboneViews.MapTabLabelPanel({el: '#map-tab-label-container'});
     mapTabRearrangementPanel = appUtilities.mapTabRearrangementPanel = new BackboneViews.MapTabRearrangementPanel({el: '#map-tab-rearrangement-container'});
+    neighborhoodQueryView = appUtilities.neighborhoodQueryView = new BackboneViews.NeighborhoodQueryView({el: '#query-neighborhood-table'});
     // pathsBetweenQueryView = appUtilities.pathsBetweenQueryView = new BackboneViews.PathsBetweenQueryView({el: '#query-pathsbetween-table'});
+    pathsFromToQueryView = appUtilities.pathsFromToQueryView = new BackboneViews.PathsFromToQueryView({el: '#query-pathsfromto-table'});
+    commonStreamQueryView = appUtilities.commonStreamQueryView = new BackboneViews.CommonStreamQueryView({el: '#query-commonstream-table'});
     // pathsByURIQueryView = appUtilities.pathsByURIQueryView = new BackboneViews.PathsByURIQueryView({el: '#query-pathsbyURI-table'});
     //promptSaveView = appUtilities.promptSaveView = new BackboneViews.PromptSaveView({el: '#prompt-save-table'}); // see PromptSaveView in backbone-views.js
+
     collaborativePathsBetweenQueryView = new collaborativeBackboneViews.PathsBetweenQueryView({el: '#query-pathsbetween-table'});//FUNDA--use collaborative version
     collaborativePathsByURIQueryView = new collaborativeBackboneViews.PathsByURIQueryView({el: '#query-pathsbyURI-table'});//FUNDA--use collaborative versi
+
     fileSaveView = appUtilities.fileSaveView = new BackboneViews.FileSaveView({el: '#file-save-table'});
     promptConfirmationView = appUtilities.promptConfirmationView = new BackboneViews.PromptConfirmationView({el: '#prompt-confirmation-table'});
     promptMapTypeView = appUtilities.promptMapTypeView = new BackboneViews.PromptMapTypeView({el: '#prompt-mapType-table'});
     promptInvalidFileView = appUtilities.promptInvalidFileView = new BackboneViews.PromptInvalidFileView({el: '#prompt-invalidFile-table'});
+    promptFileConversionErrorView = appUtilities.promptFileConversionErrorView = new BackboneViews.PromptFileConversionErrorView({el: '#prompt-fileConversionError-table'});
     reactionTemplateView = appUtilities.reactionTemplateView = new BackboneViews.ReactionTemplateView({el: '#reaction-template-table'});
     gridPropertiesView = appUtilities.gridPropertiesView = new BackboneViews.GridPropertiesView({el: '#grid-properties-table'});
     fontPropertiesView = appUtilities.fontPropertiesView = new BackboneViews.FontPropertiesView({el: '#font-properties-table'});
-
+    promptInvalidURIView = appUtilities.promptInvalidURIView = new BackboneViews.PromptInvalidURIView({el: '#prompt-invalidURI-table'});
+    promptInvalidURIWarning = appUtilities.promptInvalidURIWarning = new BackboneViews.PromptInvalidURIWarning({el: '#prompt-invalidURI-table'});
+    promptInvalidURLWarning = appUtilities.promptInvalidURLWarning = new BackboneViews.PromptInvalidURLWarning({el: '#prompt-invalidURL-table'});
+    promptInvalidImageWarning = appUtilities.promptInvalidImageWarning = new BackboneViews.PromptInvalidImageWarning({el: '#prompt-invalidImage-table'});
     toolbarButtonsAndMenu();
 
     keyboardShortcuts();
@@ -82,10 +139,9 @@ module.exports = function () {
 
         // set the current file name for cy
         appUtilities.setScratch(cy, 'currentFileName', filename);
-
         //clean and reset things
         cy.elements().unselect();
-
+        appUtilities.disableInfoBoxRelocation();
         // if the event is triggered for the active instance do the followings
         if ( isActiveInstance ) {
 
@@ -142,7 +198,7 @@ module.exports = function () {
 
         // menu behavior: on first click, triggers the other menus on hover.
         var isMenuHoverMode = false;
-        $('ul.navbar-nav > li.dropdown').on('mouseenter', function (e) {
+        $('ul.navbar-nav > li.dropdown').on('mouseenter', function(e){
             if (isMenuHoverMode) {
                 if ($(this).is('.open')) {
                     return;
@@ -190,9 +246,9 @@ module.exports = function () {
             var node = $(this).data('node');
             var lines = $(this).val();
 
-            if ($(this).val().includes("\\n")) {
+            if ($(this).val().includes("\\n")){
                 lines = $(this).val().split("\\n");
-                lines = $.map(lines, function (x) {
+                lines = $.map(lines, function(x) {
                     x = x.trim();
                     if (x) return (x);
                 });
@@ -207,7 +263,6 @@ module.exports = function () {
         $("#new-file, #new-file-icon").click(function () {
 
             appUtilities.createNewNetwork();
-
             //FUNDA
             $(document).trigger('newFile');
 
@@ -222,13 +277,12 @@ module.exports = function () {
             // use cy instance for active chise instance
             var cy = chiseInstance.getCy();
 
-            //FUNDA Closed this
-            // if(cy.elements().length != 0) {
-            //     promptConfirmationView.render(appUtilities.closeActiveNetwork.bind(appUtilities));
-            // }
-            // else {
-            appUtilities.closeActiveNetwork();
-            // }
+            if(cy.elements().length != 0) {
+                promptConfirmationView.render(appUtilities.closeActiveNetwork.bind(appUtilities));
+            }
+            else {
+                appUtilities.closeActiveNetwork();
+            }
         });
 
         $("#load-file, #load-file-icon").click(function () {
@@ -236,37 +290,78 @@ module.exports = function () {
         });
 
         //FUNDA
-        // $("#file-input").change(function () {
-
-
-
-            // // use the active chise instance
-            // var chiseInstance = appUtilities.getActiveChiseInstance();
-            //
-            // // use cy instance assocated with chise instance
-            // var cy = appUtilities.getActiveCy();
-
-            // if ($(this).val() != "") {
-            //     var file = this.files[0];
-
-
-                // var loadCallbackSBGNMLValidity = function (text) {
-                //     //funda validateSBGNML(text);
-                // }
-                // var loadCallbackInvalidityWarning = function () {
-                //     //FUNDA promptInvalidFileView.render();
-                // }
-                // if (cy.elements().length != 0) {
-                //     promptConfirmationView.render(function () {
-                //         chiseInstance.loadSBGNMLFile(file, loadCallbackSBGNMLValidity, loadCallbackInvalidityWarning)
-                //     });
-                // }
-                // else {
-                //     chiseInstance.loadSBGNMLFile(file, loadCallbackSBGNMLValidity, loadCallbackInvalidityWarning);
-                // }
-                // $(this).val("");
-            // }
+        // $("#file-input").change(function (e, fileObject) {
+        //
+        //   // use the active chise instance
+        //   var chiseInstance = appUtilities.getActiveChiseInstance();
+        //
+        //   // use cy instance assocated with chise instance
+        //   var cy = appUtilities.getActiveCy();
+        //
+        //   if ($(this).val() != "" || fileObject) {
+        //     var file = this.files[0] || fileObject;
+        //     var loadCallbackSBGNMLValidity = function (text) {
+        //       validateSBGNML(text);
+        //     }
+        //     var loadCallbackInvalidityWarning  = function () {
+        //       promptInvalidFileView.render();
+        //     }
+        //     if(cy.elements().length != 0) {
+        //       promptConfirmationView.render(function(){chiseInstance.loadSBGNMLFile(file, loadCallbackSBGNMLValidity, loadCallbackInvalidityWarning)});
+        //     }
+        //     else {
+        //       chiseInstance.loadSBGNMLFile(file, loadCallbackSBGNMLValidity, loadCallbackInvalidityWarning);
+        //     }
+        //     $(this).val("");
+        //   }
         // });
+
+        $('#import-celldesigner-file').click(function (){
+            $("#celldesigner-file-input").trigger('click');
+        });
+
+        $('#celldesigner-file-input').change(function (e, fileObject) {
+
+            if ($(this).val() != "" || fileObject) {
+                var file = this.files[0] || fileObject;
+                appUtilities.setFileContent(file.name);
+                var reader = new FileReader();
+                reader.onload = function(event) {
+                    chiseInstance = appUtilities.getActiveChiseInstance();
+                    chiseInstance.startSpinner("load-spinner");
+                    cd2sbgnml(event.target.result);
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        $("#import-simple-af-file").click(function () {
+            $("#simple-af-file-input").trigger('click');
+        });
+
+        $("#simple-af-file-input").change(function () {
+            var chiseInstance = appUtilities.getActiveChiseInstance();
+
+            // use cy instance assocated with chise instance
+            var cy = appUtilities.getActiveCy();
+
+            var loadCallbackInvalidityWarning  = function () {
+                promptInvalidFileView.render();
+            }
+
+            if ($(this).val() != "") {
+                var file = this.files[0];
+
+                if( cy.elements().length != 0)
+                    promptConfirmationView.render( function(){ chiseInstance.loadTDFile(file, loadCallbackInvalidityWarning); })
+                else
+                    chiseInstance.loadTDFile(file, loadCallbackInvalidityWarning);
+
+                $(this).val("");
+            }
+        });
+
+
         // get and set map properties from file
         $( document ).on( "sbgnvizLoadFileEnd sbgnvizLoadSampleEnd", function(evt, filename, cy){
 
@@ -284,23 +379,46 @@ module.exports = function () {
             // that uses cy instance here
             var appUndoActions = appUndoActionsFactory(cy);
 
+            // get the network id for cy
+            var networkId = cy.container().id;
+
             // reset map name and description
-            currentGeneralProperties.mapName = appUtilities.defaultGeneralProperties.mapName;
+            // default map name should be a string that contains the network id
+            currentGeneralProperties.mapName = appUtilities.getDefaultMapName(networkId);
             currentGeneralProperties.mapDescription = appUtilities.defaultGeneralProperties.mapDescription;
 
-            // set reaggange on complexity managment based on map size
-            if (cy.nodes().length > 100){
-                currentGeneralProperties.rearrangeAfterExpandCollapse = false;
+            // set recalculate layout on complexity management based on map size
+            if (cy.nodes().length > 1250){
+                currentGeneralProperties.recalculateLayoutOnComplexityManagement = false;
             }
 
             // get and set properties from file
             var properties = chiseInstance.getMapProperties();
+            // init map properties
+            var mapProperties = ( properties && properties.mapProperties ) ? properties.mapProperties : {};
 
-            // some operations are to be performed if properties.mapProperties exists
-            var mapPropertiesExist = ( properties && properties.mapProperties );
+            var urlParams = appUtilities.getScratch(cy, 'urlParams');
+
+            if (urlParams) {
+                // clear urlParams from scratch
+                appUtilities.setScratch(cy, 'urlParams', undefined);
+
+                // filter map properties from the url parameters
+                var mapPropsFromUrl = appUtilities.filterMapProperties(urlParams);
+
+                // merge the map properties coming from url into
+                // the map properties read from file
+                for ( var prop in mapPropsFromUrl ) {
+                    mapProperties[prop] = mapPropsFromUrl[prop];
+                }
+            }
+
+            // some operations are to be performed if there is any map property
+            // that comes from URL or read from file
+            var mapPropertiesExist = ( !$.isEmptyObject( mapProperties ) );
 
             if (mapPropertiesExist) {
-                appUtilities.setMapProperties(properties.mapProperties);
+                appUtilities.setMapProperties(mapProperties);
             }
 
             // some operations are to be done if the event is triggered for the active instance
@@ -469,6 +587,20 @@ module.exports = function () {
             $('#inspector-palette-tab a').tab('show');
         });
 
+        $("#resize-nodes-to-content").click(function (e) {
+
+            // use active chise instance
+            var chiseInstance = appUtilities.getActiveChiseInstance();
+
+            // use cy instance associated with chise instance
+            var cy = chiseInstance.getCy();
+
+            //Remove processes and other nodes which cannot be resized according to content
+            var toBeResized = cy.nodes().difference('node[class*="process"],[class*="association"],[class*="dissociation"],[class="source and sink"],[class="and"],[class="or"],[class="not"],[class="delay"]');
+            appUtilities.resizeNodesToContent(toBeResized);
+
+        });
+
         $("#highlight-neighbors-of-selected").click(function (e) {
 
             // use active chise instance
@@ -552,9 +684,21 @@ module.exports = function () {
             }
         });
 
+        $("#query-neighborhood").click(function (e) {
+            neighborhoodQueryView.render();
+        });
+
         $("#query-pathsbetween, #query-pathsbetween-icon").click(function (e) {
             // pathsBetweenQueryView.render(); //FUNDA
             collaborativePathsBetweenQueryView.render();
+        });
+
+        $("#query-pathsfromto").click(function (e) {
+            pathsFromToQueryView.render();
+        });
+
+        $("#query-commonstream").click(function (e) {
+            commonStreamQueryView.render();
         });
 
         $("#query-pathsbyURI").click(function (e) {
@@ -707,6 +851,15 @@ module.exports = function () {
             chiseInstance.expandAll();
         });
 
+        $("#zoom-to-selected").click( function(e){
+            // use the active chise instance
+            var cy = appUtilities.getActiveCy();
+
+            var viewUtilities = cy.viewUtilities('get');
+
+            viewUtilities.zoomToSelected(cy.$(':selected'));
+        });
+
         $("#perform-layout, #perform-layout-icon").click(function (e) {
 
             // use active chise instance
@@ -736,23 +889,24 @@ module.exports = function () {
 
             chiseInstance.endSpinner("layout-spinner"); //funda
         });
-        /* FUNDA
-            $("#undo-last-action, #undo-icon").click(function (e) {
 
-              // use active cy instance
-              var cy = appUtilities.getActiveCy();
+        //FUNDA
+        // $("#undo-last-action, #undo-icon").click(function (e) {
+        //
+        //   // use active cy instance
+        //   var cy = appUtilities.getActiveCy();
+        //
+        //   cy.undoRedo().undo();
+        // });
 
-              cy.undoRedo().undo();
-            });
+        $("#redo-last-action, #redo-icon").click(function (e) {
 
-            $("#redo-last-action, #redo-icon").click(function (e) {
+            // use active cy instance
+            var cy = appUtilities.getActiveCy();
 
-              // use active cy instance
-              var cy = appUtilities.getActiveCy();
+            cy.undoRedo().redo();
+        });
 
-              cy.undoRedo().redo();
-            });
-        */
         $("#save-as-png").click(function (evt) {
 
             // use active chise instance
@@ -787,7 +941,21 @@ module.exports = function () {
         $("#save-as-sbgnml, #save-icon").click(function (evt) {
             //var filename = document.getElementById('file-name').innerHTML;
             //chise.saveAsSbgnml(filename);
-            fileSaveView.render();
+            fileSaveView.render("sbgnml", "0.2");
+        });
+
+        $("#export-as-sbgnml3-file").click(function (evt) {
+            fileSaveView.render("sbgnml", "0.3");
+        });
+
+        $("#export-as-celldesigner-file").click(function (evt) {
+            var chiseInstance = appUtilities.getActiveChiseInstance();
+            var sbgnml = chiseInstance.createSbgnml();
+            sbgnml2cd(sbgnml);
+        });
+
+        $("#export-as-sbgnml-plain-file").click(function (evt) {
+            fileSaveView.render("sbgnml", "plain");
         });
 
         $("#add-complex-for-selected").click(function (e) {
@@ -835,7 +1003,9 @@ module.exports = function () {
             // use cy instance associated with chise instance
             var cy = chiseInstance.getCy();
 
-            chiseInstance.cloneElements(cy.nodes(':selected'));
+            //When the menu option is clicked paste at mouse location is false
+            var pasteAtMouseLoc = false;
+            chiseInstance.cloneElements(cy.nodes(':selected'), pasteAtMouseLoc);
         });
 
         /*
@@ -962,6 +1132,10 @@ module.exports = function () {
             modeHandler.setSelectionMode();
         });
 
+        $('#marquee-zoom-mode-icon').click(function(e){
+            modeHandler.setMarqueeZoomMode();
+        });
+
         $('#add-node-mode-icon').click(function (e) {
             modeHandler.setAddNodeMode();
 
@@ -980,7 +1154,7 @@ module.exports = function () {
             }
         });
 
-        $('.network-panel').on("click", ".biogene-info .expandable", function (evt) {
+        $(document).on("click", ".biogene-info .expandable .network-panel", function (evt) {
 
             // get the recently active tab
             var activeTab = appUtilities.getActiveNetworkPanel();
@@ -1008,7 +1182,7 @@ module.exports = function () {
         // this is used to detect a drag and drop of nodes from the palette
         // cy doesn't provide a clean way to handle events from the outside of cy
         // so here we need to go through the container and fire events down the chain manually to cy
-        $('.network-panel').on("mouseup", function (evt) {
+        $(document).on("mouseup", ".network-panel", function (evt) {
 
             // get the recently active tab
             var activeTab = appUtilities.getActiveNetworkPanel();
@@ -1036,6 +1210,7 @@ module.exports = function () {
             var target = $(e.target).attr("href"); // activated tab
             console.log(target);
             appUtilities.setActiveNetwork(target);
+            inspectorUtilities.handleSBGNInspector();
         });
     }
 };
