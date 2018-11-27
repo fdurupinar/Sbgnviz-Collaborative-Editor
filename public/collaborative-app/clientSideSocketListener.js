@@ -326,7 +326,7 @@ module.exports =  function(app) {
 
                 let jsonObj = appUtilities.getChiseInstance(data.cyId).convertSbgnmlTextToJson(data.sbgn);
 
-                appUtilities.getChiseInstance(data.cyId).updateGraph(jsonObj, function(){
+                appUtilities.getChiseInstance(data.cyId).updateGraph(jsonObj, () => {
                     app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(), data.cyId, appUtilities, "me");
 
 
@@ -335,18 +335,17 @@ module.exports =  function(app) {
                     $("#perform-layout").trigger('click');
 
 
-                    //open the network view and rerender it otherwise the graph becomes invisible
-                    // $("#defaultOpen").trigger('click');
-                    //
-                    // app.dynamicResize(jsonObj);
-
-                    // setTimeout(()=>{
-                    //     app.dynamicResize();
-                    // }, 2000);
-
-
-
                     if (callback) callback("success");
+
+                    //open the network view and rerender it otherwise the graph becomes invisible
+                    $("#defaultOpen").trigger('click');
+
+                    setTimeout(()=> {
+                        app.dynamicResize();
+                        appUtilities.getCyInstance(data.cyId).panzoom().fit();
+
+                    }, 1000);
+
                 });
 
                 //update cellular locations

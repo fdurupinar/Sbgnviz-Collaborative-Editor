@@ -15,16 +15,19 @@ module.exports =  function(app) {
         initialize: function(width){
           oncoprint = new Oncoprint('#oncoprint-container', width);
 
-          // this.updateData(ga_data);
+          this.updateData(ga_data);
 
           this.listenToEvents();
         },
 
         updateData: function(data){
+            //clean previous data
+
+            if(oncoprint.getTracks().length > 0 )
+                oncoprint.removeAllTracks();
+
           let share_id = null;
 
-          if(data.length > 100)
-              return;
           for (let i = 0; i < data.length; i++) {
 
             let track_params = {
@@ -54,8 +57,9 @@ module.exports =  function(app) {
           for (let i = 0; i < data.length; i++) {
             oncoprint.setTrackData(data[i].track_id, data[i].data, 'sample');
             oncoprint.setTrackInfo(data[i].track_id, "");
+
             oncoprint.setTrackTooltipFn(data[i].track_id, function(data) {
-              return "<b>Sample: " + data.sample + "</b> <p>"+ data.disp_mut + "</p>";
+              return "<b>Sample: " + data.sample + "</b> <p>"+ data.disp_mut + "</p><br>";
             });
           }
           // oncoprint.keepSorted(true);
@@ -82,13 +86,17 @@ module.exports =  function(app) {
           },
           // Callback function
           onSlide: function(position, value) {
+              // let zoom = value/100.0;
+              let zoom = value/100.0;
 
-            oncoprint.setZoom(value/100.0);
 
-            $('#oncoprint-zoom-value').val(value);
+              oncoprint.setHorzZoom(zoom);
+              $('#oncoprint-zoom-value').val(value);
+
           },
           // Callback function
           onSlideEnd: function(position, value) {
+
 
           }
         });

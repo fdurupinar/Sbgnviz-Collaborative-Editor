@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "cypress run --config videoRecording=false,screenshotOnHeadlessFailure=false"
+    "test": "cypress run --config video=false"
   },
   "repository": {
     "type": "git",
