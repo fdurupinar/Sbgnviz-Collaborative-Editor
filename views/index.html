@@ -29,6 +29,7 @@
 
         <link href="lib/css/jquery.highlighttextarea.css" rel="stylesheet">
         <link href="lib/css/jquery-ui.css" rel="stylesheet">
+        <link href="lib/css/rangeslider.css" rel="stylesheet">
 
 
         <!--This should come after chise.css -->
@@ -57,6 +58,10 @@
 
             <script src="lib/js/jquery.qtip.js"></script>
 
+            <script src="lib/js/rangeslider.js"></script>
+
+
+            <!--<script type='text/javascript' src="./collaborative-app/oncoprint/geneticrules.js"></script>-->
 
             <!---->
             <!--<script src="node_modules/ocanvas/build/dist/latest/ocanvas.min.js"></script>-->
@@ -265,6 +270,9 @@
                                         <ul class="dropdown-menu">
                                             <li><a href="#" id="query-pathsbetween">Paths Between...</a></li>
                                             <li><a href="#" id="query-pathsbyURI">By URI...</a></li>
+                                            <li><a href="#" id="query-pathsfromto">Paths From To...</a></li>
+                                            <li><a href="#" id="query-commonstream">Common Stream...</a></li>
+                                            <li><a href="#" id="query-neighborhood">Neighborhood...</a></li>
                                         </ul>
                                     </li>
                                 </ul>
@@ -403,7 +411,38 @@
                             <div class="tab-content">
                                 <!--focus should be here add tabindex -->
                                 <!--<div id="sbgn-network-container" tabindex="0" class = "tab-pane fade in active"></div>-->
+
                                 <div id="network-panels-container" class="tab-content" tabindex="0" class = "tab-pane fade in active"> </div>
+
+                                <div id ="oncoprint-container" class="tab-content" class = "tab-pane">
+
+                                    <table style = "width: 200px">
+
+                                            <tbody>
+                                            <tr>
+                                                <td>
+                                                    <i class="fa fa-search-minus"></i>
+                                                </td>
+                                                <td id = "oncoprint-zoom-container">
+                                                    <input type="range", id  = 'oncoprint-zoom', value = "100", style = "width:50px"  >
+                                                </td>
+                                                <td>
+                                                    <i class="fa fa-search-plus"></i>
+                                                </td>
+                                                <td>
+                                                    <input type = "number", id="oncoprint-zoom-value", disabled = true, value = "100">
+                                                </td>
+                                                <td>
+                                                    %
+                                                </td>
+                                            </tr>
+                                            </tbody>
+
+                                    </table>
+
+                                </div>
+
+
                                 {{ each _page.doc.images as #imageFile}}
                                 <div id={{"static-image-container-"+#imageFile.tabIndex}}  class = "tab-pane" >
 
@@ -438,8 +477,8 @@
                                         </script>
                                     </section>
 
-
                                 </div>
+
                                 {{/each}}
                             </div>
                         </div>
@@ -454,12 +493,19 @@
                     <td>
                         <div id = "canvas-tabs" class = "tabbable boxed parentTabs">
                             <ul class="nav nav-tabs">
-                                <li class = "active tab-link" ><a data-toggle="tab" id = "defaultOpen" href="#network-panels-container">Networks</a></li>
+                                <li class = "active tab-link" >
+                                    <a data-toggle="tab" id = "defaultOpen" href="#network-panels-container">Networks</a></li>
                                 <div class tabbable>
                                     <ul id="network-tabs-list" class="nav nav-tabs">
                                     </ul>
 
                                 </div>
+
+                                <li class = "tab-link" id = "oncoprint-tab" style="display: none">
+                                <!--<li class = "tab-link" id = "oncoprint-tab">-->
+                                    <a data-toggle="tab"  href="#oncoprint-container">Oncoprint</a>
+                                </li>
+
 
                                 <!--<li class = "active tab-link" ><a data-toggle="tab" id = "defaultOpen" href="#network-panels-container">Sbgn</a></li>-->
 
@@ -486,6 +532,21 @@
             </div>
 
             <div id="biogene-container" style="display: none">
+            </div>
+
+            <div id="chemical-container" style="display: none">
+            </div>
+
+            <div id="query-neighborhood-table" tabindex="-1" class="modal fade" role="dialog">
+                <!-- neighborhood query table will be shown here-->
+            </div>
+
+            <div id="query-pathsfromto-table" tabindex="-1" class="modal fade" role="dialog">
+                <!-- paths from to query table will be shown here-->
+            </div>
+
+            <div id="query-commonstream-table" tabindex="-1" class="modal fade" role="dialog">
+                <!-- common stream query table will be shown here-->
             </div>
 
             <div id="query-pathsbetween-table" tabindex="-1" class="modal fade" role="dialog">
@@ -588,7 +649,7 @@
                                 <table width="100%" height="100%" align="center" valign="center">
                                     <tbody>
                                     <tr><td>
-                                        <p id="about-newt-version" class="sbgn-text">Newt Editor version 1.0.0</p>
+                                        <p id="about-newt-version" class="sbgn-text">Newt Editor version 1.1.0</p>
                                     </td></tr>
 
                                     <tr><td>
@@ -597,8 +658,9 @@
 
                                     <tr><td>
                                         <p class="address-text marg">Mainly developed and maintained by</p>
-                                        <p class="address-text marg">i-Vis Information Visualization Group, Turkey,</p>
-                                        <p class="address-text">in collaboration with the Demir Lab at OHSU, USA and EISBM, France</p>
+                                        <p class="address-text marg">i-Vis Information Visualization Lab, Ankara, Turkey,</p>
+                                        <p class="address-text marg">in collaboration with the Demir Lab at OHSU, USA,</p>
+                                        <p class="address-text">and EISBM, Lyon, France</p>
                                     </td></tr>
 
                                     <tr><td>
@@ -644,7 +706,7 @@
                                         </tr>
                                         <tr>
                                             <td><b>Ctrl/Cmd + drag on a node</b>:
-                                                Transfer a node in and out of a complex/compartment</td>
+                                                Transfer a node in and out of a complex/compartment/submap</td>
                                         </tr>
                                         <tr>
                                             <td><b>Shift + drag</b>:
@@ -686,7 +748,6 @@
                     </div>
                 </div>
             </div>
-
 
             <script type="text/template" id="loading-small-template">
                 <p class="sbgn-text"> <%= name %> </p>
@@ -925,6 +986,16 @@
 
                     <tr>
                         <td class="header">
+                            <span class="add-on layout-text"> Infer Nesting on Load </span>
+                        </td>
+
+                        <td>
+                            <input id="infer-nesting-on-load" type="checkbox" class="layout-text" <% if (inferNestingOnLoad){ %> checked<%}%>>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="header">
                             <span class="add-on layout-text"> Enable Ports </span>
                         </td>
 
@@ -937,7 +1008,7 @@
                 </table>
 
                 <div style='text-align: center; margin-top: 5px;'>
-                    <button class='btn btn-default' style='align: center;' id='map-general-default-button'>Default</button>
+                    <button class='btn btn-default' id='map-general-default-button'>Default</button>
                     <div>
             </script>
 
@@ -1011,11 +1082,21 @@
                     <tbody>
                     <tr>
                         <td class="header">
+                            <span class="add-on layout-text"> Recalculate Layout on Complexity Management </span>
+                        </td>
+
+                        <td>
+                            <input id="recalculate-layout-on-complexity-management" type="checkbox" class="layout-text" <% if (recalculateLayoutOnComplexityManagement){ %> checked<%}%>>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="header">
                             <span class="add-on layout-text"> Rearrange on Complexity Management </span>
                         </td>
 
                         <td>
-                            <input id="rearrange-after-expand-collapse" type="checkbox" class="layout-text" <% if (rearrangeAfterExpandCollapse){ %> checked<%}%>>
+                            <input id="rearrange-on-complexity-management" type="checkbox" class="layout-text" <% if (rearrangeOnComplexityManagement){ %> checked<%}%>>
                         </td>
                     </tr>
 
@@ -1043,6 +1124,53 @@
                 <div class="modal-footer" style="text-align: center">
                 <button id="default-sbgn" class="btn btn-default">Default</button>
                 </div>-->
+            </script>
+
+            <script type="text/template" id="query-neighborhood-template">
+                <div class="modal-dialog sbgn-modal-dialog" style="width: 510px;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Neighborhood Query</h4>
+                        </div>
+                        <div class="modal-body">
+                            <table class="table-condensed layout-table">
+                                <tbody>
+                                <tr>
+                                    <th colspan=2 style="padding-left: 0px;" align="left">
+                                        <!--&emsp; are added to fill the row so that the distance between the -->
+                                        <span class="add-on layout-text"> Find the neighbors of an entity within a certain distance &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;</span>
+                                    </th>
+                                </tr>
+
+                                <tr>
+                                    <td style="padding-left: 40px;">
+                                        <span class="add-on layout-text"> Gene Symbols: </span><br>
+                                        <textarea id="query-neighborhood-gene-symbols" rows="4" cols="86" style="width: 200px;"><%= geneSymbols %></textarea>
+                                    </td>
+
+                                    <td style="padding-right: 5px;">
+                                        <table frame="box" style="border-color: rgb(204, 204, 204)">
+                                            <tbody>
+                                            <caption style="text-align: left;">Stop Distance</caption>
+                                            <tr>
+                                                <td colspan=2>Length limit</td>
+                                                <td style="padding: 10px;"><input id="query-neighborhood-length-limit" type="text" min="1" class="sbgn-input-small layout-text integer-input" style="width: 90px;" value= <%= lengthLimit %> > </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer" style="text-align: center">
+                            <button id="save-query-neighborhood" class="btn btn-default" >OK</button>
+                            <button id="cancel-query-neighborhood" class="btn btn-default">Cancel</button>
+                        </div>
+                    </div>
+                </div>
             </script>
 
             <script type="text/template" id="query-pathsbetween-template">
@@ -1086,6 +1214,103 @@
                         <div class="modal-footer" style="text-align: center">
                             <button id="save-query-pathsbetween" class="btn btn-default" >OK</button>
                             <button id="cancel-query-pathsbetween" class="btn btn-default">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </script>
+
+            <script type="text/template" id="query-pathsfromto-template">
+                <div class="modal-dialog sbgn-modal-dialog" style="width: 510px;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Paths From To Query</h4>
+                        </div>
+                        <div class="modal-body">
+                            <table class="table-condensed layout-table">
+                                <tbody>
+                                <tr>
+                                    <th colspan=3 style="padding-left: 0px;" align="left">
+                                        <span class="add-on layout-text"> Find all paths of specified length limit from a set of source entities to a set of target entities </span>
+                                    </th>
+                                </tr>
+
+                                <tr>
+                                    <td style="padding-left: 5px;">
+                                        <span class="add-on layout-text"> Source Symbols: </span><br>
+                                        <textarea id="query-pathsfromto-source-symbols" rows="4" cols="80" style="width: 150px;"><%= sourceSymbols %></textarea>
+                                    </td>
+
+                                    <td style="padding-left: 5px;">
+                                        <span class="add-on layout-text"> Target Symbols: </span><br>
+                                        <textarea id="query-pathsfromto-target-symbols" rows="4" cols="80" style="width: 150px;"><%= targetSymbols %></textarea>
+                                    </td>
+
+                                    <td style="padding-right: 5px;">
+                                        <table frame="box" style="border-color: rgb(204, 204, 204)">
+                                            <tbody>
+                                            <caption style="text-align: left;">Stop Distance</caption>
+                                            <tr>
+                                                <td colspan=2>Length limit</td>
+                                                <td style="padding: 10px;"><input id="query-pathsfromto-length-limit" type="text" min="1" class="sbgn-input-small layout-text integer-input" style="width: 90px;" value= <%= lengthLimit %> > </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer" style="text-align: center">
+                            <button id="save-query-pathsfromto" class="btn btn-default" >OK</button>
+                            <button id="cancel-query-pathsfromto" class="btn btn-default">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </script>
+
+            <script type="text/template" id="query-commonstream-template">
+                <div class="modal-dialog sbgn-modal-dialog" style="width: 510px;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Common Stream Query</h4>
+                        </div>
+                        <div class="modal-body">
+                            <table class="table-condensed layout-table">
+                                <tbody>
+                                <tr>
+                                    <th colspan=2 style="padding-left: 0px;" align="left">
+                                        <span class="add-on layout-text"> Find molecules within the specified distance that are affecting or affected by a specific set of molecules in common</span>
+                                    </th>
+                                </tr>
+
+                                <tr>
+                                    <td style="padding-left: 40px;">
+                                        <span class="add-on layout-text"> Gene Symbols: </span><br>
+                                        <textarea id="query-commonstream-gene-symbols" rows="4" cols="86" style="width: 200px;"><%= geneSymbols %></textarea>
+                                    </td>
+
+                                    <td style="padding-right: 5px;">
+                                        <table frame="box" style="border-color: rgb(204, 204, 204)">
+                                            <tbody>
+                                            <caption style="text-align: left;">Stop Distance</caption>
+                                            <tr>
+                                                <td colspan=2>Length limit</td>
+                                                <td style="padding: 10px;"><input id="query-commonstream-length-limit" type="text" min="1" class="sbgn-input-small layout-text integer-input" style="width: 90px;" value= <%= lengthLimit %> > </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer" style="text-align: center">
+                            <button id="save-query-commonstream" class="btn btn-default" >OK</button>
+                            <button id="cancel-query-commonstream" class="btn btn-default">Cancel</button>
                         </div>
                     </div>
                 </div>
@@ -1295,7 +1520,7 @@
                                 <tbody>
                                 <tr>
                                     <th style="padding-left: 0px;" align="left">
-                                        <span class="add-on layout-text">Length limit can be at most 3.</span>
+                                        <span class="add-on layout-text" id="length-limit-constant">Length limit can be at most 3.</span>
                                     </th>
                                 </tr>
 
@@ -1375,35 +1600,130 @@
                 </div>
             </script>
 
+            <!-- Conversion error warning -->
+            <script type="text/template" id="prompt-fileConversionError-template">
+                <div class="modal-dialog sbgn-modal-dialog" style="width: 300px;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Error</h4>
+                        </div>
+                        <div class="modal-body">
+                            <table class="table-condensed layout-table dialog-table" style="margin: auto;">
+                                <tbody>
+                                <tr>
+                                    <th style="padding-left: 0px;" align="left">
+                                        <span class="add-on layout-text" id="file-conversion-error-message">Conversion failed!</span>
+                                    </th>
+                                </tr>
+
+                                <tr id="prompt-fileConversionError-buttons" style="padding-bottom: 0px; margin-bottom: 0px;">
+                                    <td>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer" style="text-align: center">
+                            <button id="prompt-fileConversionError-confirm" class="btn btn-default">OK</button>
+                        </div>
+                    </div>
+                </div>
+            </script>
+
+            <!-- Invalid URL warning -->
+            <script type="text/template" id="prompt-invalidURL-template">
+                <div class="modal-dialog sbgn-modal-dialog" style="width: 300px;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Error</h4>
+                        </div>
+                        <div class="modal-body">
+                            <table class="table-condensed layout-table dialog-table" style="margin: auto;">
+                                <tbody>
+                                <tr>
+                                    <th style="padding-left: 0px;" align="left">
+                                        <span class="add-on layout-text">Invalid URL!</span>
+                                    </th>
+                                </tr>
+
+                                <tr id="prompt-invalidURL-buttons" style="padding-bottom: 0px; margin-bottom: 0px;">
+                                    <td>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer" style="text-align: center">
+                            <button id="prompt-invalidURL-confirm" class="btn btn-default">OK</button>
+                        </div>
+                    </div>
+                </div>
+            </script>
+
+            <!-- Invalid background image warning -->
+            <script type="text/template" id="prompt-invalidImage-template">
+                <div class="modal-dialog sbgn-modal-dialog" style="width: 300px;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Error!</h4>
+                        </div>
+                        <div class="modal-body">
+                            <table class="table-condensed layout-table dialog-table" style="margin: auto;">
+                                <tbody>
+                                <tr>
+                                    <th style="padding-left: 0px;" align="left">
+                                        <span class="add-on layout-text">Image file is invalid!</span>
+                                    </th>
+                                </tr>
+
+                                <tr id="prompt-invalidImage-buttons" style="padding-bottom: 0px; margin-bottom: 0px;">
+                                    <td>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer" style="text-align: center">
+                            <button id="prompt-invalidImage-confirm" class="btn btn-default">OK</button>
+                        </div>
+                    </div>
+                </div>
+            </script>
+
             <script type="text/template" id="reaction-template-template">
                 <div class="modal-dialog modal-sm sbgn-modal-dialog">
-                    <div class="modal-content">
+                    <div class="modal-content" style="display: inline-block"  id="template-modal-content" align="center">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal">&times;</button>
                             <h4 class="modal-title">Template</h4>
                         </div>
-                        <div class="modal-body">
+                        <div class="modal-body" style="display: inline-block">
                             <table class="table-condensed layout-table dialog-table">
                                 <tbody>
-                                <tr>
-                                    <td style="padding-bottom: 10px;" align="right" valign="middle">
-                                        <span class="add-on layout-text"> <b> Type </b> </span>
-                                    </td>
 
-                                    <td>
-                                        <select id="reaction-template-type-select" class='sbgn-input-medium layout-text' name="reaction-template-type">
+                                <tr align="center">
+                                    <td style="padding-bottom: 10px;" colspan=100%>
+                                        <span class="add-on layout-text" align="center" valign="middle" style="margin-right: 5px"> <b> Type:</b> </span>
+                                        <select id="reaction-template-type-select" class='sbgn-output-medium layout-text' name="reaction-template-type" align="center" valign="middle" style="width: 18%">
                                             <option id="reaction-template-type-association" value="association" selected> Association </option>
                                             <option id="reaction-template-type-dissociation" value="dissociation"> Dissociation </option>
+                                            <option id="reaction-template-type-reversible" value="reversible"> Reversible </option>
                                         </select>
                                     </td>
                                 </tr>
 
-                                <tr style="height: 40px; vertical-align:bottom">
-                                    <td align="center" style="margin-left: 5px;">
+                                <tr style="height: 40px; vertical-align:bottom; width: 100%;">
+                                    <td align="center" style="margin-left: 5px; width: 16.25%;">
                                         <span class="add-on layout-text"> <b> Input </b> </span>
                                     </td>
 
-                                    <td align="center" style="margin-right: 5px;">
+                                    <td style="margin-left: 25%;">
+                                    </td>
+
+                                    <td align="center" style="margin-right: 5px; width: 16.25%;">
                                         <span class="add-on layout-text"> <b> Output </b> </span>
                                     </td>
                                 </tr>
@@ -1416,6 +1736,11 @@
                                                 <td>
                                                     <input type='text' class='template-reaction-textbox sbgn-input-medium layout-text' name='1' value=''></input>
                                                 </td>
+                                                <td>
+                                                    <select class='template-reaction-molecule-type sbgn-output-medium layout-text' name="1" style='width: 120px'>
+                                                        <option value="Macromolecule" selected> Macromolecule </option>
+                                                        <option value="Simple Chemical"> Simple Chemical </option>
+                                                </td>
                                                 <td><img style='vertical-align: text-bottom;' class='template-reaction-delete-button' width='16px' height='16px' name='1' src='app/img/toolbar/delete-simple.svg'/>
                                                 </td>
                                             </tr>
@@ -1423,21 +1748,78 @@
                                                 <td>
                                                     <input type='text' class='template-reaction-textbox sbgn-input-medium layout-text' name='2' value=''></input>
                                                 </td>
+                                                <td>
+                                                    <select class='template-reaction-molecule-type sbgn-output-medium layout-text' name="2" style='width: 120px'>
+                                                        <option value="Macromolecule" selected> Macromolecule </option>
+                                                        <option value="Simple Chemical"> Simple Chemical </option>
+                                                </td>
                                                 <td><img style='vertical-align: text-bottom;' class='template-reaction-delete-button' width='16px' height='16px' name='2' src='app/img/toolbar/delete-simple.svg'/>
                                                 </td>
                                             </tr>
                                             <tr><td>
-                                                <img width="16px" height="16px" id='template-reaction-add-button' src='app/img/add.svg'/>
+                                                <img width="16px" height="16px" id='template-reaction-add-button' src='app/img/add.svg' style="margin-left: 100%"/>
                                             </td></tr>
                                         </table>
                                     </td>
 
+                                    <!-- Blank space between input and output -->
+                                    <td style="width: 45px; margin-left: 50%;"></td>
+
                                     <td id ='reaction-template-right-td'>
+
                                         <table id='template-reaction-associated-table'>
-                                            <tr><td><!-- empty td to mirror the delete image and try to respect (unperfectly) the symmetry--></td>
+                                            <tr>
+                                                <td style="width: 50px; margin-left: 50%;"></td>
                                                 <td>
-                                                    <input type='text' class='sbgn-input-medium layout-text' id='template-reaction-complex-name' value='' ></input>
-                                                </td></tr>
+                                                    <input type='text' class='sbgn-input-medium layout-text' id='template-reaction-complex-name' value=''></input>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+
+                                    <!--  <td style="width: 50px; margin-left: 50%;"></td> -->
+
+                                    <td id ='reversible-template-left-td' class="hide">
+                                        <table id='template-reversible-input-table'>
+                                            <tr>
+                                                <td>
+                                                    <input type='text' class='template-reaction-textbox sbgn-input-medium layout-text' name='1' value=''></input>
+                                                </td>
+                                                <td>
+                                                    <select class='template-reaction-molecule-type sbgn-output-medium layout-text' name="1" style='width: 120px'>
+                                                        <option value="Macromolecule"> Macromolecule </option>
+                                                        <option value="Simple Chemical" selected> Simple Chemical </option>
+                                                </td>
+                                                <td><img style='vertical-align: text-bottom;' class='template-reversible-input-delete-button' width='16px' height='16px' name='1' src='app/img/toolbar/delete-simple.svg'/>
+                                                </td>
+                                            </tr>
+                                            <tr><td>
+                                                <img width="16px" height="16px" id='template-reversible-input-add-button' src='app/img/add.svg' style="margin-left: 100%"/>
+                                            </td></tr>
+                                        </table>
+                                    </td>
+
+                                    <!-- Blank space between input and output
+                                    <td style="width: 50px; margin-left: 50%;"></td> -->
+
+
+                                    <td id ='reversible-template-right-td' class="hide">
+                                        <table id='template-reversible-output-table'>
+                                            <tr>
+                                                <td>
+                                                    <input type='text' class='template-reaction-textbox sbgn-input-medium layout-text' name='1' value=''></input>
+                                                </td>
+                                                <td>
+                                                    <select class='template-reaction-molecule-type sbgn-output-medium layout-text' name="1" style='width: 120px'>
+                                                        <option value="Macromolecule"> Macromolecule </option>
+                                                        <option value="Simple Chemical" selected> Simple Chemical </option>
+                                                </td>
+                                                <td><img style='vertical-align: text-bottom;' class='template-reversible-output-delete-button' width='16px' height='16px' name='1' src='app/img/toolbar/delete-simple.svg'/>
+                                                </td>
+                                            </tr>
+                                            <tr><td>
+                                                <img width="16px" height="16px" id='template-reversible-output-add-button' src='app/img/add.svg' style="margin-left: 100%"/>
+                                            </td></tr>
                                         </table>
                                     </td>
 
@@ -1759,6 +2141,36 @@
                 </div>
             </script>
 
+            <!-- ChemicalView template for backbone.js -->
+            <script type="text/template" id="chemical-template">
+                <!--<div class='node-details-text'>-->
+                <table class="table table-condensed table-striped object-panel-table" cellspacing="10">
+                    <tbody>
+                    <tr class="chemical-info chebi-name">
+                        <th valign="top">ChEBI Name:</th>
+                        <td>
+                            <%=chebiName %>
+                        </td>
+                    </tr>
+                    <tr class="chemical-info chemical-description node-details-summary">
+                        <th valign="top">Chemical Description:</th>
+                        <td colspan="2" class="expandable">
+                            <%=chemicalDescription %>
+                        </td>
+                    </tr>
+                    <tr class="chemical-info chebi-id">
+                        <th valign="top">ChEBI ID:</th>
+                        <td>
+                            <a href='https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:<%= chebiID %>' target='blank'>
+                                <%=chebiID %>
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                </div>
+            </script>
+
             <script type="text/template" id="uniprot-link-template">
                 <a href="http://www.uniprot.org/uniprot/<%= id %>" target="_blank">
                     <%=id %>
@@ -1861,23 +2273,7 @@
                     <button class='btn btn-default' style='align: center;' id='map-color-scheme-default-button'>Default</button>
                     <div>
             </script>
-            <script type="text/template" id="idxCard-template">
-                <div class='node-details-text'>
-                    <table class="table-idxCard table-striped">
 
-                        <% var i = 0; %>
-                        <% _.each(idxCards, function(card, index) { %>
-
-                        <tr><td>Card: <%= index %></td></tr>
-                        <tr><td>Evidence: <%= card.evidence %></td></tr>
-                        <tr><td>Participant a: <%= card.extracted_information.participant_a.entity_text %></td></tr>
-                        <tr><td>Participant b: <%= card.extracted_information.participant_b.entity_text %></td></tr>
-                        <tr><td>Interaction type: <%= card.extracted_information.interaction_type %></td></tr>
-
-                        <% }); %>
-                    </table>
-                </div>
-            </script>
 
 
             <inspector-view:>
@@ -2300,6 +2696,7 @@
 
                                     <option disabled>____BMEG_____</option>
                                     <option>What is the drug response on cells with TP53 alterations?</option>
+                                    <option>What is the mutation frequency of EGFR in glioblastoma?</option>
                                     <option>What is the mutation frequency of TP53 in ovarian serous cystadenocarcinoma?</option>
                                     <option>Are there common phenotypes for alterations of TP53 and MAPK1?</option>
 

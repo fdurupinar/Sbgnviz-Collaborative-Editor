@@ -5,6 +5,11 @@ body {
     padding: 0px;
 }
 
+.drag-and-drop-file{
+    border: 2px dashed #0B9BCD !important;
+    background-color: #EEEEEE;
+}
+
 .sbgn-nav-menu .open > .dropdown-menu {
     animation-name: slidenavAnimation;
     animation-duration:.3s;
@@ -185,9 +190,19 @@ body {
 }
 
 .network-panel {
-  height: 680px;
-  width: 800px;
-    position:absolute;
+    height: 100%;
+    width: 100%;
+}
+
+#network-tabs-list-container {
+    width: 1000px;
+    margin: auto;
+    background-color: #eaeaea;
+    padding-bottom: 0.2%;
+}
+
+#network-tabs-list {
+    border: 0px !important;
 }
 
 #sbgn-inspector-and-canvas {
@@ -424,6 +439,14 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
     margin: 0;
 }
 
+#template-modal-content {
+    position: fixed;
+    width: 600px;
+    top: 50%;
+    left: 50%;
+    margin-left: -300px;
+}
+
 .sbgn-input-small {
     width: 50px !important;
 }
@@ -499,9 +522,9 @@ menu:not([title]):before{
 }
 
 .property-table {
-	margin: 2px;
-	border: 1px solid rgb(204, 204, 204);
-	display: block;
+    margin: 2px;
+    border: 1px solid rgb(204, 204, 204);
+    display: block;
 }
 
 .sbgn-modal-dialog .modal-header {
@@ -531,13 +554,13 @@ menu:not([title]):before{
 }
 
 .selected-mode-sustainable, .toggle-mode-sustainable {
-  background-color: #b9b9b9;
-  *background-color: #ffffff;
-  background-image: -moz-linear-gradient(top, #ffffff, #b9b9b9);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#b9b9b9));
-  background-image: -webkit-linear-gradient(top, #ffffff, #b9b9b9);
-  background-image: -o-linear-gradient(top, #ffffff, #b9b9b9);
-  background-image: linear-gradient(to bottom, #ffffff, #b9b9b9);
+    background-color: #b9b9b9;
+    *background-color: #ffffff;
+    background-image: -moz-linear-gradient(top, #ffffff, #b9b9b9);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#b9b9b9));
+    background-image: -webkit-linear-gradient(top, #ffffff, #b9b9b9);
+    background-image: -o-linear-gradient(top, #ffffff, #b9b9b9);
+    background-image: linear-gradient(to bottom, #ffffff, #b9b9b9);
 }
 
 #align-button:focus {
@@ -602,7 +625,7 @@ menu:not([title]):before{
 }
 
 /* CSS Method for adding Font Awesome Chevron Icons */
- .accordion-toggle:after {
+.accordion-toggle:after {
     /* symbol for "opening" panels */
     font-family:'FontAwesome';
     content:"\f077";
@@ -675,6 +698,17 @@ hr.inspector-divider {
     color: #555;
     padding-left: 5px !important;
     padding-right: 5px !important;
+    border-radius: 8px 8px 0 0 !important;
+}
+
+.chise-network-tab a {
+    border-radius: 0 0 8px 8px !important;
+    width: 86px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background: transparent !important;
+    border-top: 0px !important;
 }
 
 /*.chise-tab.active {
@@ -685,8 +719,16 @@ hr.inspector-divider {
     background: #eaeaea !important;
 }
 
+.chise-network-tab.active a {
+    background: white !important;
+}
+
 .chise-tab:hover a {
     background: #eaeaea !important;
+}
+
+.chise-network-tab:hover a {
+    background: white !important;
 }
 
 .btn-default {
@@ -694,6 +736,8 @@ hr.inspector-divider {
     border-style: solid !important;
     border-width: 1px !important;
     border-radius: calc !important;
+    font-size: 12px;
+    align: center;
 }
 
 #sbgn-toolbar img {
@@ -705,6 +749,14 @@ hr.inspector-divider {
 }
 
 img#template-reaction-add-button:hover {
+    cursor: pointer;
+}
+
+img#template-reversible-input-add-button:hover {
+    cursor: pointer;
+}
+
+img#template-reversible-output-add-button:hover {
     cursor: pointer;
 }
 
@@ -745,12 +797,12 @@ img#template-reaction-add-button:hover {
 }
 
 .paletteCol {
-  position: relative;
-  display: inline-block;
-  width: 40px;
-  height: 26px;
-  text-align: center;
-  margin: 5px;
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 26px;
+    text-align: center;
+    margin: 5px;
 }
 
 .custom-menu-item {
@@ -760,7 +812,7 @@ img#template-reaction-add-button:hover {
 
 #sbgn-inspector-palette
 {
-  overflow: hidden;
+    overflow: hidden;
 }
 
 /*

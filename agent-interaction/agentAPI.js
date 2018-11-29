@@ -30,7 +30,6 @@ function Agent (name, id, ioLib) {
     else
         this.io = io;
 
-
 }
 
 /**
@@ -53,21 +52,28 @@ Agent.prototype.connectToServer = function (url,  callback) {
         serverIp = url.slice(0,sInd);
         self.room = url.slice(sInd, url.length);
     }
-    //
+
+    serverIp = serverIp.replace('localhost', '127.0.0.1');
+
+
     // if(io)
     //     this.socket =  io(serverIp); //server connection
     // else
         this.socket = this.io(serverIp,  { forceNew: true }); //server connection //this opens a separate connection for each agent
+    //     this.socket = this.io(serverIp,  { reconnect: true }); //server connection //this opens a separate connection for each agent
+
 
     var p1 = new Promise(function (resolve, reject) {
         if (self.room == ""  || self.room == null) {
 
             self.socket.emit("agentCurrentRoomRequest", function (room) {
                     self.room = room; //select the latest room
+                console.log("Agent connected");
                 resolve("success");
             });
         }
         else {
+            console.log("Agent connected2");
             resolve("success");
         }
     });

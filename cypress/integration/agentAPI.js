@@ -11,6 +11,20 @@ describe('Agent API Test', function () {
     let agentName = "testAgent";
 
 
+    function connect(){
+        it('Access global window object', function (done) {
+            cy.visit('http://localhost:3000');
+            cy.window().should(function (window) {
+                expect(window.testApp).to.be.ok;
+                expect(window.testApp.model).to.be.ok;
+                expect(window.testApp.docId).to.be.ok;
+                expect(window.$).to.be.ok;
+                expect(window.location.hostname).to.eq('localhost');
+
+                done();
+            });
+        });
+    }
     function newAgent() {
        it('new Agent', function () {
            let Agent = require("../../agent-interaction/agentAPI.js");
@@ -59,6 +73,7 @@ describe('Agent API Test', function () {
         it('agent.sendMessage', function (done) {
             cy.window().should(function (window) {
                 let model = window.testApp.model;
+
                 let testMsg = "hello my name is <b> Bob </b>";
                 agent.sendRequest("agentMessage", {comment: testMsg, targets: "*"}, function (data) {
                     setTimeout(function () { //should wait here as well
@@ -606,6 +621,7 @@ describe('Agent API Test', function () {
     }
 
     let cyId  = 0;
+    connect();
     newAgent();
     checkAgentProperties();
     loadModel();

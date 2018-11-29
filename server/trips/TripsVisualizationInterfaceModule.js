@@ -107,6 +107,7 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
         pattern = {0: 'request', 1: '&key', content: ['get-common-cellular-location', '.', '*']};
         this.tm.addHandler(pattern, (text) => {
 
+            console.log("get common location query " +  text.content);
             let modelId = text.content[2];
             this.modelGetJson(modelId, (jsonModel)=> {
 

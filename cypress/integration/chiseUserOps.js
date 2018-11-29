@@ -1,6 +1,25 @@
+function connect(){
+    it('Access global window object', function (done) {
+        cy.visit('http://localhost:3000');
+        cy.window().should(function (window) {
+            expect(window.testApp).to.be.ok;
+            expect(window.testApp.model).to.be.ok;
+            expect(window.testApp.docId).to.be.ok;
+            expect(window.$).to.be.ok;
+            expect(window.location.hostname).to.eq('localhost');
+
+            done();
+        });
+    });
+}
+
+
+
 // Seperating the test names by the network ids would be useful to figure out the
 // details of bugs. Therefore, we need to extend the test names with the network ids
 // where network id matters and used.
+
+
 function extendTestNameWithNetworkId (message, networkId) {
 
   return message + ' for network#' + networkId;
@@ -10,6 +29,7 @@ function extendTestNameWithNetworkId (message, networkId) {
 function addNodeTest(cyId, id, className, posX, posY) {
 
   let testName = extendTestNameWithNetworkId('chise.addNode()', cyId);
+
 
   it(testName, function () {
     cy.window().should(function(window){
@@ -1364,7 +1384,7 @@ function networkIdsTest () {
 
 describe('CWC Test', function(){
 
-
+    connect();
     // create a new network/tab
     createNewNetworkTest();
 

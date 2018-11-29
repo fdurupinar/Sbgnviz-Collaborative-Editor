@@ -4,6 +4,7 @@ module.exports = (function() {
     var StreamPair = require('./stream-pair.js');
     var KQML = require('./KQML/kqml.js');
     var DefaultHost = '127.0.0.1';
+    // var DefaultHost = 'causalpath.org';
     var DefaultPort = 6200;
     var MaxPortTries = 100;
 

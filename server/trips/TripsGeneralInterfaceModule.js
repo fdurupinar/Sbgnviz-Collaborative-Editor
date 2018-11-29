@@ -130,9 +130,19 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
 
         });
 
+        pattern = {0: 'request', 1: '&key', content: ['display-oncoprint', '.', '*']};
+        this.tm.addHandler(pattern, (text) => {
+            this.displayOncoprint(text);
 
-        
-            //Listen to model json request from MRA
+        });
+
+        pattern = {0: 'tell', 1: '&key', content: ['display-oncoprint', '.', '*']};
+        this.tm.addHandler(pattern, (text) => {
+            this.displayOncoprint(text);
+
+        });
+
+        //Listen to model json request from MRA
         // pattern = {0: 'reply', 1: '&key', content: ['success', '.', '*'], sender: 'MRA'};
         //
         // self.tm.addHandler(pattern, function (text) { //listen to requests
@@ -247,6 +257,60 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
 
             // this.tm.replyToMsg(text, {0: 'reply', content: {das: 'success'}});
             });
+        }
+    }
+
+    displayOncoprint(text){
+
+        let contentObj = KQML.keywordify(text.content);
+        if (contentObj) {
+
+            let data = contentObj.data;
+//
+//             console.log(data);
+//             // data = trimDoubleQuotes(data);
+//             //
+//             // data = data.replace(/(\\")/g, '"');
+//
+//
+//
+//             // data = JSON.stringify(json1);
+//
+//
+//
+            // data = data.replace(/[\']/g, '\"');
+            data = data.replace(/’/g, "'");
+            data = data.replace(/'/g, '"');
+            data = data.replace(/”/g, '"');
+
+            data  =  data.substr(1, data.length - 2);
+
+            // data[0] ="'";
+            // data[data.length-1] ="'";
+// // //
+// // // preserve newlines, etc - use valid JSON
+// //             data = data.replace(/\\n/g, "\\n")
+// //                 .replace(/\\'/g, "\\'")
+// //                 .replace(/\\"/g, '\\"')
+// //                 .replace(/\\&/g, "\\&")
+// //                 .replace(/\\r/g, "\\r")
+// //                 .replace(/\\t/g, "\\t")
+// //                 .replace(/\\b/g, "\\b")
+// //                 .replace(/\\f/g, "\\f");
+// // // remove non-printable and other non-valid JSON chars
+// //             data = data.replace(/[\u0000-\u0019]+/g,"");
+
+            try {
+
+                let json = JSON.parse(data);
+
+                this.askHuman(this.agentId, this.room, "displayOncoprint", json, (val) => {
+
+                });
+            }
+            catch(e) {
+                console.log(e);
+            }
         }
     }
 
