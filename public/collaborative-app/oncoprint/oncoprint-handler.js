@@ -23,8 +23,10 @@ module.exports =  function(app) {
         updateData: function(data){
             //clean previous data
 
+
             if(oncoprint.getTracks().length > 0 )
                 oncoprint.removeAllTracks();
+
 
           let share_id = null;
 
@@ -52,7 +54,7 @@ module.exports =  function(app) {
           }
 
           oncoprint.hideIds([], true);
-          // oncoprint.keepSorted(false);
+          oncoprint.keepSorted(false);
 
           for (let i = 0; i < data.length; i++) {
             oncoprint.setTrackData(data[i].track_id, data[i].data, 'sample');
