@@ -322,13 +322,19 @@ module.exports =  function(app) {
                 if(!data.cyId)
                     data.cyId = appUtilities.getActiveNetworkId();
 
+
                 appUtilities.getCyInstance(data.cyId).remove(appUtilities.getCyInstance(data.cyId).elements());
+
+
 
                 //get another sbgncontainer and display the new SBGN model.
 
+
                 let jsonObj = appUtilities.getChiseInstance(data.cyId).convertSbgnmlTextToJson(data.sbgn);
 
+
                 appUtilities.getChiseInstance(data.cyId).updateGraph(jsonObj, () => {
+                    app.modelManager.newModel( appUtilities.getActiveNetworkId(), "me"); //delete the existing model first so that ids don't get mixed up
                     app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(), data.cyId, appUtilities, "me");
 
 
