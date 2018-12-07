@@ -19,7 +19,7 @@ function VisHandler(modelManager){
 
 
 const possibleStates = {
-    "ont::phosphorylation": ["p", "phosphorylation", "phospho", "phosphorylated"]
+    "ont::phosphorylation": ["p", "phosphorylation", "phospho", "phosphorylated", "p@p"]
 }
 
 
