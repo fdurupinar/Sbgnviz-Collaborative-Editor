@@ -756,7 +756,8 @@ appUtilities.defaultLayoutProperties = {
     animationEasing: 'cubic-bezier(0.17,0.72,0.41,0.98)',
     // animate: 'end',
     animate: false, //funda
-    animationDuration: 2000,
+    // animationDuration: 2000,
+    animationDuration: 500, //funda
     randomize: false,
     tilingPaddingVertical: 20,
     tilingPaddingHorizontal: 20,

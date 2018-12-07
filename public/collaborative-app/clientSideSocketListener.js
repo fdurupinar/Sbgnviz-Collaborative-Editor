@@ -327,9 +327,6 @@ module.exports =  function(app) {
 
 
 
-                //get another sbgncontainer and display the new SBGN model.
-
-
                 let jsonObj = appUtilities.getChiseInstance(data.cyId).convertSbgnmlTextToJson(data.sbgn);
 
 
