@@ -381,9 +381,14 @@ input[type="file"] {
 
 }
 
+#inputs-name{
+    width: 100px;
+}
 #change-user-color{
-
+    width: 100px;
     margin-left: 5px;
+
+    padding: 0px;
 
 }
 #chat-history{
@@ -463,25 +468,19 @@ input[type="file"] {
     color: #0b9bcd;
     font-size: large;
 
-
 }
 
 #reset-conversation{
 
-    position: absolute;
+    /*position: absolute;*/
     right: 0px;
-    /*margin-left: 100px;*/
-    margin-right: 5px;
-
-
+    margin: 5px;
     font-size: large;
-
-
 }
 
 
 #test-messages{
-
+    width: 98%;
 }
 .time {
 
@@ -499,6 +498,8 @@ input[type="file"] {
 
 #send-message{
     margin-top: 2px;
+    margin-bottom: 5px;
+
 }
 
 #inputs-comment{

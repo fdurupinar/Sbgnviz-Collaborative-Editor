@@ -2289,7 +2289,7 @@
                                 <li class = "tab-link"><a data-toggle="tab" href="#sbgn-inspector">Inspector</a></li>
                                 <!--<li class = "tab-link"><a data-toggle="tab" href="#command-history-area">Operations</a></li>-->
                                 <li class = "tab-link"><a data-toggle="tab" href="#factoid-area">Reach</a></li>
-                                <li class = "tab-link"><a data-toggle="tab" href="#visualization-test-area">VTest</a></li>
+                                <!--<li class = "tab-link"><a data-toggle="tab" href="#visualization-test-area">VTest</a></li>-->
 
                             </ul>
                         </div>
@@ -2634,6 +2634,8 @@
                             <div id="inputs">
                                 User name: <input id="inputs-name" value="{{_page.doc.users[_session.userId].name}}">
                                 <button id = "change-user-color" class = "btn btn-mini" on-click ="changeColorCode()">New user color</button>
+                                <button id = "reset-conversation" class = "btn btn-info btn-mini" on-click = "resetConversationOnTrips()">Reset Conversation</button>
+
                                 <form id="inputs-form" on-submit="add($event)">
                                     <!--<form id="inputs-form">-->
                                     <textarea id="inputs-comment" rows="3", wrap ="soft" on-keypress="enterMessage($event)">{{_page.newComment}}</textarea>
@@ -2641,7 +2643,7 @@
 
 
                                     <button  class = "btn btn-info" id = "send-message">Send</button>
-                                    <button id = "reset-conversation" class = "btn btn-info btn-mini" on-click = "resetConversationOnTrips()">Reset Conversation</button>
+
                                 </form>
 
                                 <select id = "test-messages" on-change="updateTripsMessage()">

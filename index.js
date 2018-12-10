@@ -1485,7 +1485,7 @@ app.proto.dynamicResize = function () {
 
     // make inspector-tab-area resizable
     $("#inspector-tab-area").resizable({
-        minWidth:355
+        minWidth:390
     });
 
     // force each of the cytoscape.js
