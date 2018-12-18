@@ -46,7 +46,7 @@ exports.validateSBGNML = function (req, res) {
 	function executeValidate(sbgnml, res) {
 		var xsdString;
 		try {
-			xsdString = fs.readFileSync('app/resources/libsbgn-0.3.xsd', {encoding: 'utf8'});// function (err, data) {
+			xsdString = fs.readFileSync('./app/resources/libsbgn-0.3.xsd', {encoding: 'utf8'});// function (err, data) {
 		}
 		catch (err) {
 			res.status(500);
@@ -103,8 +103,14 @@ exports.validateSBGNML = function (req, res) {
  * by the application to other domains than the application's domain.
  */
 exports.testURL = function (req, res) {
-	var url = req.query.url;
-	request.get(url, {timeout: 5000}, function (error, response, body) {
+	var options = {  
+		url: req.query.url,
+		method: 'GET',
+		qs: req.query.qs,
+		timeout: 5000
+	};
+	
+	request.get(options, function (error, response, body) {
 		res.send({error: error, response: response});
 	});
 };
