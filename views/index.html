@@ -38,12 +38,20 @@
 
         <Body:>
 
+            <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>-->
+            <!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
+
+            <!---->
+
             <script src="lib/js/ocanvas.min.js"></script>
             <script src="app/bundle.js"></script>
             <!-- libraries -->
 
 
             <!--<script src="node_modules/bootstrap/dist/js/bootstrap.js"></script>-->
+
+
+            <!--<script src="lib/js/bootstrap.min.js"></script>-->
 
             <script src="lib/js/jquery.noty.packaged.js"></script>
 
@@ -61,16 +69,17 @@
             <script src="lib/js/rangeslider.js"></script>
 
 
-            <!--<script type='text/javascript' src="./collaborative-app/oncoprint/geneticrules.js"></script>-->
+
 
             <!---->
             <!--<script src="node_modules/ocanvas/build/dist/latest/ocanvas.min.js"></script>-->
-            <!--<script src="node_modules/jquery/dist/jquery.js"></script>-->
+            <script src="node_modules/jquery/dist/jquery.js"></script>
             <!--<script src="node_modules/qtip2/dist/jquery.qtip.js"></script>-->
 
             <!--<script src="node_modules/cytoscape-qtip/cytoscape-qtip.js"></script>-->
 
             <script src="lib/js/socket.io.js"></script>
+
 
             <!--<body>-->
             <div class="nav-menu sbgn-nav-menu">
@@ -113,10 +122,44 @@
                                             <li><a href="#" id="load-sample13">Regulation of TGF-beta induced metastasis</a></li>
                                         </ul>
                                     </li>
-                                    <li><a href="#" id="save-as-sbgnml">Save...</a></li>
+                                    <li><a href="#" id="save-as-sbgnml">Save as Sbgnml...</a></li>
+                                    <li><a href="#" id="save-as-nwt">Save as Nwt...</a></li>
+                                    <li class="divider"></li>
                                     <li class="dropdown-submenu">
                                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                            Save as Image
+                                            Import
+                                            <!--<b class="right-caret"></b>-->
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            <input id="simple-af-file-input" type="file" style="display:none" />
+                                            <input id="sif-file-input"  type="file" style="display:none" />
+                                            <input id="celldesigner-file-input" type="file" style="display:none" />
+                                            <input id="sif-format-input" type="file" style="display:none" />
+                                            <input id="sif-layout-input" type="file" style="display:none" />
+                                            <li><a href="#" id="import-celldesigner-file">CellDesigner File</a></li>
+                                            <li><a href="#" id="import-simple-af-file">Simple AF File</a></li>
+                                            <li><a href="#" id="import-sif-file">SIF File</a></li>
+                                            <li><a href="#" id="import-sif-format">SIF Format</a></li>
+                                            <li><a href="#" id="import-sif-layout">SIF Layout</a></li>
+                                        </ul>
+                                    </li>
+                                    <li class="dropdown-submenu">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                            Export
+                                            <!--<b class="right-caret"></b>-->
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="#" id="export-as-sbgnml-plain-file">SBGN-ML Plain</a></li>
+                                            <li><a href="#" id="export-as-sbgnml3-file">SBGN-ML 0.3</a></li>
+                                            <li><a href="#" id="export-as-nwt3-file">NWT 0.3</a></li>
+                                            <li><a href="#" id="export-as-celldesigner-file">CellDesigner File</a></li>
+                                            <li><a href="#" id="export-to-plain-sif">Plain SIF</a></li>
+                                            <li><a href="#" id="export-to-sif-layout">SIF Layout File</a></li>
+                                        </ul>
+                                    </li>
+                                    <li class="dropdown-submenu">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                            Export as Image
                                             <!--<b class="right-caret"></b>-->
                                         </a>
                                         <ul class="dropdown-menu">
@@ -297,6 +340,8 @@
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li><a href="#" id="quick-help">Quick Help</a></li>
+                                    <li><a href="#" id="quick-tutorial">Quick Tutorial</a></li>
+                                    <li><a href="#" id="ui-guide">UI Guide</a></li>
                                     <li><a href="#" id="about">About</a></li>
                                 </ul>
                             </li>
@@ -586,6 +631,22 @@
             </div>
 
             <div id="prompt-invalidFile-table" tabindex="-1" class="modal fade" role="dialog">
+                <!-- map type change confirmation dialog will be shown here-->
+            </div>
+
+            <div id="prompt-fileConversionError-table" tabindex="-1" class="modal fade" role="dialog">
+                <!-- map type change confirmation dialog will be shown here-->
+            </div>
+
+            <div id="prompt-invalidURL-table" tabindex="-1" class="modal fade" role="dialog">
+                <!-- map type change confirmation dialog will be shown here-->
+            </div>
+
+            <div id="prompt-invalidImage-table" tabindex="-1" class="modal fade" role="dialog">
+                <!-- map type change confirmation dialog will be shown here-->
+            </div>
+
+            <div id="prompt-invalidEdge-table" tabindex="-1" class="modal fade" role="dialog">
                 <!-- map type change confirmation dialog will be shown here-->
             </div>
 
@@ -1001,6 +1062,15 @@
 
                         <td>
                             <input id="enable-ports" type="checkbox" class="layout-text" <% if (enablePorts){ %> checked<%}%>>
+                        </td>
+
+                    <tr>
+                        <td class="header">
+                            <span class="add-on layout-text"> Enable Topology Grouping of SIF Nodes </span>
+                        </td>
+
+                        <td>
+                            <input id="enable-sif-topology-grouping" type="checkbox" class="layout-text" <% if (enableSIFTopologyGrouping){ %> checked<%}%>>
                         </td>
                     </tr>
 
@@ -1661,6 +1731,38 @@
                     </div>
                 </div>
             </script>
+            <!-- Invalid edge warning -->
+            <script type="text/template" id="prompt-invalidEdge-template">
+                <div class="modal-dialog sbgn-modal-dialog" style="width: 335px;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Error</h4>
+                        </div>
+                        <div class="modal-body">
+                            <table class="table-condensed layout-table dialog-table" style="margin: auto;">
+                                <tbody>
+                                <tr>
+                                    <th style="padding-left: 0px;" align="left">
+                                        <span class="add-on layout-text centered">Invalid edge type! Refer to Legend menu for help.</span>
+                                    </th>
+                                </tr>
+
+                                <tr id="prompt-invalidEdge-buttons" style="padding-bottom: 0px; margin-bottom: 0px;">
+                                    <td>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer" style="text-align: center">
+                            <button id="prompt-invalidEdge-confirm" class="btn btn-default">OK</button>
+                        </div>
+                    </div>
+                </div>
+            </script>
+
+
 
             <!-- Invalid background image warning -->
             <script type="text/template" id="prompt-invalidImage-template">
@@ -2029,60 +2131,65 @@
                         <div class="modal-body">
                             <table class="table-condensed layout-table">
                                 <tbody>
-                                <tr>
-                                    <td>
-                                        <span class="add-on layout-text"> Font Family </span>
-                                    </td>
 
-                                    <td>
-                                        <%= getFontFamilyHtml() %>
-                                    </td>
-                                </tr>
+                                <%= generateFontPropertiesRows() %>
 
-                                <tr>
-                                    <td>
-                                        <span class="add-on layout-text"> Font Size </span>
-                                    </td>
-                                    <td>
-                                        <input id="font-properties-font-size" type="text" min="1" class="sbgn-input-small layout-text integer-input" value= <%= fontSize %> >
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <span class="add-on layout-text"> Font Weight </span>
-                                    </td>
-
-                                    <td>
-                                        <select id="font-properties-select-font-weight" class='input-medium layout-text' name="font-weight-select">
-                                            <option id="font-properties-font-weight-none" value="" <% if (fontWeight == ''){ %> selected<%}%> >  </option>
-                                            <option id="font-properties-font-weight-lighter" value="lighter" <% if (fontWeight == 'lighter'){ %> selected<%}%> > Lighter </option>
-                                            <option id="font-properties-font-weight-normal" value="normal" <% if (fontWeight == 'normal'){ %> selected<%}%> > Normal </option>
-                                            <option id="font-properties-font-weight-bold" value="bold" <% if (fontWeight == 'bold'){ %> selected<%}%> > Bold </option>
-                                            <option id="font-properties-font-weight-bolder" value="bolder" <% if (fontWeight == 'bolder'){ %> selected<%}%> > Bolder </option>
-                                        </select>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <span class="add-on layout-text"> Font Type </span>
-                                    </td>
-
-                                    <td>
-                                        <select id="font-properties-select-font-style" class='input-medium layout-text' name="font-style-select">
-                                            <option id="font-properties-font-style-none" value="" <% if (fontStyle == ''){ %> selected<%}%> >  </option>
-                                            <option id="font-properties-font-style-normal" value="normal" <% if (fontStyle == 'normal'){ %> selected<%}%> > Normal </option>
-                                            <option id="font-properties-font-style-italic" value="italic" <% if (fontStyle == 'italic'){ %> selected<%}%> > Italic </option>
-                                            <option id="font-properties-font-style-oblique" value="oblique" <% if (fontStyle == 'oblique'){ %> selected<%}%> > Oblique </option>
-                                        </select>
-                                    </td>
-                                </tr>
                                 </tbody>
                             </table>
                         </div>
                         <div class="modal-footer" style="text-align: center">
                             <button id="set-font-properties" class="btn btn-default" >Set</button>
+                        </div>
+                    </div>
+                </div>
+            </script>
+
+            <script type="text/template" id="infobox-properties-template">
+                <div class="modal-dialog modal-sm sbgn-modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Infobox Properties</h4>
+                        </div>
+                        <div class="modal-body">
+                            <table class="table-condensed layout-table">
+                                <tbody>
+
+                                <tr>
+                                    <td>
+                                        <span class="add-on layout-text"> Border Color </span>
+                                    </td>
+                                    <td>
+                                        <input id="infobox-properties-border-color" type="color" class="inspector-input-box" value= <%= borderColor %> >
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <span class="add-on layout-text"> Fill Color </span>
+                                    </td>
+                                    <td>
+                                        <input id="infobox-properties-background-color" type="color" class="inspector-input-box" value= <%= fillColor %> >
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <span class="add-on layout-text"> Border Width </span>
+                                    </td>
+                                    <td>
+                                        <input id="infobox-properties-border-width" type="text" min="1" class="sbgn-input-small layout-text integer-input" value= <%= borderWidth %> >
+                                    </td>
+                                </tr>
+
+                                <%= generateFontPropertiesRows() %>
+                                <%= generateSelectShapeRow() %>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer" style="text-align: center">
+                            <button id="set-as-default-infobox-properties" class="btn btn-default" style="margin-bottom: 2px; white-space:normal !important; word-wrap: break-word;"><%= generateSetAsDefaultText() %></button>
+                            <button id="set-infobox-properties" class="btn btn-default" >Set</button>
                         </div>
                     </div>
                 </div>
@@ -2445,8 +2552,55 @@
                                             </div>
                                         </div>
                                         <!-- AF Edges End -->
+
+                                        <!-- SIF Start -->
+                                        <div class="panel">
+                                            <div id="SIF-palette-heading" class="panel-heading" data-toggle="collapse" data-target="#expand-collapse-sif-nodes-palette">
+                                                <p class="panel-title accordion-toggle">
+                                                    SIF
+                                                </p>
+                                            </div>
+                                            <div id="expand-collapse-sif-nodes-palette" class="panel-collapse collapse">
+                                                <div class="panel-body">
+                                                    <div id="sif-node-palette" class="element-palette node-palette">
+                                                        <div class="paletteWrapper">
+                                                            <div class="paletteCol"><img src="app/img/nodes/macromolecule.svg" language="SIF" value="protein" title="Protein"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/macromolecule.svg" language="SIF" value="small molecule" title="Small Molecule"/></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="panel-body" style="padding-bottom: 0px;">
+                                                    <div id="sif-edge-palette" class="element-palette edge-palette">
+                                                        <div class="paletteWrapper">
+                                                            <div class="paletteCol"><img src="app/img/edges/production.svg" language="SIF" value="controls-state-change-of" title="Controls State Change of"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/production.svg" language="SIF" value="controls-transport-of" title="Controls Transport of"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/production.svg" language="SIF" value="controls-phosphorylation-of" title="Controls Phosphorylation of"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/controls-expression-of.svg" language="SIF" value="controls-expression-of" title="Controls Expression of"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/production.svg" language="SIF" value="catalysis-precedes" title="Catalysis Precedes"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/consumption.svg" language="SIF" value="in-complex-with" title="In Complex With"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/consumption.svg" language="SIF" value="interacts-with" title="Interacts With"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/consumption.svg" language="SIF" value="neighbor-of" title="Neighbor of"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/production.svg" language="SIF" value="consumption-controled-by" title="Neighbor of"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/production.svg" language="SIF" value="controls-production-of" title="Controls Production of"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/production.svg" language="SIF" value="controls-transport-of-chemical" title="Controls Transport of Chemical"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/production.svg" language="SIF" value="chemical-affects" title="Chemical Affects"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/consumption.svg" language="SIF" value="reacts-with" title="Reacts With"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/production.svg" language="SIF" value="used-to-produce" title="Used to Produce"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/production.svg" language="SIF" value="activates" title="Activates"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/inhibition.svg" language="SIF" value="inhibits" title="Inhibits"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/production.svg" language="SIF" value="phosphorylates" title="Phosphorylates"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/inhibition.svg" language="SIF" value="dephosphorylates" title="Dephosphorylates"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/controls-expression-of.svg" language="SIF" value="upregulates-expression" title="Upregulates Expression"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/downregulates-expression.svg" language="SIF" value="downregulates-expression" title="Downregulates Expression"/></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- SIF End -->
                                     </div>
                                 </div>
+
                             </div>
                         </div>
 
@@ -2617,9 +2771,7 @@
                                 {{/each}}
                                 </form>
                                 <!--</ul>-->
-
                             </div>
-
 
                             <ul id="messages" as="list">
                                 <!--on-change = "onScroll()">-->
@@ -2641,18 +2793,16 @@
                                     <textarea id="inputs-comment" rows="3", wrap ="soft" on-keypress="enterMessage($event)">{{_page.newComment}}</textarea>
                                     <!--<input id="inputs-comment" rows = "3", wrap = "soft" style = {{_page.newComment.style}} type = "text">{{_page.newComment.text}}</input>-->
 
-
                                     <button  class = "btn btn-info" id = "send-message">Send</button>
 
                                 </form>
 
                                 <select id = "test-messages" on-change="updateTripsMessage()">
 
-
-
                                     <option selected = "selected" >Hello.</option>
 
                                     <option disabled>____Demo Location Update_____</option>
+                                    <!--<option data-toggle="tooltip" data-placement="left" data-html="true" title="<b>Groups the nodes that have</b> ">Let's build a model.</option>-->
                                     <option>Let's build a model.</option>
                                     <option>AKT1 phosphorylates MAPK1.</option>
                                     <option>Let's move AKT1 and MAPK1 into mitochondrion.</option>
@@ -2698,8 +2848,8 @@
                                     <option>Let's stop learning about AKT1.</option>
 
                                     <option disabled>____BMEG_____</option>
-                                    <option>What is the drug response on cells with TP53 alterations?</option>
-                                    <option>What is the drug response for cells with TP53 alterations?</option>
+                                    <option title = "Finds drugs that perform significantly better on killing cells with TP53 alterations compared to killing cells without TP53 alterations.">What is the drug response on cells with TP53 alterations?</option>
+                                    <option title = "Finds drugs that perform significantly better on killing cells with TP53 alterations compared to killing cells without TP53 alterations.">What is the drug response for cells with TP53 alterations?</option>
                                     <option>What is the mutation frequency of EGFR in glioblastoma?</option>
                                     <option>What is the mutation frequency of TP53 in ovarian serous cystadenocarcinoma?</option>
                                     <!--<option>Are there common phenotypes for alterations of TP53 and MAPK1?</option>-->
@@ -2709,15 +2859,16 @@
 
                                     <option disabled>____Misc____</option>
                                     <option>What is the most likely cellular location of AKT1 and BRAF?</option>
-                                    <option>What are the common upstreams of AKT1 and BRAF?</option>
-                                    <option>Are there common upstreams of AKT1 and BRAF?</option>
-                                    <option>What are the common upstreams of AKT1, BRAF and MAPK1?</option>
-                                    <option>What genes are mutually exclusive with CDH1 for breast cancer?</option>
-                                    <option>What are the mutually exclusive genes with TP53 for breast cancer?</option>
-                                    <option>What is the mutation significance of TP53 for lung cancer?</option>
-                                    <option>What is the mutation significance of TP53 in ovarian serous cystadenocarcinoma?</option>
-                                    <option>What is the mutation significance of PTEN in pancreatic adenocarcinoma?</option>
-                                    <option>What is the mutation significance of BRAF in prostatic adenocarcinoma</option>
+                                    <option title = "Finds genes that modify the function of both AKT1 and BRAF."> What are the common upstreams of AKT1 and BRAF?</option>
+                                    <option title = "Finds genes that modify the function of both AKT1 and BRAF.">Are there common upstreams of AKT1 and BRAF?</option>
+                                    <option title = "Finds genes that modify the function of  AKT1, BRAF and MAPK1.">What are the common upstreams of AKT1, BRAF and MAPK1?</option>
+                                    <option title = "Finds genes with alterations that have significantly low overlap with the alterations of CDH1." >What genes are mutually exclusive with CDH1 for breast cancer?</option>
+                                    <option title = "Finds genes with alterations that have significantly low overlap with the alterations of TP53.">What are the mutually exclusive genes with TP53 for breast cancer?</option>
+                                    <option title="Shows MutSig results to identify genes that were mutated more often than expected by chance.">What is the mutation significance of TP53 for lung cancer?</option>
+                                    <option title="Shows MutSig results to identify genes that were mutated more often than expected by chance.">What is the mutation significance of TP53 in ovarian serous cystadenocarcinoma?</option>
+                                    <option title="Shows MutSig results to identify genes that were mutated more often than expected by chance.">What is the mutation significance of PTEN in pancreatic adenocarcinoma?</option>
+                                    <option title="Shows MutSig results to identify genes that were mutated more often than expected by chance." >What is the mutation significance of BRAF in prostatic adenocarcinoma?
+                                    </option>
 
                                     <option disabled>_________</option>
                                     <option value = "3">MEK phosphorylates ERK.</option>
@@ -2899,4 +3050,9 @@
 
                         </script>
 
+                        <script>
+                        $( function() {
 
+                            $('[data-toggle="tooltip"]').tooltip();
+                        } );
+                        </script>

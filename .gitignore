@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Created by .ignore support plugin (hsz.mobi)
 ### Example user template template
 ### Example user template
@@ -940,3 +941,10 @@ cypress/screenshots
 cypress/videos
 cypress/fixtures/profile.json
 cypress/fixtures/users.json
+=======
+/nbproject/*
+
+node_modules/
+
+app/bundle.js
+>>>>>>> 9163e3282d3cf85a0a926d3d476c139ee9732b34

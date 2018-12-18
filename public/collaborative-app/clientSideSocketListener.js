@@ -301,8 +301,6 @@ module.exports =  function(app) {
 
                     if (callback) callback("success");
                 });
-
-
             });
 
             app.socket.on('displayOncoprint', function(data, callback){
@@ -310,14 +308,13 @@ module.exports =  function(app) {
                 document.getElementById('oncoprint-tab').style.display='block';
                 app.oncoprintHandler.updateData(data);
 
-
-
+                if (callback) callback("success");
+                // console.log("oncoprint");
+                // console.log(data);
             });
 
 
-
             app.socket.on("displaySbgn", function(data, callback){
-
 
                 if(!data.cyId)
                     data.cyId = appUtilities.getActiveNetworkId();
@@ -325,10 +322,7 @@ module.exports =  function(app) {
 
                 appUtilities.getCyInstance(data.cyId).remove(appUtilities.getCyInstance(data.cyId).elements());
 
-
-
                 let jsonObj = appUtilities.getChiseInstance(data.cyId).convertSbgnmlTextToJson(data.sbgn);
-
 
                 appUtilities.getChiseInstance(data.cyId).updateGraph(jsonObj, () => {
                     app.modelManager.newModel( appUtilities.getActiveNetworkId(), "me"); //delete the existing model first so that ids don't get mixed up
