@@ -30,7 +30,7 @@
     "derby": "^0.10.9",
     "express": "^4.16.4",
     "express-session": "^1.15.6",
-    "jquery": "^3.0.0",
+    "jquery": "~3.3.1",
     "jquery-expander": "1.7.0",
     "mongodb": "^2.2.36",
     "mousetrap": "^1.6.2",

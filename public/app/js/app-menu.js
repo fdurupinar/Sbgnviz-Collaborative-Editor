@@ -862,6 +862,7 @@ module.exports = function() {
 
         $("#perform-layout, #perform-layout-icon").click(function (e) {
 
+            console.log("layout called");
             // use active chise instance
             var chiseInstance = appUtilities.getActiveChiseInstance();
 

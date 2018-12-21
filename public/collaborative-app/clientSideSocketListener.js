@@ -39,7 +39,7 @@ module.exports =  function(app) {
             app.socket.on('runLayout', function (data, callback) {
                 try {
                     appUtilities.setActiveNetwork(data.cyId);
-                    $("#perform-layout").trigger('click');
+                    $("#perform-layout")[0].click();
                     if (callback) callback("success");
                 }
                 catch (e) {
@@ -142,16 +142,16 @@ module.exports =  function(app) {
                     appUtilities.getCyInstance(data.cyId).elements().unselect();
 
                     if (data.val === "showAll")
-                        $("#show-all").trigger('click');
+                        $("#show-all")[0].click();
                     else {
                         data.elementIds.forEach(function (id) {
                             appUtilities.getCyInstance(data.cyId).getElementById(id).select();
                         });
 
                         if (data.val == "show")
-                            $("#show-selected").trigger('click');
+                            $("#show-selected")[0].click();
                         else
-                            $("#hide-selected").trigger('click');
+                            $("#hide-selected")[0].click();
                     }
 
 
@@ -187,7 +187,7 @@ module.exports =  function(app) {
                     appUtilities.setActiveNetwork(data.cyId);
 
                     if (data.val === "remove") {
-                        $("#remove-highlights").trigger('click');
+                        $("#remove-highlights")[0].click();
                     }
                     else {
                         data.elementIds.forEach(function (id) {
@@ -195,9 +195,9 @@ module.exports =  function(app) {
                         });
 
                         if (data.val === "neighbors")
-                            $("#highlight-neighbors-of-selected").trigger('click');
+                            $("#highlight-neighbors-of-selected")[0].click();
                         else if (data.val === "processes")
-                            $("#highlight-processes-of-selected").trigger('click');
+                            $("#highlight-processes-of-selected")[0].click();
                     }
 
                     if (callback) callback("success");
@@ -221,9 +221,9 @@ module.exports =  function(app) {
                     });
 
                     if (data.val === "collapse")
-                        $("#collapse-selected").trigger('click');
+                        $("#collapse-selected")[0].click();
                     else
-                        $("#expand-selected").trigger('click');
+                        $("#expand-selected")[0].click();
 
                     if (callback) callback("success");
                 }
@@ -270,7 +270,7 @@ module.exports =  function(app) {
                         appUtilities.getCyInstance(data.cyId).getElementById(nodeId).select();
                     });
 
-                    $("#clone-selected").trigger('click');
+                    $("#clone-selected")[0].click();
 
 
                     if (callback) callback("success");
@@ -297,7 +297,7 @@ module.exports =  function(app) {
 
                     appUtilities.setActiveNetwork(chiseInst.cyId);
 
-                    $("#perform-layout").trigger('click');
+                    $("#perform-layout")[0].click();
 
                     if (callback) callback("success");
                 });
@@ -337,17 +337,19 @@ module.exports =  function(app) {
 
                     appUtilities.setActiveNetwork(data.cyId);
 
-                    $("#perform-layout").trigger('click');
+
+                    $("#perform-layout")[0].click();
 
 
                     if (callback) callback("success");
 
                     //open the network view and rerender it otherwise the graph becomes invisible
-                    $("#defaultOpen").trigger('click');
+                    $("#defaultOpen")[0].click();
 
                     setTimeout(()=> {
                         app.dynamicResize();
                         appUtilities.getCyInstance(data.cyId).panzoom().fit();
+
 
                     }, 1000);
 
