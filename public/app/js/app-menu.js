@@ -159,7 +159,6 @@ module.exports = function() {
             if (!$('#inspector-map-tab').hasClass('active')) {
                 $('#inspector-map-tab a').tab('show');
             }
-
         }
 
     });
@@ -422,34 +421,35 @@ module.exports = function() {
             }
         });
 
+        //FUNDa: there are updated in editor-listener.js
         // TODO: eliminate code replication in similar functions.
-        $("#sif-file-input").change(function () {
-            var chiseInstance = appUtilities.getActiveChiseInstance();
-
-            // use cy instance assocated with chise instance
-            var cy = appUtilities.getActiveCy();
-
-            var loadCallbackInvalidityWarning  = function () {
-                promptInvalidFileView.render();
-            }
-
-            if ($(this).val() != "") {
-                var file = this.files[0];
-
-                var loadFcn = function() {
-                    var layoutBy = function() {
-                        appUtilities.triggerLayout( cy, true );
-                    };
-                    chiseInstance.loadSIFFile(file, layoutBy, loadCallbackInvalidityWarning);
-                };
-                if( cy.elements().length != 0)
-                    promptConfirmationView.render( loadFcn );
-                else
-                    loadFcn();
-
-                $(this).val("");
-            }
-        });
+        // $("#sif-file-input").change(function () {
+        //     var chiseInstance = appUtilities.getActiveChiseInstance();
+        //
+        //     // use cy instance assocated with chise instance
+        //     var cy = appUtilities.getActiveCy();
+        //
+        //     var loadCallbackInvalidityWarning  = function () {
+        //         promptInvalidFileView.render();
+        //     }
+        //
+        //     if ($(this).val() != "") {
+        //         var file = this.files[0];
+        //
+        //         var loadFcn = function() {
+        //             var layoutBy = function() {
+        //                 appUtilities.triggerLayout( cy, true );
+        //             };
+        //             chiseInstance.loadSIFFile(file, layoutBy, loadCallbackInvalidityWarning);
+        //         };
+        //         if( cy.elements().length != 0)
+        //             promptConfirmationView.render( loadFcn );
+        //         else
+        //             loadFcn();
+        //
+        //         $(this).val("");
+        //     }
+        // });
 
 
         // get and set map properties from file
