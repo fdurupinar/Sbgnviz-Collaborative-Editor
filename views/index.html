@@ -2632,10 +2632,13 @@
 
                             <button id = "clear-history" class = "btn  btn-mini" on-click ="clearHistory()">Clear chat </button>
 
+
+
                             <!--</div>-->
                             <div id="inputs">
                                 User name: <input id="inputs-name" value="{{_page.doc.users[_session.userId].name}}">
-                                <button id = "change-user-color" class = "btn btn-mini" on-click ="changeColorCode()">New user color</button>
+                                <b>  Wizard mode</b> <input type="checkbox" id = "wizard-mode" on-change="updateWizardMode($event)" >
+                                <!--<button id = "change-user-color" class = "btn btn-mini" on-click ="changeColorCode()">New user color</button>-->
                                 <button id = "reset-conversation" class = "btn btn-info btn-mini" on-click = "resetConversationOnTrips()">Reset Conversation</button>
 
                                 <form id="inputs-form" on-submit="add($event)">
@@ -2646,6 +2649,7 @@
                                     <button  class = "btn btn-info" id = "send-message">Send</button>
 
                                 </form>
+
 
                                 <select id = "test-messages" on-change="updateTripsMessage()">
 
@@ -2812,6 +2816,8 @@
 
 
                 <audio id="notificationAudio" src="resources/chatSound.wav" preload="auto"></audio>
+
+
 
                 <!--TODO: Close this-->
                 <!--<p></p>-->

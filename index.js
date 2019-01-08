@@ -114,6 +114,8 @@ app.get('/:docId', function (page, model, arg, next) {
             let pcQuery = model.at((docPath + '.pcQuery'));
             let noTrips = model.at((docPath + '.noTrips'));
             let biopaxMode = model.at((docPath + '.biopaxMode'));
+            let wizardMode = model.at((docPath + '.wizardMode'));
+
 
             pysb.subscribe(() =>{
             });
@@ -144,6 +146,8 @@ app.get('/:docId', function (page, model, arg, next) {
 
             biopaxMode.subscribe(()=>{
             });
+
+
             noTrips.subscribe(() => {
 
             });
@@ -244,6 +248,9 @@ app.proto.create = function (model) {
     //Lets editor-listener to subscribe to UI operations
     $(document).trigger('createNewNetwork', [appUtilities.getActiveCy(), appUtilities.getActiveNetworkId()]);
 
+    //update the ui
+    document.getElementById('wizard-mode').checked = model.get('_page.doc.wizardMode');
+
     this.atBottom = true;
 
 
@@ -288,6 +295,8 @@ app.proto.init = function (model) {
  */
 app.proto.listenToUIOperations = function(model){
     let self = this;
+
+    $('')
 
     $('#messages').contentchanged = function () {
         let scrollHeight = $('#messages')[0].scrollHeight
@@ -784,6 +793,17 @@ app.proto.listenToEdgeOperations = function(model){
 app.proto.listenToModelOperations = function(model){
     let self = this;
 
+    model.on('all', '_page.doc.wizardMode', function(op, mode, prev, passed){
+
+        if(docReady &&  !passed.user) {
+            if(!mode)
+                mode = false;
+            document.getElementById('wizard-mode').checked = mode;
+
+
+        }
+    });
+
 
     model.on('all', '_page.doc.cellularLocations.*', function(location, op, names, prev, passed){
 
@@ -830,7 +850,6 @@ app.proto.listenToModelOperations = function(model){
             }
         }
     });
-
 
 
     //Cy updated by other clients
@@ -1049,6 +1068,11 @@ app.proto.updateCellularLocations = function() {
 // UI events
 ////////////////////////////////////////////////////////////////////////////
 
+app.proto.updateWizardMode = function(e){
+
+    this.model.pass({user:"me"}).set('_page.doc.wizardMode', e.target.checked);
+
+}
 app.proto.onScroll = function () {
     let bottom, containerHeight, scrollBottom;
 
@@ -1269,7 +1293,6 @@ app.proto.enterMessage = function(event){
 
         this.lastMsgInd = this.lastMsgInd > 0 ? this.lastMsgInd - 1 : 0;
     }
-
 
 };
 

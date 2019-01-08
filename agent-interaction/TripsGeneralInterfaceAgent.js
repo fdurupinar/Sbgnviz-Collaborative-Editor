@@ -14,6 +14,8 @@ function TripsGeneralInterfaceAgent(agentName, id) {
     this.agentId = id;
     this.tripsUttNum = 1;
 }
+
+
 TripsGeneralInterfaceAgent.prototype.init = function(){
 
     this.sendRequest('agentConnectToTripsRequest', {isInterfaceAgent: true, userName: this.agentName }, (result) => {
@@ -39,10 +41,15 @@ TripsGeneralInterfaceAgent.prototype.listenToMessages = function(){
     this.socket.on('message', (data) => {
 
         if(data.userId != this.agentId) {
-            this.relayMessage(data.comment);
+            let wizardMode = document.getElementById('wizard-mode').checked;
+
+            if(wizardMode && data.comment.toUpperCase().indexOf("@BOB")> -1 || !wizardMode){  //trim the @bob part
+                let msg  = data.comment.replace(/@[bB][Oo][bB]/, ""); //clean the message anyway
+                this.relayMessage(msg);
+            }
+
         }
     });
 }
-
 
 
