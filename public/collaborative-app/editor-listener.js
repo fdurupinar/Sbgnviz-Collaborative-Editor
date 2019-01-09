@@ -46,6 +46,7 @@ module.exports = function(modelManager, socket, userId, app){
     //A new sample or file is loaded --update model and inform others
     $(document).on("sbgnvizLoadSampleEnd sbgnvizLoadFileEnd",  function(event, file, cy){
 
+
         console.log("Loading new sample");
         //remove annotations view
 
@@ -59,6 +60,9 @@ module.exports = function(modelManager, socket, userId, app){
         //         ele._private.data.annotationsView = null;
         //     });
         // },1000);
+
+
+
     });
 
     // call dynamicResize of CWC when dynamicResize is called for newt
