@@ -57,9 +57,13 @@ $(document).ready(function () {
 
     appMenu();
 
+
     // create a new network and access the related chise.js instance
     appUtilities.createNewNetwork();
 
     // launch with model file if exists
-    appUtilities.launchWithModelFile();
+     // appUtilities.launchWithModelFile(); //funda
+
+
+
 });
