@@ -91,6 +91,8 @@ app.get('/:docId', function (page, model, arg, next) {
 
             // //chat related
             model.set('_page.room', room);
+
+
             //
             model.set('_page.durations', [{name: 'All', id: -1}, {name: 'One day', id: ONE_DAY}, {
                 name: 'One hour',
@@ -115,6 +117,7 @@ app.get('/:docId', function (page, model, arg, next) {
             let noTrips = model.at((docPath + '.noTrips'));
             let biopaxMode = model.at((docPath + '.biopaxMode'));
             let wizardMode = model.at((docPath + '.wizardMode'));
+
 
 
             pysb.subscribe(() =>{
@@ -190,9 +193,12 @@ app.proto.create = function (model) {
     this.socket = io();
     this.notyView = window.noty({layout: "bottom",theme:"bootstrapTheme", text: "Please wait while model is loading."});
 
+
     this.listenToUIOperations(model);
 
     let id = model.get('_session.userId');
+
+    this.model.set('_page.url', document.URL);
 
 
     // Make modelManager instance accessible through window object as testModelManager to use it in Cypress tests
@@ -202,8 +208,11 @@ app.proto.create = function (model) {
     window.testApp = this;
     window.sessionUserId = model.get('_session.userId');
 
-
     this.modelManager.addUser(model.get('_session.userId'));
+
+    this.modelManager.setUserTyping(model.get('_session.userId'), false);
+
+
 
     // this.modelManager.setName( model.get('_session.userId'),name);
 
@@ -251,6 +260,8 @@ app.proto.create = function (model) {
     //update the ui
     document.getElementById('wizard-mode').checked = model.get('_page.doc.wizardMode');
 
+
+
     this.atBottom = true;
 
 
@@ -285,6 +296,10 @@ app.proto.create = function (model) {
  * @param model
  */
 app.proto.init = function (model) {
+
+
+
+
     this.listenToNodeOperations(model);
     this.listenToEdgeOperations(model);
     this.listenToModelOperations(model);
@@ -794,6 +809,38 @@ app.proto.listenToModelOperations = function(model){
     let self = this;
 
 
+    model.on('all', '_page.doc.users.*.isTyping', function( id, op, mode, prev, passed){
+
+
+        if(docReady &&  !passed.user) { //another user made the update
+            let userId = self.model.get('_session.userId');
+            let users = self.model.get('_page.doc.users');
+
+
+        //see if there are other users who are writing at the time
+            let isAnyoneTyping = false;
+
+            for(let uid in users){
+                let user = users[uid];
+
+                if (uid !== userId) {
+                    if (user.isTyping)
+                        isAnyoneTyping = true;
+                }
+            }
+
+            if(!isAnyoneTyping)
+                document.getElementById('is-another-user-typing').style.display = "none";
+
+            else
+                document.getElementById('is-another-user-typing').style.display = "block";
+
+
+        }
+
+    });
+
+
     model.on('all', '_page.doc.wizardMode', function(op, mode, prev, passed){
 
         if(docReady &&  !passed.user) {
@@ -1287,14 +1334,22 @@ app.proto.connectTripsAgent = function(){
 
 app.proto.enterMessage = function(event){
 
+
+    let userId = this.model.get('_session.userId');
     if (event.keyCode === 13 && !event.shiftKey) { //enter
        this.add(event);
         // prevent default behavior
         event.preventDefault();
 
         this.lastMsgInd = this.lastMsgInd > 0 ? this.lastMsgInd - 1 : 0;
-    }
 
+        this.modelManager.setUserTyping(userId, false);
+
+
+    }
+    else {
+        this.modelManager.setUserTyping(userId, true);
+    }
 };
 
 app.proto.add = function (event, model) {
@@ -1333,7 +1388,6 @@ app.proto.add = function (event, model) {
     };
 
 
-
     //also lets server know that a client message is entered.
     self.socket.emit('getDate', msg, function(date){ //get the date from the server
         msg.date = date;
@@ -1348,7 +1402,12 @@ app.proto.add = function (event, model) {
         var scrollHeight = $('#messages')[0].scrollHeight
        $('#messages').scrollTop( scrollHeight - $('.message').height());
 
+
+        self.modelManager.setUserTyping(myId, false);
+
     });
+
+
 };
 
 

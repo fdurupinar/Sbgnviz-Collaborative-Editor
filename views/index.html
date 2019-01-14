@@ -313,7 +313,11 @@
                 </nav>
             </div>
 
-            <div id="sbgn-toolbar">
+            <table>
+                <tbody>
+                <tr>
+                    <td>
+                         <div id="sbgn-toolbar">
                 <div class="inside-menu">
                     <img id="new-file-icon" class="sbgn-toolbar-element" src="app/img/toolbar/new.svg" title="New: Create a blank SBGN map">
                     <img id="load-file-icon" class="sbgn-toolbar-element" src="app/img/toolbar/load.svg" title="Load: Load an SBGN map from SBGN-ML file">
@@ -406,11 +410,20 @@
 
 
             </div>
+                    </td>
+
+                    <td>
+                        Link to share: <b> {{_page.url}} </b>
+                    </td>
+                 </tr>
+                </tbody>
+
+            </table>
+
             <table id="sbgn-inspector-and-canvas">
                 <tbody>
                 <tr>
                     <td>
-
                         <div id ="canvas-tab-area"  >
 
                             <div class="tab-content">
@@ -509,7 +522,6 @@
                                 <!--<li class = "tab-link" id = "oncoprint-tab">-->
                                     <a data-toggle="tab"  href="#oncoprint-container">Oncoprint</a>
                                 </li>
-
 
                                 <!--<li class = "active tab-link" ><a data-toggle="tab" id = "defaultOpen" href="#network-panels-container">Sbgn</a></li>-->
 
@@ -2643,6 +2655,7 @@
 
                                 <form id="inputs-form" on-submit="add($event)">
                                     <!--<form id="inputs-form">-->
+                                    <div id = "is-another-user-typing" style = "display: none; font-style: italic">User is typing</div>
                                     <textarea id="inputs-comment" rows="3", wrap ="soft" on-keypress="enterMessage($event)">{{_page.newComment}}</textarea>
                                     <!--<input id="inputs-comment" rows = "3", wrap = "soft" style = {{_page.newComment.style}} type = "text">{{_page.newComment.text}}</input>-->
 
@@ -2909,4 +2922,11 @@
 
                             $('[data-toggle="tooltip"]').tooltip();
                         } );
+                        </script>
+
+                        <script>
+
+                            $(()=>{
+                                return (document.URL);
+                            })
                         </script>

@@ -57,6 +57,10 @@ class ModelManager{
         this.model.set('documents.' + this.docId + '.users.' + userId +'.name', userName);
     }
 
+    setUserTyping(userId, val){
+        this.model.pass({user:"me"}).set('documents.' + this.docId + '.users.' + userId +'.isTyping', val);
+    }
+
     getName (userId) {
         return this.model.get('documents.' + this.docId + '.users.' + userId + '.name');
     }
@@ -132,6 +136,7 @@ class ModelManager{
                 colorCode = getNewColor();
 
             this.setName(userId, userName);
+            this.setUserTyping(userId, false);
             this.setColorCode(userId, colorCode);
         }
     }
