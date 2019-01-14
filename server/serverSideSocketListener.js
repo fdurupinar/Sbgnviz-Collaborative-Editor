@@ -583,6 +583,21 @@ module.exports.start = function(io, model, cancerDataOrganizer){
             });
         });
 
+        socket.on('agentAddProvenanceRequest', function(data, callback){
+
+            let requestStr = "addProvenance";
+
+
+
+            askHuman(data.userId, data.room,  requestStr, data, function(val){
+
+                    console.log("here we are");
+                    console.log(data);
+                if (callback) callback(val);
+            });
+        });
+
+
         //done via sockets as data conversion to json is done in menu-functions
         socket.on('agentLoadFileRequest',  function(data, callback){
             if(data.fileType.indexOf(".owl") > -1){

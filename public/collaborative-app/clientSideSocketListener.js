@@ -381,7 +381,24 @@ module.exports =  function(app) {
             });
 
 
+            app.socket.on("addProvenance", function (data, callback) {
 
+                if(!data.cyId)
+                    data.cyId = appUtilities.getActiveNetworkId();
+
+                console.log(data);
+
+                if(data.pc)
+                    app.model.push('_page.doc.provenance', {html:data.html, pc: data.pc, title: data.title, userName: self.agentName});
+                else if (data.title)
+                    app.model.push('_page.doc.provenance', {html:data.html,  title: data.title, userName: self.agentName});
+                else
+                    app.model.push('_page.doc.provenance', {html:data.html,  userName: self.agentName});
+
+                if(callback)
+                    callback("success");
+
+            });
         },
 
 

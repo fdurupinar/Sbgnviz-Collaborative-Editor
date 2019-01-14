@@ -150,6 +150,7 @@ string after http:<ip>:3000/ in the server address.
 |   "agentMessage"          |{room: <room>, userId: <agentId>, comment:  <message string -- can be raw html>, targets: < user ids or * to include all users in the room >}   |
 |   "agentMergeGraphRequest"          |{room: <room>, userId: <agentId>, graph:<graph content>, type:<"sbgn" or "json">, cyId:<tab id | 0 if not specified>}   |
 |   "agentDisplaySbgnRequest"          |{room: <room>, userId: <agentId>, sbgn:<sbgn content>, cyId:<tab id | 0 if not specified>}   |
+|   "agentAddProvenanceRequest"          |{room: <room>, userId: <agentId>, html:<html content>, cyId:<tab id | 0 if not specified>, title:<optional>, pc:<optional, Pathway Commons links>}   |
 
 
 

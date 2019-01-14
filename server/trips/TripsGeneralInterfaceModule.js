@@ -365,13 +365,16 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
             contentObj.html = trimDoubleQuotes(contentObj.html);
         if(contentObj.pc)
             contentObj.pc = trimDoubleQuotes(contentObj.pc);
+
+
+        this.askHuman(this.agendId, this.room, "addProvenance", contentObj);
         //we can directly update the model
-        if(contentObj.pc)
-            self.model.push('documents.' + this.room + '.provenance', {html:contentObj.html, pc: contentObj.pc, title: contentObj.title, userName: self.agentName});
-        else if (contentObj.title)
-            self.model.push('documents.' + this.room + '.provenance', {html:contentObj.html,  title: contentObj.title, userName: self.agentName});
-        else
-            self.model.push('documents.' + this.room + '.provenance', {html:contentObj.html,  userName: self.agentName});
+        // if(contentObj.pc)
+        //     self.model.push('documents.' + this.room + '.provenance', {html:contentObj.html, pc: contentObj.pc, title: contentObj.title, userName: self.agentName});
+        // else if (contentObj.title)
+        //     self.model.push('documents.' + this.room + '.provenance', {html:contentObj.html,  title: contentObj.title, userName: self.agentName});
+        // else
+        //     self.model.push('documents.' + this.room + '.provenance', {html:contentObj.html,  userName: self.agentName});
 
     }
 
