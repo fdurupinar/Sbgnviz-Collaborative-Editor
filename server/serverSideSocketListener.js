@@ -115,6 +115,7 @@ module.exports.start = function(io, model, cancerDataOrganizer){
             return(human.userId !== userId && human.room === room);
         }); //returns the first match
 
+        console.log("roommate is " + roomMate);
 
 
         if(roomMate != null) {
@@ -597,6 +598,11 @@ module.exports.start = function(io, model, cancerDataOrganizer){
             });
         });
 
+        socket.on('agentDisconnectBobRequest', function(callback){
+
+
+        });
+
 
         //done via sockets as data conversion to json is done in menu-functions
         socket.on('agentLoadFileRequest',  function(data, callback){
@@ -811,18 +817,23 @@ module.exports.start = function(io, model, cancerDataOrganizer){
 
         socket.on('agentMessage', function( msg, callback){
 
-            console.log("agent sent a message: " + msg);
             msg.date = +(new Date);
             msg.userName = socket.userName;
-            model.add('documents.' + msg.room + '.messages', msg);
-            //io.in(socket.room).emit("message", msg);
 
-            if(msg.comment){
-                if (msg.comment.indexOf("The most likely context") > -1) { //if agent told about context
-                    io.in(socket.room).emit("agentContextQuestion",msg.userId);
+            try {
+                model.add('documents.' + msg.room + '.messages', msg);
+                //io.in(socket.room).emit("message", msg);
+
+                if (msg.comment) {
+                    if (msg.comment.indexOf("The most likely context") > -1) { //if agent told about context
+                        io.in(socket.room).emit("agentContextQuestion", msg.userId);
+                    }
                 }
+                if (callback) callback("success");
             }
-            if(callback) callback("success");
+            catch(e){
+                console.log("Connection error " + e);
+            }
         });
 
         //Agent wants the model
@@ -845,6 +856,8 @@ module.exports.start = function(io, model, cancerDataOrganizer){
         //For testing purposes only
         socket.on('agentManualDisconnectRequest', function(data, callback){
             try {
+
+
                 //do not delete socket but remove agent from the list of users
                 modelManagerList[data.room].deleteUserId(data.userId);
                 socket.subscribed = false; //why isn't the socket removed
@@ -867,6 +880,16 @@ module.exports.start = function(io, model, cancerDataOrganizer){
             model.set(docPath + '.context', data.param);
         });
 
+        socket.on('agentRemoveBobRequest', function(data){
+            if(tripsGeneralInterfaceInstance && tripsGeneralInterfaceInstance.isConnectedToTrips()) {
+                console.log("Remove Bob request");
+
+                askHuman(data.userId, data.room,  "removeBob", function(val){
+                    tripsGeneralInterfaceInstance.disconnect();
+
+                });
+            }
+        });
 
         socket.on('agentConnectToTripsRequest', function(param){
             console.log("Agent trips connection request");

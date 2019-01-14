@@ -386,7 +386,6 @@ module.exports =  function(app) {
                 if(!data.cyId)
                     data.cyId = appUtilities.getActiveNetworkId();
 
-                console.log(data);
 
                 if(data.pc)
                     app.model.push('_page.doc.provenance', {html:data.html, pc: data.pc, title: data.title, userName: self.agentName});
@@ -398,6 +397,13 @@ module.exports =  function(app) {
                 if(callback)
                     callback("success");
 
+            });
+
+            app.socket.on("removeBob", function(data, callback){
+
+                if(app.tripsAgent) {
+                    app.tripsAgent.disconnect()
+                }
             });
         },
 

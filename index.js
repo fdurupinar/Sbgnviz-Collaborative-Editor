@@ -793,6 +793,7 @@ app.proto.listenToEdgeOperations = function(model){
 app.proto.listenToModelOperations = function(model){
     let self = this;
 
+
     model.on('all', '_page.doc.wizardMode', function(op, mode, prev, passed){
 
         if(docReady &&  !passed.user) {

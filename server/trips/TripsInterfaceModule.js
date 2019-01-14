@@ -73,6 +73,9 @@ class TripsInterfaceModule {
 
     }
 
+    disconnect(){
+        this.tm.disconnect();
+    }
 
 
 }
