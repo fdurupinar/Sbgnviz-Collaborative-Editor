@@ -224,7 +224,7 @@ app.proto.create = function (model) {
 
 
 
-    console.log(model.get('_page.doc.notes'));
+
 
 
     // this.modelManager.setName( model.get('_session.userId'),name);
