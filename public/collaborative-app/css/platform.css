@@ -93,7 +93,8 @@
 /*Setting sizes of network panels would not be needed here
 if PR(https://github.com/iVis-at-Bilkent/newt/pull/223) is merged*/
 .network-panel {
-    position:absolute;
+    /*position:absolute;*/
+    position: relative;
     height: 100%;
     width: 100%;
 }
