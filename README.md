@@ -152,6 +152,7 @@ string after http:<ip>:3000/ in the server address.
 |   "agentDisplaySbgnRequest"          |{room: <room>, userId: <agentId>, sbgn:<sbgn content>, cyId:<tab id | 0 if not specified>}   |
 |   "agentAddProvenanceRequest"          |{room: <room>, userId: <agentId>, html:<html content>, cyId:<tab id | 0 if not specified>, title:<optional>, pc:<optional, Pathway Commons links>}   |
 |   "agentRemoveBobRequest"          |room:< room >, userId:< agentId >, Disconnects Trips agent |
+|   "agentUpdateSampleSentencesRequest"          |json: <json file for sample sentences. Sample format can be found at: /server/data/sampleSentences.json>room:< room >, userId:< agentId > |
 
 
 In order to set up and run an agent:
