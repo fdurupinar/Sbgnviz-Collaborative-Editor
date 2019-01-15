@@ -2664,106 +2664,7 @@
                                 </form>
 
 
-                                <select id = "test-messages" on-change="updateTripsMessage()">
-
-                                    <option selected = "selected" >Hello.</option>
-
-                                    <option disabled>____Demo Location Update_____</option>
-                                    <option  data-toggle="tooltip" data-placement="left" data-html="true" title="<b>Groups the nodes that have</b> ">Let's build a model.</option>
-                                    <option>AKT1 phosphorylates MAPK1.</option>
-                                    <option>Let's move AKT1 and MAPK1 into mitochondrion.</option>
-                                    <option >Phosphorylated MAPK1 is active.</option>
-                                    <option>FEN1 phosphorylates AKT1.</option>
-                                    <option>Move all into mitochondrion.</option>
-                                    <option>Let's highlight the downstream of AKT1.</option>
-
-                                    <option disabled>____Demo Visualization____</option>
-
-                                    <option>Let's build a model.</option>
-                                    <option>AKT1 phosphorylates MAPK1.</option>
-                                    <option>Let's show AKT1 on the top.</option>
-                                    <option>Let's move phosphorylated MAPK1 to the bottom.</option>
-                                    <option>Let's highlight the downstream of AKT1.</option>
-                                    <option>Let's highlight the upstream of phosphorylated MAPK1.</option>
-                                    <option>Let's show phosphorylated MAPK1 on the top.</option>
-                                    <!--<option>Let's show the downstream of AKT1 on the top.</option>-->
-                                    <option>Let's move mitochondrion elements to the top.</option>
-
-
-                                    <option disabled>___Causality______</option>
-                                    <option>How does BRAF affect MAPK1?</option>
-                                    <option>How does MAPK1 affect BRAF?</option>
-                                    <option>What is the path between BRAF and MAPK1?</option>
-                                    <option>How does MAPK1 affect JUND?</option>
-                                    <option>How does SETDB1 affect ADAM17?</option>
-                                    <option>How does KRAS affect MAPK3?</option>
-                                    <option>How does  ITGAV affect ILK?</option>
-
-                                    <option disabled>____Causality_Target/Source_____</option>
-                                    <option>What genes does MAPK1 phosphorylate?</option>
-                                    <option>What pathways affect BRAF?</option>
-                                    <option>What genes activate ILK?</option>
-                                    <option>How does KRAS activate MAPK3?</option>
-
-                                    <option disabled>____Correlation_____</option>
-                                    <option>Let's learn about AKT1 in ovarian cancer.</option>
-                                    <option>What is its relationship with BRAF?</option>
-                                    <option>What is its relationship with PTPN1?</option>
-                                    <option>AKT1 phosphorylates IFT140. </option>
-                                    <option>What is the next correlation of AKT1?</option>
-                                    <option>Let's stop learning about AKT1.</option>
-
-                                    <option disabled>____BMEG_____</option>
-                                    <option title = "Finds drugs that perform significantly better on killing cells with TP53 alterations compared to killing cells without TP53 alterations.">What is the drug response on cells with TP53 alterations?</option>
-                                    <option title = "Finds drugs that perform significantly better on killing cells with TP53 alterations compared to killing cells without TP53 alterations.">What is the drug response for cells with TP53 alterations?</option>
-                                    <option>What is the mutation frequency of EGFR in glioblastoma?</option>
-                                    <option>What is the mutation frequency of TP53 in ovarian serous cystadenocarcinoma?</option>
-                                    <!--<option>Are there common phenotypes for alterations of TP53 and MAPK1?</option>-->
-                                    <option>Show me the mutations of BRAF in breast cancer.</option>
-                                    <option>What are the mutations of PTEN in breast cancer?</option>
-
-                                    <option disabled>____Misc____</option>
-                                    <option>What is the most likely cellular location of AKT1 and BRAF?</option>
-                                    <option title = "Finds genes that modify the function of both AKT1 and BRAF."> What are the common upstreams of AKT1 and BRAF?</option>
-                                    <option title = "Finds genes that modify the function of both AKT1 and BRAF.">Are there common upstreams of AKT1 and BRAF?</option>
-                                    <option title = "Finds genes that modify the function of  AKT1, BRAF and MAPK1.">What are the common upstreams of AKT1, BRAF and MAPK1?</option>
-                                    <option title = "Finds genes with alterations that have significantly low overlap with the alterations of CDH1." >What genes are mutually exclusive with CDH1 for breast cancer?</option>
-                                    <option title = "Finds genes with alterations that have significantly low overlap with the alterations of TP53.">What are the mutually exclusive genes with TP53 for breast cancer?</option>
-                                    <option title="Shows MutSig results to identify genes that were mutated more often than expected by chance.">What is the mutation significance of TP53 for lung cancer?</option>
-                                    <option title="Shows MutSig results to identify genes that were mutated more often than expected by chance.">What is the mutation significance of TP53 in ovarian serous cystadenocarcinoma?</option>
-                                    <option title="Shows MutSig results to identify genes that were mutated more often than expected by chance.">What is the mutation significance of PTEN in pancreatic adenocarcinoma?</option>
-                                    <option title="Shows MutSig results to identify genes that were mutated more often than expected by chance." >What is the mutation significance of BRAF in prostatic adenocarcinoma?
-                                    </option>
-
-                                    <option disabled>_________</option>
-                                    <option value = "3">MEK phosphorylates ERK.</option>
-                                    <option value = "4">EGF binds EGFR.</option>
-                                    <option value = "5">EGFR bound to EGF binds GRB2.</option>
-                                    <option value = "6">Phosphorylated ERK is active.</option>
-                                    <option value = "7">MAP2K1 phosphorylated at S220 phosphoryates MAPK1.</option>
-                                    <option value = "8">Active TP53 transcribes MDM2.</option>
-                                    <option value = "8b">Undo</option>
-                                    <option value = "26">Is phosphorylated MAPK1 always high?</option>
-                                    <option value = "27">Is the amount of phosphorylated MAPK1 eventually high?</option>
-                                    <option value = "28">Is the MAP2K1-MAPK1 complex formed?</option>
-                                    <option value = "29">Is the amount of FOS ever high if we increase the amount of ELK1 by 10 fold?</option>
-                                    <option value = "30">Does Vemurafenib decrease phosphorylated ERK in the model?</option>
-                                    <option value = "31">Does Selumetinib decrease JUN in the model?</option>
-                                    <option value = "10">How does KRAS regulate MAP2K1?</option>
-                                    <option value = "13">How does HRAS activate MAPK3?</option>
-                                    <option value = "15">Does phosphorylation at S222 activate MAP2K1?</option>
-                                    <option value = "15">What drugs inhibit MAP2K1?</option>
-                                    <option value = "16">Are there any drugs for BRAF?</option>
-                                    <option value = "17">Does Vemurafenib inhibit BRAF?</option>
-                                    <option value = "18">What are the targets of PLX-4720?</option>
-                                    <option value = "19">Which transcription factors regulate frizzled8?</option>
-                                    <option value = "20">Does TP53 target MDM2?</option>
-                                    <option value = "21">What are the regulators of SRF?</option>
-                                    <option value = "22">What transcription factors are shared by SRF, HRAS, and ELK1?</option>
-                                    <option value = "23">Which pathways involve TAP1 and JAK1?</option>
-                                    <option value = "25">What genes are in the prolactin signaling pathway?</option>
-
-                                </select>
+                                <view is="test-messages"></view>
 
                             </div>
                         </div>
@@ -2869,10 +2770,21 @@
                             </tbody>
                         </table>
 
+                        <test-messages:>
+
+                            <select id = "test-messages" on-change="updateTripsMessage()">
+                                {{each _page.doc.sampleSentences as #sampleSentence}}
+                                    {{if #sampleSentence.disabled}}
+                                        <option disabled title={{#sampleSentence.title}}> {{#sampleSentence.text}}</option>
+                                    {{else}}
+                                    <option  title={{#sampleSentence.title}}> {{#sampleSentence.text}}</option>
+                                    {{/if}}
+                                {{/each}}
+                            </select>
 
 
 
-                        <script>
+                            <script>
                             function showQTip(el) {
                                 $(el).parent().qtip({
                                     content: {

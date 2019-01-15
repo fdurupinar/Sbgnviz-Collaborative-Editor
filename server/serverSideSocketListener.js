@@ -31,6 +31,37 @@ let executeCommandLineProcess = function (cmdStr, callback){
 };
 
 /***
+ * Read the file to visualize and return its contents in callback
+ * @param filePath : path+fileName
+ * @param callback
+ */
+var readJsonFile =  function(filePath, callback ){
+
+    try {
+        var fs = require('fs');
+        fs.readFile(filePath, 'utf-8', function (error, fileContent) {
+            if (error) {
+                if (callback) callback("Error " + error)
+                console.log('exec error: ' + error);
+                return;
+            }
+
+            if (callback) {
+                callback(fileContent);
+            }
+
+
+        });
+    }
+    catch(error){
+        if (callback) callback("Error " + error);
+    }
+
+};
+
+
+
+/***
  * Start listening to sockets
  * @param io
  * @param model: shared model
@@ -41,6 +72,7 @@ module.exports.start = function(io, model, cancerDataOrganizer){
     let roomList = [];
     let humanList = [];
     let pnnlArr  = [];
+    let sampleSentencesJson;
     let tripsGeneralInterfaceInstance;
 
     let tripsVisualizationInterfaceInstance;
@@ -69,6 +101,13 @@ module.exports.start = function(io, model, cancerDataOrganizer){
         listenToHumanRequests(socket);
 
         listenToQueryRequests(socket); //can come from both human and agent
+
+        readJsonFile('./server/data/sampleSentences.json', function(content){
+            sampleSentencesJson =  JSON.parse(content);
+
+
+        });
+
 
 
         socket.on('disconnect', function() {
@@ -242,7 +281,15 @@ module.exports.start = function(io, model, cancerDataOrganizer){
 
             data.socketId = socket.id;
 
+
+            let roomExists = false;
+            if(roomList.indexOf(data.room) > -1)
+                roomExists = true;
+
+
             roomList.push(data.room);
+
+
 
             humanList.push({room:data.room, userId: data.userId, socketId: data.socketId});
 
@@ -268,6 +315,7 @@ module.exports.start = function(io, model, cancerDataOrganizer){
                 let pcQuery = model.at((docPath + '.pcQuery'));
 
                 let noTrips = model.at((docPath + '.noTrips'));
+                let sampleSentences = model.at((docPath + '.sampleSentences'));
 
                 pageDoc.subscribe(function () {
                     pysb.subscribe(function () {
@@ -301,10 +349,13 @@ module.exports.start = function(io, model, cancerDataOrganizer){
                     noTrips.subscribe(function(){
                     });
 
+                    sampleSentences.subscribe(function(){
+                    });
                     users.subscribe(function () {
                         let ModelManager = require("../public/collaborative-app/modelManager.js");
 
                         modelManagerList[data.room] = new ModelManager(model, data.room);
+
 
 
                         //Add the user explicitly here
@@ -312,6 +363,10 @@ module.exports.start = function(io, model, cancerDataOrganizer){
                         //modelManagerList[data.room].setName(data.userId, data.userName); done up
 
                         model.set((docPath + '.noTrips'), (process.argv.length > 2) && (process.argv[2].toUpperCase().indexOf("TRIPS") > -1));
+
+
+                        if(!roomExists) //read this once for each room.
+                            model.set((docPath + '.sampleSentences'), sampleSentencesJson);
 
 
                         userIds.subscribe(function () {
@@ -435,6 +490,7 @@ module.exports.start = function(io, model, cancerDataOrganizer){
                     let provenance = model.at((docPath + '.provenance'));
                     let pcQuery = model.at((docPath + '.pcQuery'));
                     let noTrips = model.at((docPath + '.noTrips'));
+                    let sampleSentences = model.at((docPath + '.sampleSentences'));
 
                     if(!data.room)
                         return;
@@ -462,6 +518,9 @@ module.exports.start = function(io, model, cancerDataOrganizer){
                             });
 
                             noTrips.subscribe(function () { 
+                            });
+
+                            sampleSentences.subscribe(function(){
                             });
 
                             userIds.subscribe(function () {
@@ -588,14 +647,18 @@ module.exports.start = function(io, model, cancerDataOrganizer){
 
             let requestStr = "addProvenance";
 
-
-
             askHuman(data.userId, data.room,  requestStr, data, function(val){
 
                     console.log("here we are");
                     console.log(data);
                 if (callback) callback(val);
             });
+        });
+
+        socket.on('agentUpdateSampleSentencesRequest', function(data,  callback){
+            let docPath = 'documents.' + data.room;
+            model.set((docPath + '.sampleSentences'), data.json);
+            if(callback) callback("success");
         });
 
         socket.on('agentDisconnectBobRequest', function(callback){

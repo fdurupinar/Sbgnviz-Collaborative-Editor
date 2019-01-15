@@ -117,7 +117,7 @@ app.get('/:docId', function (page, model, arg, next) {
             let noTrips = model.at((docPath + '.noTrips'));
             let biopaxMode = model.at((docPath + '.biopaxMode'));
             let wizardMode = model.at((docPath + '.wizardMode'));
-
+            let sampleSentences = model.at((docPath + '.sampleSentences'));
 
 
             pysb.subscribe(() =>{
@@ -162,10 +162,15 @@ app.get('/:docId', function (page, model, arg, next) {
             cellularLocations.subscribe(() => {
 
             });
+
+            sampleSentences.subscribe(() => {
+
+            });
             users.subscribe(() => {
 
                 return page.render();
             });
+
 
         });
     });
@@ -211,6 +216,7 @@ app.proto.create = function (model) {
     this.modelManager.addUser(model.get('_session.userId'));
 
     this.modelManager.setUserTyping(model.get('_session.userId'), false);
+
 
 
 
@@ -807,6 +813,7 @@ app.proto.listenToEdgeOperations = function(model){
  */
 app.proto.listenToModelOperations = function(model){
     let self = this;
+
 
 
     model.on('all', '_page.doc.users.*.isTyping', function( id, op, mode, prev, passed){
