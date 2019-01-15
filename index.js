@@ -208,7 +208,10 @@ app.proto.create = function (model) {
 
     let id = model.get('_session.userId');
 
-    this.model.set('_page.url', document.URL);
+    let url = document.URL;
+    if(url[url.length-1] === '#')
+        url = url.substring(0, url.length-1);
+    this.model.set('_page.url', url);
 
 
     // Make modelManager instance accessible through window object as testModelManager to use it in Cypress tests
