@@ -432,6 +432,18 @@
 
                                 <div id="network-panels-container" class="tab-content" tabindex="0" class = "tab-pane fade in active"> </div>
 
+                                <div id ="notes-container" class="tab-content" class = "tab-pane">
+                                    <form id="notes-form" on-submit="saveNotes($event)">
+
+                                        <textarea id="notes-input"  wrap ="soft">{{_page.doc.notes}}</textarea>
+
+
+                                    </form>
+
+
+
+                                </div>
+
                                 <div id ="oncoprint-container" class="tab-content" class = "tab-pane">
 
                                     <table style = "width: 200px">
@@ -518,8 +530,11 @@
 
                                 </div>
 
+                                <li class = "tab-link" id = "notes-tab">
+                                    <a data-toggle="tab"  href="#notes-container">Notes</a>
+                                </li>
+
                                 <li class = "tab-link" id = "oncoprint-tab" style="display: none">
-                                <!--<li class = "tab-link" id = "oncoprint-tab">-->
                                     <a data-toggle="tab"  href="#oncoprint-container">Oncoprint</a>
                                 </li>
 

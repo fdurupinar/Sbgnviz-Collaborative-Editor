@@ -118,6 +118,7 @@ app.get('/:docId', function (page, model, arg, next) {
             let biopaxMode = model.at((docPath + '.biopaxMode'));
             let wizardMode = model.at((docPath + '.wizardMode'));
             let sampleSentences = model.at((docPath + '.sampleSentences'));
+            let notes = model.at((docPath + '.notes'));
 
 
             pysb.subscribe(() =>{
@@ -164,6 +165,10 @@ app.get('/:docId', function (page, model, arg, next) {
             });
 
             sampleSentences.subscribe(() => {
+
+            });
+
+            notes.subscribe(() => {
 
             });
             users.subscribe(() => {
@@ -218,6 +223,8 @@ app.proto.create = function (model) {
     this.modelManager.setUserTyping(model.get('_session.userId'), false);
 
 
+
+    console.log(model.get('_page.doc.notes'));
 
 
     // this.modelManager.setName( model.get('_session.userId'),name);
@@ -1339,6 +1346,7 @@ app.proto.connectTripsAgent = function(){
 };
 
 
+
 app.proto.enterMessage = function(event){
 
 
@@ -1358,6 +1366,7 @@ app.proto.enterMessage = function(event){
         this.modelManager.setUserTyping(userId, true);
     }
 };
+
 
 app.proto.add = function (event, model) {
     let self = this;

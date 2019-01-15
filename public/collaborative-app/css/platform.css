@@ -76,6 +76,20 @@
     width: var(--canvas-width);
 }
 
+#notes-form{
+    border:none;
+    height: var(--canvas-height);
+    width: var(--canvas-width);
+}
+
+
+#notes-input{
+    border:none;
+    height: 99%;
+    width: var(--canvas-width);
+}
+
+
 /*Setting sizes of network panels would not be needed here
 if PR(https://github.com/iVis-at-Bilkent/newt/pull/223) is merged*/
 .network-panel {
