@@ -40,7 +40,14 @@ TripsGeneralInterfaceAgent.prototype.listenToMessages = function(){
 
     this.socket.on('message', (data) => {
 
-        if(data.userId != this.agentId) {
+        //check if Bob is in the targets list of the message:
+        let isBobChecked = false;
+        data.targets.forEach((target)=>{
+            if (target.id === 'Bob123')
+                isBobChecked = true;
+        });
+
+        if(data.userId != this.agentId && isBobChecked) {
             let wizardMode = document.getElementById('wizard-mode').checked;
 
             if(wizardMode && data.comment.toUpperCase().indexOf("@BOB")> -1 || !wizardMode){  //trim the @bob part

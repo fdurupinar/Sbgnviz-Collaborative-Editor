@@ -41,7 +41,17 @@ app.on('model', function (model) {
 
         let userId = model.get('_session.userId');
 
-        return msg.userId === userId;
+        //make sure userId is in targets list
+        // let isUserChecked = false;
+        // if(!msg.targets) //if no targets are defined, take user as an intended target by default
+        //     isUserChecked = true;
+        // else {
+        //     msg.targets.forEach((target) => {
+        //         if (target.id === userId)
+        //             isUserChecked = true;
+        //     });
+        // }
+        return msg.userId === userId; //&& isUserChecked;
     });
 
 });
@@ -974,16 +984,33 @@ app.proto.listenToModelOperations = function(model){
 
     });
 
-
     let timeSort = function (a, b) {
         return (a != null ? a.date : void 0) - (b != null ? b.date : void 0);
     };
+
 
     return model.sort('_page.doc.messages', timeSort).ref('_page.list');
 
 };
 
 
+app.proto.isUserInTargets = function(targets){
+
+    let userId = this.model.get('_session.userId');
+
+    console.log(targets);
+    if(!targets)
+        return true;
+
+    let isTarget = false;
+
+    targets.forEach((target) =>{
+        if(target.id == userId)
+            isTarget = true;
+    });
+
+    return isTarget;
+}
 app.proto.addCellularLocation = function(genes, compartment, cyId) {
     if (!cyId)
         cyId = appUtilities.getActiveNetworkId();

@@ -2653,7 +2653,9 @@
                             <ul id="messages" as="list">
                                 <!--on-change = "onScroll()">-->
                                 {{each _page.list as #message}}
-                                <view is="chat-message"></view>
+                                {{if isUserInTargets(#message.targets)}}
+                                    <view is="chat-message"></view>
+                                {{/if}}
                                 {{/each}}
                             </ul>
 
@@ -2768,6 +2770,7 @@
                         <table class = "message" align="center" valign="center">
                             <tbody>
                             <tr>
+
                                 <td style = "font-size:medium; color:{{_page.doc.users[#message.userId].colorCode}};  padding : 5px">
                                     {{#message.userName}}
                                 </td>
