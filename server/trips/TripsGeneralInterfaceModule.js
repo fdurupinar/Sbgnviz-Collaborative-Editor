@@ -31,6 +31,11 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
 
     }
 
+    disconnect(){
+        console.log("general interface disconnect");
+        super.disconnect();
+    }
+
     /***
      * When socket changes, update the listeners on that socket
      */

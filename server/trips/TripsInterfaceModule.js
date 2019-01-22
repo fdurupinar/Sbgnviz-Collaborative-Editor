@@ -53,6 +53,7 @@ class TripsInterfaceModule {
 
     isConnectedToTrips() {
 
+
         if(this.tm && this.tm.socket && this.tm.socket.stream && this.tm.socket.stream.readable )
             return true;
 
@@ -74,6 +75,9 @@ class TripsInterfaceModule {
     }
 
     disconnect(){
+
+        console.log("Called disconnect");
+        console.log(this.tm.socket);
         this.tm.disconnect();
     }
 

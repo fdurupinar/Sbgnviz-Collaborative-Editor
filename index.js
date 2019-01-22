@@ -998,7 +998,7 @@ app.proto.isUserInTargets = function(targets){
 
     let userId = this.model.get('_session.userId');
 
-    console.log(targets);
+
     if(!targets || targets == '*')
         return true;
 
@@ -1379,7 +1379,6 @@ app.proto.connectTripsAgent = function(){
 
 
 app.proto.enterMessage = function(event){
-
 
     let userId = this.model.get('_session.userId');
     if (event.keyCode === 13 && !event.shiftKey) { //enter

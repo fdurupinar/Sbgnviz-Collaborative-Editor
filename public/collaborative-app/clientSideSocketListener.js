@@ -402,7 +402,12 @@ module.exports =  function(app) {
             app.socket.on("removeBob", function(data, callback){
 
                 if(app.tripsAgent) {
-                    app.tripsAgent.disconnect()
+
+                    app.tripsAgent.disconnect();
+                    if(callback) {
+                        console.log("there's a callback");
+                        callback();
+                    }
                 }
             });
         },

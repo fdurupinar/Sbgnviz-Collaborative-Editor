@@ -20,6 +20,9 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
 
        this.geneList = []; //list of molecules in the current pysb model
    }
+   disconnect(){
+       super.disconnect();
+   }
 
     /***
      * Gets the standardized name of the gene from an EKB XML string

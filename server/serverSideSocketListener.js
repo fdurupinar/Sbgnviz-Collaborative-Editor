@@ -443,12 +443,19 @@ module.exports.start = function(io, model, cancerDataOrganizer){
          */
         socket.on('resetConversationRequest', function(){
             let p = new Promise((resolve, reject) => {
-                if(tripsGeneralInterfaceInstance)resolve("success");
+                if(tripsGeneralInterfaceInstance && tripsGeneralInterfaceInstance.isConnectedToTrips())
+
+
+                    resolve("success");
             });
             p.then((val) => {
+
                 tripsGeneralInterfaceInstance.cleanModel();
 
             });
+
+            //Send this to agents listening to conversations,  such as Clare
+            io.in(socket.room).emit("conversationReset");
 
 
         });
@@ -696,6 +703,7 @@ module.exports.start = function(io, model, cancerDataOrganizer){
 
             if(callback) callback();
         });
+
 
         socket.on('agentCleanAllRequest',  function(data, callback){
             askHuman(data.userId, data.room,  "cleanAll", data, function(val){
@@ -947,8 +955,10 @@ module.exports.start = function(io, model, cancerDataOrganizer){
             if(tripsGeneralInterfaceInstance ) {
                 console.log("Remove Bob request");
 
-                askHuman(data.userId, data.room,  "removeBob", function(val){
+                askHuman(data.userId, data.room,  "removeBob", "",function(){
+                    console.log("burada olmali");
                     tripsGeneralInterfaceInstance.disconnect();
+
 
                 });
             }
@@ -973,6 +983,8 @@ module.exports.start = function(io, model, cancerDataOrganizer){
                 tripsVisualizationInterfaceInstance.updateWebSocket(socket);
             }
         });
+
+
     };
 
     /***

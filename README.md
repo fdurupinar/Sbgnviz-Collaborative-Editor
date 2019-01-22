@@ -55,10 +55,14 @@ npm install
 ```
 Running the server
 ------------------
+With Bob:
 ```
 node server
 ```
   ```
+Without Bob:
+node server -notrips
+
 
 In order to open a client enter `http://localhost:3000` in the address bar of your browser.
 
