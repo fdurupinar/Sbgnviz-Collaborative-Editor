@@ -999,7 +999,7 @@ app.proto.isUserInTargets = function(targets){
     let userId = this.model.get('_session.userId');
 
     console.log(targets);
-    if(!targets)
+    if(!targets || targets == '*')
         return true;
 
     let isTarget = false;
