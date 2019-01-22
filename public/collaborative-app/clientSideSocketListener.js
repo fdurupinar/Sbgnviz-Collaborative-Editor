@@ -405,7 +405,7 @@ module.exports =  function(app) {
 
                     app.tripsAgent.disconnect();
                     if(callback) {
-                        console.log("there's a callback");
+
                         callback();
                     }
                 }

@@ -76,8 +76,7 @@ class TripsInterfaceModule {
 
     disconnect(){
 
-        console.log("Called disconnect");
-        console.log(this.tm.socket);
+
         this.tm.disconnect();
     }
 

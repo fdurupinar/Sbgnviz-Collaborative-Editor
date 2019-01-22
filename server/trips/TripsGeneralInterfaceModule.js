@@ -32,7 +32,6 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
     }
 
     disconnect(){
-        console.log("general interface disconnect");
         super.disconnect();
     }
 

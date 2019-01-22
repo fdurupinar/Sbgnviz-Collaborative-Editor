@@ -953,10 +953,10 @@ module.exports.start = function(io, model, cancerDataOrganizer){
 
         socket.on('agentRemoveBobRequest', function(data){
             if(tripsGeneralInterfaceInstance ) {
-                console.log("Remove Bob request");
+
 
                 askHuman(data.userId, data.room,  "removeBob", "",function(){
-                    console.log("burada olmali");
+
                     tripsGeneralInterfaceInstance.disconnect();
 
 
