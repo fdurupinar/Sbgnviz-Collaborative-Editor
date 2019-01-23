@@ -42,10 +42,14 @@ TripsGeneralInterfaceAgent.prototype.listenToMessages = function(){
 
         //check if Bob is in the targets list of the message:
         let isBobChecked = false;
-        data.targets.forEach((target)=>{
-            if (target.id === 'Bob123')
-                isBobChecked = true;
-        });
+        if(!data.targets || data.targets == '*')
+            isBobChecked = true;
+        else{
+            data.targets.forEach((target)=>{
+                if (target.id === 'Bob123')
+                    isBobChecked = true;
+            });
+        }
 
         if(data.userId != this.agentId && isBobChecked) {
             let wizardMode = document.getElementById('wizard-mode').checked;

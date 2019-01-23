@@ -656,8 +656,8 @@ module.exports.start = function(io, model, cancerDataOrganizer){
 
             askHuman(data.userId, data.room,  requestStr, data, function(val){
 
-                    console.log("here we are");
-                    console.log(data);
+
+
                 if (callback) callback(val);
             });
         });
