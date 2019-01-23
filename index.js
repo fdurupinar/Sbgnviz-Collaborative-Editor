@@ -1546,7 +1546,7 @@ app.proto.formatTime = function (message) {
         seconds = '0' + seconds;
     }
 
-    return hours + ':' + minutes + ':' + seconds;
+    return hours + ':' + minutes + ':' + seconds + ' (UTC)';
 };
 
 
