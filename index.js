@@ -41,16 +41,6 @@ app.on('model', function (model) {
 
         let userId = model.get('_session.userId');
 
-        //make sure userId is in targets list
-        // let isUserChecked = false;
-        // if(!msg.targets) //if no targets are defined, take user as an intended target by default
-        //     isUserChecked = true;
-        // else {
-        //     msg.targets.forEach((target) => {
-        //         if (target.id === userId)
-        //             isUserChecked = true;
-        //     });
-        // }
         return msg.userId === userId; //&& isUserChecked;
     });
 
@@ -998,9 +988,14 @@ app.proto.isUserInTargets = function(targets){
 
     let userId = this.model.get('_session.userId');
 
+    console.log(targets);
+
 
     if(!targets || targets == '*')
         return true;
+
+    //if there is no such user in the user list, this should also return true
+    // let users = this.model.get('_page.doc.userIds');
 
     let isTarget = false;
 
@@ -1401,6 +1396,7 @@ app.proto.enterMessage = function(event){
 app.proto.add = function (event, model) {
     let self = this;
 
+
     if(!model)
         model = this.model;
 
@@ -1414,17 +1410,33 @@ app.proto.add = function (event, model) {
     let users = model.get('_page.doc.userIds');
 
     let myId = model.get('_session.userId');
+
+    //hack
+    //if all the targets are selected let targets = '*', so when the page is reloaded, everyone can see the messages
+
+    let isAllUsersChecked = true;
     for(let i = 0; i < users.length; i++){
         let user = users[i];
         if(user === myId ||  document.getElementById(user).checked){
             targets.push({id: user});
         }
+        else
+            isAllUsersChecked = false;
     }
+
+
+    if(isAllUsersChecked)
+        targets = '*';
+
 
     let msgUserId = model.get('_session.userId');
     let msgUserName = model.get('_page.doc.users.' + msgUserId +'.name');
 
     comment.style = "font-size:large";
+
+
+
+
 
     let msg = {room: model.get('_page.room'),
         targets: targets,
@@ -1436,6 +1448,8 @@ app.proto.add = function (event, model) {
 
     //also lets server know that a client message is entered.
     self.socket.emit('getDate', msg, function(date){ //get the date from the server
+
+
         msg.date = date;
 
         model.add('_page.doc.messages', msg);
@@ -1518,11 +1532,12 @@ app.proto.formatTime = function (message) {
         return;
     }
     time = new Date(time);
-    hours = time.getHours();
 
-    minutes = time.getMinutes();
+    hours = time.getUTCHours();
 
-    seconds = time.getSeconds();
+    minutes = time.getUTCMinutes();
+
+    seconds = time.getUTCSeconds();
 
     if (minutes < 10) {
         minutes = '0' + minutes;
