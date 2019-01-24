@@ -477,24 +477,27 @@ app.proto.listenToNodeOperations = function(model){
     //     sbgn = sbgn.replace("libsbgn/0.3", "libsbgn/0.2");
     //     //
     //     self.socket.emit('BioPAXRequest', sbgn, "biopax", function(biopax) {
-    //         self.model.set('_page.doc.pysb.' + cyId + '.biopax', biopax.graph);
+    //         self.model.set('_page.doc.pysb.' + cyIdt + '.biopax', biopax.graph);
     //     });
     //
     // });
 
     model.on('all', '_page.doc.cy.*.nodes.*', function(cyId, id, op, val, prev, passed){
 
+
         if(docReady &&  !passed.user) {
             let node  = model.get('_page.doc.cy.' + cyId + '.nodes.' + id);
-            if(!node || !node.id){ //node is deleted
-                appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).remove();
+            if((!node || !node.id)){ //node is deleted
 
-                if(node.data.class === "compartment"){
-                    this.removeCellularLocation(node.data.class);
+
+                let cyNode =  appUtilities.getCyInstance(parseInt(cyId)).getElementById(id);
+                console.log(cyNode.data("class"));
+                if(cyNode && cyNode.data("class") === "compartment"){
+                    self.removeCellularLocation(cyNode.data("label"));
                 }
 
-                // why was this open??
-                // self.socket.emit('resetConversationRequest');
+                appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).remove();
+
             }
         }
         else {
@@ -987,9 +990,6 @@ app.proto.listenToModelOperations = function(model){
 app.proto.isUserInTargets = function(targets){
 
     let userId = this.model.get('_session.userId');
-
-    console.log(targets);
-
 
     if(!targets || targets == '*')
         return true;
