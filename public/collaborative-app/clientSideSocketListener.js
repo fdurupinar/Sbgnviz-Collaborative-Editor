@@ -310,8 +310,6 @@ module.exports =  function(app) {
                 document.getElementById('oncoprint-tab').style.display='block';
                 app.oncoprintHandler.updateData(data);
 
-
-
             });
 
 
@@ -331,32 +329,37 @@ module.exports =  function(app) {
 
 
                 appUtilities.getChiseInstance(data.cyId).updateGraph(jsonObj, () => {
+
                     app.modelManager.newModel( appUtilities.getActiveNetworkId(), "me"); //delete the existing model first so that ids don't get mixed up
+
+
+
                     app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(), data.cyId, appUtilities, "me");
 
 
                     appUtilities.setActiveNetwork(data.cyId);
 
-
-                    $("#perform-layout")[0].click();
-
-
-                    if (callback) callback("success");
-
-                    //open the network view and rerender it otherwise the graph becomes invisible
-                    $("#defaultOpen")[0].click();
-
                     setTimeout(()=> {
+
+                        $("#perform-layout")[0].click();
+
+                        //open the network view and rerender it otherwise the graph becomes invisible
+                        $("#defaultOpen")[0].click();
+
                         app.dynamicResize();
                         appUtilities.getCyInstance(data.cyId).panzoom().fit();
 
 
+                        if (callback) callback("success");
                     }, 1000);
+
+
 
                 });
 
                 //update cellular locations
                 app.updateCellularLocations();
+
 
             });
 

@@ -371,13 +371,16 @@ module.exports = function(modelManager, socket, userId, app){
                     var modelElList = [];
                     var paramList = [];
                     var paramListData = [];
+
                     args.eles.forEach(function (ele) {
-                        if(ele.isNode()){
-                            modelElList.push({id: ele.id(), isNode: true});
-                            ele.data("annotationsView", null);
-                            paramList.push(ele.position());
-                            //paramListData.push(ele.data());
-                        }
+                        if(ele.isNode()){ //check if element is in the model already, otherwise don't try to add it
+                            // if(modelManager.isNodeInModel(cyId, ele.id()){
+                                modelElList.push({id: ele.id(), isNode: true});
+                                ele.data("annotationsView", null);
+                                paramList.push(ele.position());
+                                //paramListData.push(ele.data());
+                            }
+                        // }
                     });
 
                     modelManager.changeModelElementGroupAttribute("position", modelElList, cyId, paramList,  "me");

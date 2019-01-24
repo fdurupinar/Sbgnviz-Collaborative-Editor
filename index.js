@@ -225,11 +225,6 @@ app.proto.create = function (model) {
 
     this.modelManager.setUserTyping(model.get('_session.userId'), false);
 
-
-
-
-
-
     // this.modelManager.setName( model.get('_session.userId'),name);
 
 
@@ -256,6 +251,7 @@ app.proto.create = function (model) {
     cyIds.forEach((cyId) => {
         if(parseInt(cyId) !== parseInt(appUtilities.getActiveNetworkId())) //tab 0: initial tab
             appUtilities.createNewNetwork(parseInt(cyId)); //opens a new tab
+
         this.loadCyFromModel(cyId, function (isModelEmpty) {
         });
     });
@@ -394,10 +390,7 @@ app.proto.loadCyFromModel = function(cyId, callback){
     if (jsonArr) {
 
         //Updates data fields and sets style fields to default
-        appUtilities.getChiseInstance(parseInt(cyId)).updateGraph({
-            nodes: jsonArr.nodes,
-            edges: jsonArr.edges
-        }, function(){
+        appUtilities.getChiseInstance(parseInt(cyId)).updateGraph({nodes: jsonArr.nodes, edges: jsonArr.edges}, function(){
             //Update position fields separately
             appUtilities.getCyInstance(parseInt(cyId)).nodes().forEach(function(node){
 
@@ -482,6 +475,9 @@ app.proto.listenToNodeOperations = function(model){
     //
     // });
 
+
+
+
     model.on('all', '_page.doc.cy.*.nodes.*', function(cyId, id, op, val, prev, passed){
 
 
@@ -491,7 +487,6 @@ app.proto.listenToNodeOperations = function(model){
 
 
                 let cyNode =  appUtilities.getCyInstance(parseInt(cyId)).getElementById(id);
-                console.log(cyNode.data("class"));
                 if(cyNode && cyNode.data("class") === "compartment"){
                     self.removeCellularLocation(cyNode.data("label"));
                 }
@@ -537,7 +532,6 @@ app.proto.listenToNodeOperations = function(model){
     });
 
     model.on('all', '_page.doc.cy.*.nodes.*.position', function(cyId, id, op, pos,prev, passed){
-
 
 
         if(docReady && !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0) {

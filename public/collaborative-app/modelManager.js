@@ -407,7 +407,33 @@ class ModelManager{
 
         return nodeArr;
     }
+    getModelNodes(cyId) {
+        let nodes = this.model.get('documents.' + this.docId + '.cy.' + cyId + '.nodes');
+        return nodes;
+    }
 
+
+    isNodeInModel(cyId, nodeId){
+        let nodesArr = this.getModelNodesArr(cyId);
+
+        for(let i = 0; i < nodesArr.length; i++){
+            if(nodesArr[i].id == nodeId)
+                return true;
+        }
+
+        return false;
+    }
+
+    isEdgeInModel(cyId, edgeId) {
+        let edgesArr = this.getModelEdgesArr(cyId);
+
+        for (let i = 0; i < edgesArr.length; i++) {
+            if (edgesArr[i].id == edgeId)
+                return true;
+        }
+
+        return false;
+    }
 
     getModelEdgePathStr(id, cyId){
         return 'documents.' + this.docId + '.cy.' + cyId +'.edges.' + id;
@@ -700,6 +726,10 @@ class ModelManager{
     }
 
     getModelEdgeAttribute(attStr, edgeId, cyId){
+
+        if(!this.isEdgeInModel(cyId, edgeId))
+            return;
+
         let edgePathStr = this.getModelEdgePathStr(edgeId, cyId);
         let edgePath = this.model.at(edgePathStr);
 
@@ -708,6 +738,9 @@ class ModelManager{
     //attStr: attribute namein the model
     //historyData is for  sbgnStatesAndInfos only
     changeModelNodeAttribute (attStr, nodeId, cyId, attVal, user, noHistUpdate) { //historyData){
+
+        if(!this.isNodeInModel(cyId, nodeId))
+            return;
 
         let nodePathStr = this.getModelNodePathStr(nodeId, cyId);
         let nodePath = this.model.at(nodePathStr);
@@ -828,7 +861,12 @@ class ModelManager{
 
         }
 
+
+
+
         this.model.pass({user: user}).del(nodePathStr);
+
+
 
         return "success";
 
@@ -1026,6 +1064,12 @@ class ModelManager{
         }
 
 
+
+        this.model.pass({user: user}).del('documents.' + this.docId + '.cy.' + cyId +'.edges');
+        this.model.pass({user: user}).del('documents.' + this.docId + '.cy.' + cyId +'.nodes');
+
+
+
     }
 
 
@@ -1053,6 +1097,8 @@ class ModelManager{
 
         let cyPathStr = this.getModelCyPathStr(cyId);
         let nodes = this.model.get(cyPathStr +'.nodes');
+
+
 
         if (nodes == null)
             return null;
