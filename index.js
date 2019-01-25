@@ -1073,7 +1073,10 @@ app.proto.addCellularLocation = function(genes, compartment, cyId) {
         elements.forEach((el) => {
 
             if (!descs.contains(el)) { //el is not a descendant of this node, so add it into this
-                el.move({"parent": existingCompartment.id()});
+                // el.move({"parent": existingCompartment.id()});
+
+                chiseInst.changeParent(el, existingCompartment.id(), 0, 0);
+
                 el.updateStyle();
 
             }
@@ -1120,6 +1123,102 @@ app.proto.addCellularLocation = function(genes, compartment, cyId) {
 
 }
 
+
+app.proto.moveOutOfCellularLocation = function(genes, compartment, cyId){
+    if (!cyId)
+        cyId = appUtilities.getActiveNetworkId();
+
+
+    let cy = appUtilities.getCyInstance(cyId);
+    let chiseInst = appUtilities.getChiseInstance(cyId);
+
+
+
+    //make sure they are unselected
+    cy.elements().unselect();
+
+    let elements = [];
+
+
+    if (genes === 'ont::all') {
+        cy.elements().select();
+        cy.nodes().forEach((el) => elements.push(el));
+    }
+    else {
+        genes.forEach((gene) => {
+            let els = this.visHandler.findAllNodesFromLabel(gene, cy.nodes());
+            els.forEach((el) => elements.push(el));
+        });
+
+        //unselect all others
+        elements.forEach((el) => {
+            if (el.isNode()) {
+                el.select();
+
+                //select its parents as well
+                let parentId = el.data('parent');
+                while (parentId) {
+                    let parentEl = cy.getElementById(parentId);
+                    parentEl.select();
+                    elements.push(parentEl);
+                    parentId = parentEl.data('parent');
+                }
+            }
+        });
+
+        let nodes = cy.nodes(':selected');
+
+        // let extendedNodes = chiseInst.elementUtilities.getNeighboursOfNodes(nodes);
+        // // let extendedNodes = chiseInst.elementUtilities.extendNodeList(nodes); //processes
+        // extendedNodes.forEach((el) => el.select());
+
+    }
+
+
+    //format label, eliminate any w:: or ont:: i
+    let compartmentLabel = compartment.replace("W::", '');
+    compartmentLabel = compartmentLabel.replace("ONT::", '');
+
+
+    //check if compartment exists
+    let existingCompartment;
+    cy.nodes().forEach((node) => {
+        if (node.data("label") === compartmentLabel && node.isParent()) {
+            existingCompartment = node; //they should all be the same compartment as this process eliminates duplicates
+        }
+    });
+
+    if (existingCompartment) {
+        let descs = existingCompartment.descendants();
+
+        elements.forEach((el) => {
+
+            if (descs.contains(el)) { //el is actually a descendant of this node, so move it out
+                // el.move({"parent": null});
+
+
+                chiseInst.changeParent(el, null, 0, 0);
+                el.updateStyle();
+
+
+            }
+        });
+
+            setTimeout(() => {
+                $("#perform-layout").trigger('click');
+            }, 200);
+
+
+
+
+    }
+
+    //unselect back
+    cy.elements().unselect();
+
+
+
+}
 
 app.proto.removeCellularLocation = function(location) {
     this.modelManager.removeModelCellularLocation(location);

@@ -473,6 +473,34 @@ module.exports =  function(app) {
 
             });
 
+            app.socket.on('moveOutOfCellularLocation', function (data, callback) {
+                try {
+
+
+                    app.moveOutOfCellularLocation(data.genes, data.compartment, data.cyId);
+                    app.modelManager.removeNodesFromCellularLocation(data.genes, data.compartment,  "me");
+
+                    // app.modelManager.addModelCellularLocation(data.genes, data.compartment, "me");
+
+
+                    //unselect back
+                    // cy.elements().unselect();
+
+                    //remove highlights
+                    // chiseInst.removeHighlights();
+
+
+                    if (callback) callback("success");
+                }
+                catch (e) {
+                    console.log(e);
+                    if (callback) callback();
+
+                }
+
+            });
+
+
 
         },
 

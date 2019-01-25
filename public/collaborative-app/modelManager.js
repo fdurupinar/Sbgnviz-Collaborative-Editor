@@ -1288,7 +1288,6 @@ class ModelManager{
     }
 
 
-
     setRollbackPoint (cyId) {
         let modelCy = this.getModelCy(cyId);
         this.model.set('documents.' + this.docId + '.prevCy.' + cyId, modelCy);
@@ -1320,6 +1319,18 @@ class ModelManager{
     removeModelCellularLocation(location, user, noHistUpdate) {
         this.model.pass({user:user}).remove('documents.' + this.docId +'.cellularLocations', location);
 
+    }
+
+    removeNodesFromCellularLocation(genes, location, user, noHistUpdate){
+        let modelGenes = this.model.get('documents.' + this.docId +'.cellularLocations.' + location);
+
+
+        let filteredGenes = modelGenes.filter(function(val, ind, arr){
+           return genes.indexOf(val) < 0
+        });
+
+    //    reassign genes
+        this.model.set('documents.' + this.docId +'.cellularLocations.' + location, filteredGenes);
     }
 
 }

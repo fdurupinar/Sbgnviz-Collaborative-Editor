@@ -107,6 +107,27 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
         });
 
 
+        pattern = {0: 'request', 1: '&key', content: ['put-out-of-compartment', '.', '*']};
+        this.tm.addHandler(pattern, (text) => {
+
+            let genes;
+            let termStr =  text.content[2];
+
+            if(termStr.toLowerCase() === 'ont::all')
+                genes = "ont::all";
+            else
+                genes = this.extractGeneNamesFromEkb(termStr);
+
+            let compartment = trimDoubleQuotes(text.content[4]);
+            this.askHuman(this.agentId, this.room, "moveOutOfCellularLocation", {genes: genes, compartment:compartment},  () => {
+                this.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
+            });
+
+
+
+        });
+
+
         pattern = {0: 'request', 1: '&key', content: ['get-common-cellular-location', '.', '*']};
         this.tm.addHandler(pattern, (text) => {
 
