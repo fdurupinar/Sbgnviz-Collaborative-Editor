@@ -40,27 +40,37 @@ TripsGeneralInterfaceAgent.prototype.listenToMessages = function(){
 
     this.socket.on('message', (data) => {
 
-        //check if Bob is in the targets list of the message:
-        let isBobChecked = false;
-        if(!data.targets || data.targets == '*')
-            isBobChecked = true;
-        else{
-            data.targets.forEach((target)=>{
-                if (target.id === 'Bob123')
-                    isBobChecked = true;
-            });
+        if(this.isIntendedForBob(data)){
+            let msg = data.comment.replace(/@[bB][Oo][bB]/, ""); //clean the message anyway
+            this.relayMessage(msg);
         }
 
-        if(data.userId != this.agentId && isBobChecked) {
-            let wizardMode = document.getElementById('wizard-mode').checked;
-
-            if(wizardMode && data.comment.toUpperCase().indexOf("@BOB")> -1 || !wizardMode){  //trim the @bob part
-                let msg  = data.comment.replace(/@[bB][Oo][bB]/, ""); //clean the message anyway
-                this.relayMessage(msg);
-            }
-
-        }
     });
+}
+
+TripsGeneralInterfaceAgent.prototype.isIntendedForBob = function(data){
+
+    let isBobChecked = false;
+    if(!data.targets || data.targets == '*')
+        isBobChecked = true;
+    else{
+        data.targets.forEach((target)=>{
+            if (target.id === 'Bob123')
+                isBobChecked = true;
+        });
+    }
+
+    if(data.userId != this.agentId && isBobChecked) {
+        let wizardMode = document.getElementById('wizard-mode').checked;
+
+        if(wizardMode && data.comment.toUpperCase().indexOf("@BOB")> -1 || !wizardMode) {  //trim
+            return true;
+        }
+
+    }
+
+    return false;
+
 }
 
 

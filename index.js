@@ -971,6 +971,19 @@ app.proto.listenToModelOperations = function(model){
 
     });
 
+    model.on('change', '_page.doc.messages.*', function ( id, msg, prev,passed) {
+
+
+
+        if (!passed.user && self.tripsAgent && self.tripsAgent.isIntendedForBob((msg))) {
+            msg.sentToBob = true;
+            self.model.pass({user:"me"}).set('_page.doc.messages.'+ id, msg);
+        }
+
+
+    });
+
+
     let timeSort = function (a, b) {
         return (a != null ? a.date : void 0) - (b != null ? b.date : void 0);
     };

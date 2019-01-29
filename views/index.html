@@ -2779,11 +2779,24 @@
                                 </td>
 
                             </tr>
-                            <tr><td  style = "padding : 5px; font-size:medium">
+                            <tr>
+                                <td  style = "padding : 5px; font-size:medium">
 
                                     {{ unescaped #message.comment}}
 
-                            </td>
+                                </td>
+                                <td style="float:right">
+                                    <!--Image indicating if message is checked-->
+                                    {{if #message.sentToBob}}
+
+                                        <label for="message-sent-indicator">
+                                            <i class="fa fa-check-circle"></i>
+                                        </label>
+
+                                        <div id = "message-sent-indicator"></div>
+
+                                    {{/if}}
+                                </td>
                             </tr>
                             </tbody>
                         </table>
