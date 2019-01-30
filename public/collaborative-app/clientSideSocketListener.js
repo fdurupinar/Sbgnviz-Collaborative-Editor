@@ -36,6 +36,12 @@ module.exports =  function(app) {
                 self.cleanAll(callback);
             });
 
+
+            app.socket.on('cleanModel', function ( data, callback) {
+
+                self.cleanModel(callback);
+            });
+
             app.socket.on('runLayout', function (data, callback) {
                 try {
                     appUtilities.setActiveNetwork(data.cyId);
@@ -504,6 +510,36 @@ module.exports =  function(app) {
 
         },
 
+
+        cleanModel: function( callback){
+            try {
+
+                let cyIds = app.modelManager.getCyIds();
+
+                cyIds.forEach(function(cyId) {
+                    console.log(cyId);
+                    appUtilities.getCyInstance(cyId).remove(appUtilities.getCyInstance(cyId).elements());
+                    app.modelManager.newModel(cyId, "me"); //do not delete cytoscape, only the model
+
+                });
+
+
+                appUtilities.closeOtherNetworks(0);
+
+                app.model.set('_page.doc.images', null);
+
+                app.dynamicResize(); //to clean the canvas
+
+                // app.model.set('_page.doc.provenance', null);
+
+                if (callback) callback("success");
+            }
+            catch (e) {
+                console.log(e);
+                if(callback) callback();
+
+            }
+        },
 
         cleanAll: function( callback){
             try {

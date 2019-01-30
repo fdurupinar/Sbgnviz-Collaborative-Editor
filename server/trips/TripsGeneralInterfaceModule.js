@@ -344,6 +344,40 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
         });
 
         //this will clean the image tabs and sbgn model
+        this.askHuman(this.agentId, this.room, "cleanModel",{},  function (val) {
+        });
+
+
+        this.sendResetCausalityRequest();
+    }
+
+
+    //Similar to clean model, but also cleans the provenance
+    cleanAll(){
+        let responseHeaders = {
+            "access-control-allow-origin": "*",
+            "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
+            "access-control-allow-headers": "content-type, accept",
+            "access-control-max-age": 10,
+            "Content-Type": "application/json"
+        };
+
+        //The socket connection is between the interface and the agent, so we cannot directly emit messages
+        //we must ask the client with the browser to do it for us
+        //Reset through clic
+        request({
+            url: 'http://localhost:8000/clic/initiate-reset', //URL to hit
+            headers: responseHeaders,
+            form: ''
+
+        }, function (error) {
+
+            if (error) {
+                console.log(error);
+            }
+        });
+
+        //this will clean the image tabs and sbgn model
         this.askHuman(this.agentId, this.room, "cleanAll",{},  function (val) {
         });
 
