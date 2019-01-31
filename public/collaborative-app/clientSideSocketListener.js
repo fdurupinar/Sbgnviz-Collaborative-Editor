@@ -306,7 +306,7 @@ module.exports =  function(app) {
                     $("#perform-layout")[0].click();
 
                     if (callback) callback("success");
-                });
+                }, true);
 
 
             });
@@ -347,8 +347,9 @@ module.exports =  function(app) {
 
                     setTimeout(()=> {
 
-                        $("#perform-layout")[0].click();
+                        // $("#perform-layout")[0].click();
 
+                        // app.callLayout(data.cyId);
                         //open the network view and rerender it otherwise the graph becomes invisible
                         $("#defaultOpen")[0].click();
 
@@ -361,7 +362,7 @@ module.exports =  function(app) {
 
 
 
-                });
+                }, true);
 
                 //update cellular locations
                 app.updateCellularLocations();

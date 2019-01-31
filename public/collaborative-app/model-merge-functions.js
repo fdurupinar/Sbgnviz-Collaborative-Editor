@@ -34,7 +34,7 @@ module.exports = function(){
                     if (callback) callback("success");
                 }, 1000);
 
-            });
+            }, true);
         },
 
         //Merge an array of json objects to output a single json object.
@@ -63,7 +63,7 @@ module.exports = function(){
                     if (callback) callback();
                 }, 1000);
 
-            });
+            }, true);
 
             return {sentences: sentenceNodeMap, idxCards: idxCardNodeMap};
         },

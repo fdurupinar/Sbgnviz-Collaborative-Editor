@@ -92,7 +92,6 @@ app.get('/:docId', function (page, model, arg, next) {
             // //chat related
             model.set('_page.room', room);
 
-
             //
             model.set('_page.durations', [{name: 'All', id: -1}, {name: 'One day', id: ONE_DAY}, {
                 name: 'One hour',
@@ -208,6 +207,7 @@ app.proto.create = function (model) {
 
     let id = model.get('_session.userId');
 
+    console.log("Session id is : " + id );
     let url = document.URL;
     if(url[url.length-1] === '#')
         url = url.substring(0, url.length-1);
@@ -221,17 +221,18 @@ app.proto.create = function (model) {
     window.testApp = this;
     window.sessionUserId = model.get('_session.userId');
 
-    this.modelManager.addUser(model.get('_session.userId'));
 
-    this.modelManager.setUserTyping(model.get('_session.userId'), false);
+    this.modelManager.addUser(id);
 
-    // this.modelManager.setName( model.get('_session.userId'),name);
+    //name is assigned in the modelmanager
+    let userNameModel = this.modelManager.getName(id);
 
+    this.modelManager.setUserTyping(id, false);
 
     this.dynamicResize();
 
     //Notify server about the client connection
-    this.socket.emit("subscribeHuman", { userName:name, room:  model.get('_page.room'), userId: id});
+    this.socket.emit("subscribeHuman", { userName:userNameModel, room:  model.get('_page.room'), userId: id});
 
     this.agentSocket = require('./public/collaborative-app/clientSideSocketListener')(this);
     this.agentSocket.listen();
@@ -276,9 +277,13 @@ app.proto.create = function (model) {
 
     this.atBottom = true;
 
-   
+
+    //sort session ids
+
     setTimeout(()=>{
         let userIds = this.modelManager.getUserIds();
+
+
         let noTrips = model.get('_page.doc.noTrips');
         if(!noTrips &&  userIds.indexOf(BobId) < 0) {
 
@@ -413,7 +418,7 @@ app.proto.loadCyFromModel = function(cyId, callback){
 
             if(callback) callback(false);
 
-        });
+        }, true);
 
 
 
@@ -934,9 +939,10 @@ app.proto.listenToModelOperations = function(model){
 
             chiseInst.updateGraph(jsonObj, function() {
                 self.modelManager.initModel(chiseInst.getCy().nodes(), chiseInst.getCy().edges(), chiseInst.cyId, appUtilities, "me");
-                $("#perform-layout").trigger('click');
+                // $("#perform-layout").trigger('click');
+                self.callLayout(chiseInst.cyId);
 
-            });
+            }, true);
 
     }); //opens a new tab
 
@@ -1125,7 +1131,8 @@ app.proto.addCellularLocation = function(genes, compartment, cyId) {
             }
 
             setTimeout(() => {
-                $("#perform-layout").trigger('click');
+                this.callLayout(cyId);
+                // $("#perform-layout").trigger('click');
             }, 200);
 
         }
@@ -1220,7 +1227,8 @@ app.proto.moveOutOfCellularLocation = function(genes, compartment, cyId){
         });
 
             setTimeout(() => {
-                $("#perform-layout").trigger('click');
+                this.callLayout(cyId);
+                // $("#perform-layout").trigger('click');
             }, 200);
 
 
@@ -1660,6 +1668,15 @@ app.proto.formatObj = function(obj){
     return JSON.stringify(obj, null, '\t');
 };
 
+
+app.proto.callLayout = function(cyId){
+
+
+    var currentLayoutProperties = appUtilities.getScratch(appUtilities.getCyInstance(cyId), 'currentLayoutProperties');
+    appUtilities.getChiseInstance(cyId).performLayout(currentLayoutProperties);
+
+
+}
 
 app.proto.dynamicResize = function () {
     // get window inner width and inner height that includes scrollbars when they are rendered
