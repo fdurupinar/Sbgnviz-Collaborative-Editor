@@ -352,7 +352,7 @@ input[type="file"] {
     overflow: hidden;
     /*background: #fefefe;*/
     background: #ececec;
-
+    /*overflow-y: auto;*/
     border: 1px solid #dddddd;
 
 }
