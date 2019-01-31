@@ -2661,16 +2661,39 @@
                                 {{/each}}
                             </ul>
 
+
                             <button id = "clear-history" class = "btn  btn-mini" on-click ="clearHistory()">Clear chat </button>
 
 
 
                             <!--</div>-->
                             <div id="inputs">
-                                User name: <input id="inputs-name" value="{{_page.doc.users[_session.userId].name}}">
-                                <b>  Wizard mode</b> <input type="checkbox" id = "wizard-mode" on-change="updateWizardMode($event)" >
-                                <!--<button id = "change-user-color" class = "btn btn-mini" on-click ="changeColorCode()">New user color</button>-->
-                                <button id = "reset-conversation" class = "btn btn-info btn-mini" on-click = "resetConversationOnTrips()">Reset Conversation</button>
+                                <table style = "width: 90%;">
+                                    <tbody>
+
+                                    <tr>
+                                        <td>
+                                        User name: <input id="inputs-name" value="{{_page.doc.users[_session.userId].name}}">
+                                        </td>
+                                        <td style="float:right" >
+                                            <b>  Wizard mode</b> <input type="checkbox" id = "wizard-mode" on-change="updateWizardMode($event)" >
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                        <button id = "change-user-color" class = "btn btn-mini" on-click ="changeColorCode()">New user color</button>
+                                        </td>
+                                        <td style="float:right">
+                                            <button id = "reset-conversation" class = "btn btn-info btn-mini" on-click = "resetConversationOnTrips()">Reset Conversation</button>
+                                        </td>
+                                    </tr>
+
+                                    </tbody>
+                                </table>
+
+
+
+
 
                                 <form id="inputs-form" on-submit="add($event)">
                                     <!--<form id="inputs-form">-->
