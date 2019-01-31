@@ -1,340 +1,192 @@
-
 [
-  {
-      "text": "Hello"
-  },
-
-
-  {
-    "text": "____Demo Location Update____",
-    "disabled": true
-
-  },
-
-
-  {
-    "text": "Let's build a model."
-
-  },
-  {
-    "text": "AKT1 phosphorylates MAPK1."
-
-  },
-  {
-
-    "text": "EGF binds EGFR."
-
-  },
-  {
-    "text": "Let's move AKT1 and MAPK1 into mitochondrion."
-  },
-
-  {
-    "text": "Phosphorylated MAPK1 is active."
-  },
-
-  {
-    "text": "FEN1 phosphorylates AKT1."
-  },
-
-  {
-    "text": "Move all into nucleus."
-  },
-  {
-    "text": "Move AKT1 out of nucleus."
-  },
-
-  {
-    "text": "Let's highlight the downstream of AKT1."
-  },
-
-  {
-    "text": "____Demo Visualization____",
-    "disabled": true
-
-  },
-
-
-  {
-    "text": "Let's build a model."
-
-  },
-  {
-    "text": "AKT1 phosphorylates MAPK1."
-
-  },
-  {
-    "text": "Let's show AKT1 on the top."
-  },
-
-  {
-    "text": "Let's move phosphorylated MAPK1 to the bottom."
-  },
-
-  {
-    "text": "Let's highlight the downstream of AKT1."
-  },
-
-  {
-    "text": "Let's highlight the upstream of phosphorylated MAPK1."
-  },
-
-  {
-    "text": "Let's show phosphorylated MAPK1 on the top."
-  },
-  {
-    "text": "Let's move mitochondrion elements to the top."
-  },
-  {
-    "text": "____Demo Causality____",
-    "disabled": true
-
-  },
-  {
-    "text": "How does BRAF affect MAPK1?"
-
-  },
-  {
-    "text": "How does MAPK1 affect BRAF?"
-
-  },
-  {
-    "text": "What is the path between BRAF and MAPK1?"
-  },
-
-  {
-    "text": "What genes does MAPK1 phosphorylate?"
-  },
-
-  {
-    "text": "What pathways affect BRAF?"
-  },
-
-  {
-    "text": "What genes activate ILK?"
-  },
-
-  {
-    "text": "How does KRAS activate MAPK3?"
-  },
-  {
-    "text": "____BMEG____",
-    "disabled": true
-
-  },
-  {
-    "title": "Finds drugs that perform significantly better on killing cells with TP53 alterations compared to killing cells without TP53 alterations.",
-    "text": "What is the drug response on cells with TP53 alterations?"
-
-  },
-  {
-    "title": "Finds drugs that perform significantly better on killing cells with TP53 alterations compared to killing cells without TP53 alterations.",
-    "text": "What is the drug response for cells with TP53 alterations?"
-
-  },
-  {
-    "text": "What is the mutation frequency of EGFR in glioblastoma?"
-  },
-
-  {
-    "text": "What is the mutation frequency of TP53 in ovarian serous cystadenocarcinoma?"
-  },
-
-  {
-    "text": "Show me the mutations of BRAF in breast cancer."
-  },
-
-  {
-    "text": "What are the mutations of PTEN in breast cancer?"
-  },
-
-  {
-    "text": "____Misc____",
-    "disabled": true
-
-  },
-  {
-    "text": "What is the most likely cellular location of AKT1 and BRAF?"
-
-  },
-  {
-    "title": "Finds genes that modify the function of both AKT1 and BRAF.",
-    "text": "What are the common upstreams of AKT1 and BRAF?"
-
-  },
-  {
-    "title": "Finds genes that modify the function of both AKT1 and BRAF.",
-    "text": "Are there common upstreams of AKT1 and BRAF"
-  },
-
-  {
-    "title": "Finds genes that modify the function of  AKT1, BRAF and MAPK1.",
-    "text": "What are the common upstreams of AKT1, BRAF and MAPK1?"
-  },
-
-  {
-    "title": "Finds genes with alterations that have significantly low overlap with the alterations of CDH1.",
-    "text": "What genes are mutually exclusive with CDH1 for breast cancer?"
-  },
-
-  {
-    "title": "Finds genes with alterations that have significantly low overlap with the alterations of TP53.",
-    "text": "What are the mutually exclusive genes with TP53 for breast cancer?"
-  },
-  {
-    "title": "Shows MutSig results to identify genes that were mutated more often than expected by chance.",
-    "text": "What is the mutation significance of TP53 for lung cancer?"
-  },
-  {
-    "title": "Shows MutSig results to identify genes that were mutated more often than expected by chance.",
-    "text": "WWhat is the mutation significance of TP53 in ovarian serous cystadenocarcinoma?"
-  },
-  {
-    "title": "Shows MutSig results to identify genes that were mutated more often than expected by chance.",
-    "text": "What is the mutation significance of PTEN in pancreatic adenocarcinoma?"
-  },
-  {
-    "title": "Shows MutSig results to identify genes that were mutated more often than expected by chance.",
-    "text": "What is the mutation significance of BRAF in prostatic adenocarcinoma?"
-  },
-
-  {
-    "text": "____Model_____",
-    "disabled": true
-
-  },
-  {
-    "text": "MEK phosphorylates ERK."
-
-  },
-  {
-
-    "text": "EGF binds EGFR."
-
-  },
-  {
-
-    "text": "EGFR bound to EGF binds GRB2."
-
-  },
-  {
-
-    "text": "Phosphorylated ERK is active."
-
-  },
-  {
-
-    "text": "MAP2K1 phosphorylated at S220 phosphoryates MAPK1."
-
-  },
-  {
-
-    "text": "Active TP53 transcribes MDM2."
-
-  },
-  {
-
-    "text": "Undo"
-
-  },
-  {
-
-    "text": "Is phosphorylated MAPK1 always high?"
-
-  },
-  {
-
-    "text": "Is the amount of phosphorylated MAPK1 eventually high?"
-
-  },
-  {
-
-    "text": "Is the MAP2K1-MAPK1 complex formed?"
-
-  },
-  {
-
-    "text": "Is the amount of FOS ever high if we increase the amount of ELK1 by 10 fold?"
-
-  },
-  {
-
-    "text": "Does Vemurafenib decrease phosphorylated ERK in the model?"
-
-  },
-  {
-
-    "text": "Does Selumetinib decrease JUN in the model?"
-
-  },
-  {
-
-    "text": "How does KRAS regulate MAP2K1?"
-
-  },
-  {
-
-    "text": "How does HRAS activate MAPK3?"
-
-  },
-  {
-
-    "text": "Does phosphorylation at S222 activate MAP2K1?"
-
-  },
-  {
-
-    "text": "What drugs inhibit MAP2K1?"
-
-  },
-  {
-
-    "text": "Are there any drugs for BRAF?"
-
-  },
-  {
-
-    "text": "Does Vemurafenib inhibit BRAF?"
-
-  },
-  {
-    "text": "____TFTA_____",
-    "disabled": true
-
-  },
-  {
-
-    "text": "What are the targets of PLX-4720?"
-
-  },
-  {
-
-    "text": "Which transcription factors regulate frizzled8?"
-
-  },
-  {
-
-    "text": "Does TP53 target MDM2?"
-
-  },
-  {
-
-    "text": "What are the regulators of SRF?"
-
-  },
-  {
-
-    "text": "What transcription factors are shared by SRF, HRAS, and ELK1?"
-
-  },
-  {
-
-    "text": "Which pathways involve TAP1 and JAK1?"
-
-  },
-  {
-
-    "text": "What genes are in the prolactin signaling pathway?"
-
-  }
+ {
+  "text": "__Transcriptional regulation__",
+  "disabled": true
+ },
+ {
+  "text": "Does STAT3 regulate the c-fos gene?"
+ },
+ {
+  "text": "Does STAT3 regulate the c-fos gene in liver?"
+ },
+ {
+  "text": "Which transcription factors regulate frizzled8?"
+ },
+ {
+  "text": "Show me the evidence that kras regulates fzd8."
+ },
+ {
+  "text": "What genes does stat3 regulate?"
+ },
+ {
+  "text": "What transcription factors are shared by the SRF, HRAS, and elk1 genes?"
+ },
+ {
+  "text": "What genes are regulated by elk1 and srf?"
+ },
+ {
+  "text": "__Mechanism and path search__",
+  "disabled": true
+ },
+ {
+  "text": "What does MAP4K2 interact with?"
+ },
+ {
+  "text": "Does MAP2K1 activate MAPK1?"
+ },
+ {
+  "text": "What phosphorylates SOCS1?"
+ },
+ {
+  "text": "Does phosphorylation at T185 activate MAPK1?"
+ },
+ {
+  "text": "How does KRAS affect ELK1?"
+ },
+ {
+  "text": "What are the paths between MAPK3 and FOS?"
+ },
+ {
+  "text": "What pathways affect BRAF?"
+ },
+ {
+  "text": "__Drug targets__",
+  "disabled": true
+ },
+ {
+  "text": "What are the targets of PLX-4720?"
+ },
+ {
+  "text": "What drugs target BRAF?"
+ },
+ {
+  "text": "Does selumetinib target MAP2K2?"
+ },
+ {
+  "text": "__Entity type and family/complex membership__",
+  "disabled": true
+ },
+ {
+  "text": "What is Selumetinib?"
+ },
+ {
+  "text": "Is BRAF a kinase?"
+ },
+ {
+  "text": "Is SRF a transcription factor?"
+ },
+ {
+  "text": "What are the members of RAS?"
+ },
+ {
+  "text": "Is BRAF a member of the RAF family?"
+ },
+ {
+  "text": "__Model building__",
+  "disabled": true
+ },
+ {
+  "text": "Let\u2019s build a model"
+ },
+ {
+  "text": "Selumetinib inhibits MAP2K1"
+ },
+ {
+  "text": "Undo"
+ },
+ {
+  "text": "Remove the fact that MEK binds ERK from the model"
+ },
+ {
+  "text": "Active MAP2K1 phosphorylates MAPK1"
+ },
+ {
+  "text": "Phosphorylated MAPK1 is active"
+ },
+ {
+  "text": "DUSP dephosphorylates MAPK1 on T185"
+ },
+ {
+  "text": "Active MAPK1 activates ELK1"
+ },
+ {
+  "text": "Active ELK1 transcribes FOS"
+ },
+ {
+  "text": "__Model queries / simulations__",
+  "disabled": true
+ },
+ {
+  "text": "What is in the model?"
+ },
+ {
+  "text": "Does Selumetinib decrease JUN in the model?"
+ },
+ {
+  "text": "Is the amount of phosphorylated MAPK1 ever high?"
+ },
+ {
+  "text": "Is the amount of FOS always high if we increase the amount of ELK1 by 10 fold?"
+ },
+ {
+  "text": "__Cancer genomics__",
+  "disabled": true
+ },
+ {
+  "text": "What is the drug response on cells with TP53 alterations?"
+ },
+ {
+  "text": "What is the mutation frequency of EGFR in glioblastoma?"
+ },
+ {
+  "text": "What are the mutations of PTEN in breast cancer?"
+ },
+ {
+  "text": "What genes are mutually exclusive with CDH1 for breast cancer?"
+ },
+ {
+  "text": "__Cellular localization__",
+  "disabled": true
+ },
+ {
+  "text": "What is the most likely cellular location of AKT1 and BRAF?"
+ },
+ {
+  "text": "__Pathway membership__",
+  "disabled": true
+ },
+ {
+  "text": "What pathways involve SRF?"
+ },
+ {
+  "text": "Which KEGG pathways use SRF?"
+ },
+ {
+  "text": "Does the mTor pathway utilize SGK1?"
+ },
+ {
+  "text": "Which kinases are in the MAPK signaling pathway?"
+ },
+ {
+  "text": "What signaling pathways are shared by STAT3 and SRF?"
+ },
+ {
+  "text": "__Micro-RNA regulation__",
+  "disabled": true
+ },
+ {
+  "text": "What microRNAs target STAT3?"
+ },
+ {
+  "text": "Does miR-20b-5p target STAT3?"
+ },
+ {
+  "text": "What genes does miR-20b-5p target?"
+ },
+ {
+  "text": "What miRNAs most frequently regulate EGFR, SRF, STAT3, JAK2, and SMAD3?"
+ },
+ {
+  "text": "What genes are most frequently regulated by miR-335-5p, miR-155-5p, miR-145-5p and miR-20a-5p?"
+ }
 ]
