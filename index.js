@@ -1301,9 +1301,15 @@ app.proto.openPCQueryWindow = function(pc_url){
 app.proto.updateTripsMessage = function(){
 
     let e = document.getElementById("test-messages");
-    let msg = e.options[e.selectedIndex].text;
 
-    this.model.set('_page.newComment', msg);
+    try {
+        let msg = e.options[e.selectedIndex].text;
+
+        this.model.set('_page.newComment', msg);
+    }
+    catch(error){
+        console.log(error);
+    }
 };
 
 app.proto.resetConversationOnTrips = function(){

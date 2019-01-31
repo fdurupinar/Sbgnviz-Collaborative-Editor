@@ -2826,7 +2826,7 @@
 
                         <test-messages:>
 
-                            <select id = "test-messages" on-change="updateTripsMessage()">
+                            <select id = "test-messages" on-change="updateTripsMessage()" on-click="updateTripsMessage()">
                                 {{each _page.doc.sampleSentences as #sampleSentence}}
                                     {{if #sampleSentence.disabled}}
                                         <option disabled title={{#sampleSentence.title}}> {{#sampleSentence.text}}</option>
