@@ -1274,7 +1274,7 @@ class ModelManager{
 
         let newModelCy = this.model.get('documents.' + this.docId + '.cy.' + cyId );
 
-
+        
 
         if (!noHistUpdate) {
             this.updateHistory({opName: 'init', cyId: cyId, param: newModelCy, opTarget: 'model'});

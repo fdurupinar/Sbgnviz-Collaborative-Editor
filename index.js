@@ -276,7 +276,7 @@ app.proto.create = function (model) {
 
     this.atBottom = true;
 
-
+   
     setTimeout(()=>{
         let userIds = this.modelManager.getUserIds();
         let noTrips = model.get('_page.doc.noTrips');
@@ -408,6 +408,8 @@ app.proto.loadCyFromModel = function(cyId, callback){
             //
 
              // appUtilities.getCyInstance(parseInt(cyId)).panzoom().reset();
+
+            appUtilities.getCyInstance(parseInt(cyId)).panzoom().fit();
 
             if(callback) callback(false);
 
@@ -543,7 +545,7 @@ app.proto.listenToNodeOperations = function(model){
             appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).updateStyle();
 
             //parent as well
-            // appUtilities.getCyInstance(parseInt(cyId)).panzoom().fit();
+            appUtilities.getCyInstance(parseInt(cyId)).panzoom().fit();
 
         }
     });
@@ -1448,14 +1450,6 @@ app.proto.moveCompartment = function(){
 };
 
 
-
-// app.proto.lockSelected  = function(){
-//     cy.elements(':selected').lock();
-// }
-
-app.proto.unlockSelected  = function(){
-    cy.elements(':selected').unlock();
-}
 
 app.proto.connectTripsAgent = function(){
     let self = this;
