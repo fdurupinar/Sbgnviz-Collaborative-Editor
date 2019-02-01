@@ -93,6 +93,7 @@
 /*Setting sizes of network panels would not be needed here
 if PR(https://github.com/iVis-at-Bilkent/newt/pull/223) is merged*/
 .network-panel {
+    /*TODO: Relative causes problems with multiple tabs, but absolute causes problems with the  dockerized version where the canvas covers the whole screen on the second user*/
     /*position:absolute;*/
     position: relative;
     height: 100%;

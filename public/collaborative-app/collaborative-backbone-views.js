@@ -81,7 +81,7 @@ var PathsBetweenQueryView = Backbone.View.extend({
 
                     chiseInst.updateGraph(jsonObj, function() {
 
-                    });
+                    }, true);
 
                     // appUtilities.getChiseInstance(data.cyId).updateGraph(jsonObj, function(){
                     //     app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(), appUtilities, "me");
@@ -188,7 +188,7 @@ var PathsByURIQueryView = Backbone.View.extend({
 
                     chiseInst.updateGraph(jsonObj, function() {
 
-                    });
+                    }, true);
 
                     appUtilities.getActiveChiseInstance().endSpinner('paths-between-spinner');
 

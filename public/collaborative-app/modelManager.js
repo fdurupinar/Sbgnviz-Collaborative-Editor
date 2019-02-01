@@ -178,10 +178,15 @@ class ModelManager{
 
     }
 
+
+
     getFactoidModel(){
         return this.model.get('documents.' + this.docId + '.factoid');
     }
 
+    setOncoprint(val){
+        this.model.set('documents.' + this.docId + '.oncoprint', val);
+    }
     /***
      *
      * @param cmd  {opName, opTarget,  elType, elId, opAttr,param, prevParam}

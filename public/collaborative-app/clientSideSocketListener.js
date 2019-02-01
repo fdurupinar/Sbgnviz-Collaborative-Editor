@@ -313,6 +313,7 @@ module.exports =  function(app) {
 
             app.socket.on('displayOncoprint', function(data, callback){
 
+                app.modelManager.setOncoprint(data);
                 document.getElementById('oncoprint-tab').style.display='block';
                 app.oncoprintHandler.updateData(data);
 

@@ -118,6 +118,7 @@ app.get('/:docId', function (page, model, arg, next) {
             let wizardMode = model.at((docPath + '.wizardMode'));
             let sampleSentences = model.at((docPath + '.sampleSentences'));
             let notes = model.at((docPath + '.notes'));
+            let oncoprint = model.at((docPath + '.oncoprint'));
 
 
             pysb.subscribe(() =>{
@@ -168,6 +169,10 @@ app.get('/:docId', function (page, model, arg, next) {
             });
 
             notes.subscribe(() => {
+
+            });
+
+            oncoprint.subscribe(() => {
 
             });
             users.subscribe(() => {
@@ -872,6 +877,20 @@ app.proto.listenToModelOperations = function(model){
 
         }
     });
+
+
+    model.on('all', '_page.doc.oncoprint', function(op, data, prev, passed){
+
+        //once defined, keep it open
+        if(docReady &&  !passed.user) {
+
+            document.getElementById('oncoprint-tab').style.display='block';
+            self.oncoprintHandler.updateData(data);
+
+
+        }
+    });
+
 
 
     model.on('all', '_page.doc.cellularLocations.*', function(location, op, names, prev, passed){
