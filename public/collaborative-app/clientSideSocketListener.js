@@ -295,7 +295,6 @@ module.exports =  function(app) {
 
                 let chiseInst = appUtilities.createNewNetwork(); //opens a new tab
 
-
                 let jsonObj = chiseInst.convertSbgnmlTextToJson(data.graph);
 
                 chiseInst.updateGraph(jsonObj, function(){
@@ -313,7 +312,6 @@ module.exports =  function(app) {
 
             app.socket.on('displayOncoprint', function(data, callback){
 
-
                 let timeOut = 0;
                 if(document.getElementById('oncoprint-tab').style.visibility == 'hidden') {
                     timeOut = 2000;
@@ -322,23 +320,15 @@ module.exports =  function(app) {
 
                 setTimeout(()=> {
 
-
                     app.modelManager.setOncoprint(data);
                     app.oncoprintHandler.updateData(data);
-
-
 
                     }, timeOut
                 );
 
-
-
             });
 
-
-
             app.socket.on("displaySbgn", function(data, callback){
-
 
                 if(!data.cyId)
                     data.cyId = appUtilities.getActiveNetworkId();
