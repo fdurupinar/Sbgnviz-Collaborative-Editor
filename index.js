@@ -207,7 +207,7 @@ app.proto.create = function (model) {
     this.socket = io();
     this.notyView = window.noty({layout: "bottom",theme:"bootstrapTheme", text: "Please wait while model is loading."});
 
-
+    document.getElementById('oncoprint-tab').style.visibility='hidden';
     this.listenToUIOperations(model);
 
     let id = model.get('_session.userId');
@@ -884,9 +884,8 @@ app.proto.listenToModelOperations = function(model){
         //once defined, keep it open
         if(docReady &&  !passed.user) {
 
-            document.getElementById('oncoprint-tab').style.display='block';
+            document.getElementById('oncoprint-tab').style.visibility='visible';
             self.oncoprintHandler.updateData(data);
-
 
         }
     });
@@ -1330,11 +1329,13 @@ app.proto.updateTripsMessage = function(){
     let e = document.getElementById("test-messages");
 
     try {
+
         let msg = e.options[e.selectedIndex].text;
 
         this.model.set('_page.newComment', msg);
     }
     catch(error){
+        console.log(e.selectedIndex);
         console.log(error);
     }
 };

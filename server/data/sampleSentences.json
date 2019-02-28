@@ -1,4 +1,20 @@
 [
+  {
+    "text": "__Cancer genomics__",
+    "disabled": true
+  },
+  {
+    "text": "What is the drug response on cells with TP53 alterations?"
+  },
+  {
+    "text": "What is the mutation frequency of EGFR in glioblastoma?"
+  },
+  {
+    "text": "What are the mutations of PTEN in breast cancer?"
+  },
+  {
+    "text": "What genes are mutually exclusive with CDH1 for breast cancer?"
+  },
  {
   "text": "__Transcriptional regulation__",
   "disabled": true
@@ -127,22 +143,6 @@
  },
  {
   "text": "Is the amount of FOS always high if we increase the amount of ELK1 by 10 fold?"
- },
- {
-  "text": "__Cancer genomics__",
-  "disabled": true
- },
- {
-  "text": "What is the drug response on cells with TP53 alterations?"
- },
- {
-  "text": "What is the mutation frequency of EGFR in glioblastoma?"
- },
- {
-  "text": "What are the mutations of PTEN in breast cancer?"
- },
- {
-  "text": "What genes are mutually exclusive with CDH1 for breast cancer?"
  },
  {
   "text": "__Cellular localization__",

@@ -313,9 +313,25 @@ module.exports =  function(app) {
 
             app.socket.on('displayOncoprint', function(data, callback){
 
-                app.modelManager.setOncoprint(data);
-                document.getElementById('oncoprint-tab').style.display='block';
-                app.oncoprintHandler.updateData(data);
+
+                let timeOut = 0;
+                if(document.getElementById('oncoprint-tab').style.visibility == 'hidden') {
+                    timeOut = 2000;
+                    document.getElementById('oncoprint-tab').style.visibility = 'visible';
+                }
+
+                setTimeout(()=> {
+
+
+                    app.modelManager.setOncoprint(data);
+                    app.oncoprintHandler.updateData(data);
+
+
+
+                    }, timeOut
+                );
+
+
 
             });
 

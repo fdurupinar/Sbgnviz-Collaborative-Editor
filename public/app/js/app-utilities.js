@@ -833,7 +833,9 @@ appUtilities.setFileContent = function (fileName) {
         displayedSpan.appendChild(document.createTextNode(fileName));
     else displayedSpan.appendChild(document.createTextNode(fileName.substring(0, 34) + "...xml"));
 
-    displayedSpan.style.display = 'block';
+    //FUNDA
+    // displayedSpan.style.display = 'block';
+    displayedSpan.style.display = 'none';
     span.style.display = 'none';
 };
 

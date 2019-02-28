@@ -307,9 +307,7 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
             try {
 
                 let json = JSON.parse(data);
-
                 this.askHuman(this.agentId, this.room, "displayOncoprint", json, (val) => {
-
                 });
             }
             catch(e) {

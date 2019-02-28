@@ -34,7 +34,7 @@
     "jquery-expander": "1.7.0",
     "mongodb": "^2.2.36",
     "mousetrap": "^1.6.2",
-    "oncoprintjs": "^1.1.12",
+    "oncoprintjs": "^1.1.16",
     "onecolor": "^3.1.0",
     "pdf2text": "^1.1.0",
     "pegjs": "^0.10.0",

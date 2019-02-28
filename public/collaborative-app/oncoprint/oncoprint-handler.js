@@ -15,7 +15,7 @@ module.exports =  function(app) {
         initialize: function(width){
           oncoprint = new Oncoprint('#oncoprint-container', width);
 
-          this.updateData(ga_data);
+          // this.updateData(ga_data);
 
           this.listenToEvents();
         },
@@ -28,44 +28,45 @@ module.exports =  function(app) {
                 oncoprint.removeAllTracks();
 
 
-          let share_id = null;
+            let share_id = null;
 
-          for (let i = 0; i < data.length; i++) {
+            for (let i = 0; i < data.length; i++) {
 
-            let track_params = {
-              'rule_set_params':  geneticRules.genetic_rule_set_different_colors_no_recurrence,
-              'label': data[i].gene,
-              'target_group': 0,
-              'sortCmpFn': geneticComparator(),
-              'description': data[i].desc,
-              'na_z': 1.1,
-              'value_key': 'frequency',
-              'value_range': [0, 100],
+                let track_params = {
+                  'rule_set_params':  geneticRules.genetic_rule_set_different_colors_no_recurrence,
+                  'label': data[i].gene,
+                  'target_group': 0,
+                  'sortCmpFn': geneticComparator(),
+                  'description': data[i].desc,
+                  'na_z': 1.1,
+                  'value_key': 'frequency',
+                  'value_range': [0, 100],
 
-            };
-            let new_ga_id = oncoprint.addTracks([track_params])[0];
-            data[i].track_id = new_ga_id;
-            if (i === 0) {
-              share_id = new_ga_id;
+                };
+                let new_ga_id = oncoprint.addTracks([track_params])[0];
+                data[i].track_id = new_ga_id;
+                if (i === 0) {
+                  share_id = new_ga_id;
+                }
+                else {
+                  oncoprint.shareRuleSet(share_id, new_ga_id);
+                }
+
             }
-            else {
-              oncoprint.shareRuleSet(share_id, new_ga_id);
-            }
-          }
 
-          oncoprint.hideIds([], true);
-          oncoprint.keepSorted(false);
+            oncoprint.hideIds([], true);
+            oncoprint.keepSorted(false);
 
-          for (let i = 0; i < data.length; i++) {
-            oncoprint.setTrackData(data[i].track_id, data[i].data, 'sample');
-            oncoprint.setTrackInfo(data[i].track_id, "");
+            for (let i = 0; i < data.length; i++) {
+                oncoprint.setTrackData(data[i].track_id, data[i].data, 'sample');
+                oncoprint.setTrackInfo(data[i].track_id, "");
 
-            oncoprint.setTrackTooltipFn(data[i].track_id, function(data) {
-              return "<b>Sample: " + data.sample + "</b> <p>"+ data.disp_mut + "</p><br>";
+                oncoprint.setTrackTooltipFn(data[i].track_id, function(data) {
+                return "<b>Sample: " + data.sample + "</b> <p>"+ data.disp_mut + "</p><br>";
             });
-          }
-          // oncoprint.keepSorted(true);
-          oncoprint.releaseRendering();
+            }
+            oncoprint.keepSorted(false);
+            oncoprint.releaseRendering();
 
       },
 
