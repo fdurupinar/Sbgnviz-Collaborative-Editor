@@ -250,6 +250,8 @@ app.proto.create = function (model) {
     this.oncoprintHandler.initialize($('#oncoprint-container').width());
 
 
+
+
     //Loading cytoscape and clients
 
     let cyIds = this.modelManager.getCyIds();

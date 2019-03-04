@@ -1249,6 +1249,12 @@ class ModelManager{
             if(edgeData == null)
                 edgeData = edge._private.data;
 
+
+            //This is a workaround to handle (.) dots in mongo
+            if(edgeData.siteLocSet){ //dots in Pathway Commons links are causing problems
+                edgeData.siteLocSet = JSON.stringify(edgeData.siteLocSet);
+            }
+
             this.changeModelEdgeAttribute('data', edge.id(), cyId, edgeData, user, noHistUpdate);
         }
 

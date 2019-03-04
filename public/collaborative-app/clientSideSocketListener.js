@@ -305,16 +305,20 @@ module.exports =  function(app) {
                     $("#perform-layout")[0].click();
 
                     if (callback) callback("success");
+
                 }, true);
 
 
-            });
+
+                });
 
             app.socket.on('displayOncoprint', function(data, callback){
 
+
                 let timeOut = 0;
                 if(document.getElementById('oncoprint-tab').style.visibility == 'hidden') {
-                    timeOut = 2000;
+
+                    timeOut = 4000;
                     document.getElementById('oncoprint-tab').style.visibility = 'visible';
                 }
 
@@ -326,6 +330,7 @@ module.exports =  function(app) {
                     }, timeOut
                 );
 
+
             });
 
             app.socket.on("displaySbgn", function(data, callback){
@@ -336,10 +341,7 @@ module.exports =  function(app) {
 
                 appUtilities.getCyInstance(data.cyId).remove(appUtilities.getCyInstance(data.cyId).elements());
 
-
-
                 let jsonObj = appUtilities.getChiseInstance(data.cyId).convertSbgnmlTextToJson(data.sbgn);
-
 
                 appUtilities.getChiseInstance(data.cyId).updateGraph(jsonObj, () => {
 

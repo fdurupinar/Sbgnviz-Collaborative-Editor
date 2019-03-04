@@ -51,8 +51,8 @@ module.exports = function(modelManager, socket, userId, app){
         //remove annotations view
 
         //FIXME
-        modelManager.newModel( appUtilities.getActiveNetworkId(), "me"); //do not delete cytoscape, only the model
-        modelManager.initModel(cy.nodes(), cy.edges(), appUtilities.getActiveNetworkId(),  appUtilities);
+       modelManager.newModel( appUtilities.getActiveNetworkId(), "me"); //do not delete cytoscape, only the model
+       modelManager.initModel(cy.nodes(), cy.edges(), appUtilities.getActiveNetworkId(),  appUtilities);
 
         // setTimeout(function(){
         //         cy.elements().forEach(function(ele){
@@ -136,6 +136,44 @@ module.exports = function(modelManager, socket, userId, app){
         }, 1000);
 
         });
+
+    $("#sif-file-input").change(function () {
+        if ($(this).val() != "") {
+            var file = this.files[0];
+
+
+            var chiseInstance = appUtilities.getActiveChiseInstance();
+
+                // use cy instance assocated with chise instance
+            var cy = appUtilities.getActiveCy();
+
+
+            if ($(this).val() != "") {
+                var file = this.files[0];
+
+                var loadFcn = function() {
+                    var layoutBy = function() {
+                        appUtilities.triggerLayout( cy, true );
+                    };
+                    chiseInstance.loadSIFFile(file, layoutBy, null);
+
+                };
+
+                loadFcn();
+
+                $(this).val("");
+            }
+        }
+        //TODO: is this unnecessary?
+
+        setTimeout(function () {
+            modelManager.initModel(appUtilities.getActiveCy().nodes(), appUtilities.getActiveCy().edges(),
+                appUtilities.getActiveNetworkId(), appUtilities, "me");
+
+
+        }, 1000);
+
+    });
 
 
 

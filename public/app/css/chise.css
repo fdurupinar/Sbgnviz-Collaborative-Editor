@@ -6,8 +6,8 @@ body {
 }
 
 .drag-and-drop-file{
-    border: 2px dashed #0B9BCD !important;
-    background-color: #EEEEEE;
+  border: 2px dashed #0B9BCD !important;
+  background-color: #EEEEEE;
 }
 
 .sbgn-nav-menu .open > .dropdown-menu {
@@ -190,19 +190,35 @@ body {
 }
 
 .network-panel {
-    height: 100%;
-    width: 100%;
+  height: 100%;
+  width: 100%;
+}
+
+.select-cursor {
+    cursor: url(../../app/img/select-cursor.svg), pointer!important;
+}
+
+.add-node-cursor {
+    cursor: url(../../app/img/add-node-cursor.svg), pointer!important;
+}
+
+.add-edge-cursor {
+    cursor: url(../../app/img/add-edge-cursor.svg), pointer!important;
+}
+
+.zoom-cursor {
+    cursor: url(../../app/img/zoom-cursor.svg), pointer!important;
 }
 
 #network-tabs-list-container {
-    width: 1000px;
-    margin: auto;
-    background-color: #eaeaea;
-    padding-bottom: 0.2%;
+  width: 1000px;
+  margin: auto;
+  background-color: #eaeaea;
+  padding-bottom: 0.2%;
 }
 
 #network-tabs-list {
-    border: 0px !important;
+  border: 0px !important;
 }
 
 #sbgn-inspector-and-canvas {
@@ -440,11 +456,11 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
 }
 
 #template-modal-content {
-    position: fixed;
-    width: 600px;
-    top: 50%;
-    left: 50%;
-    margin-left: -300px;
+  position: fixed;
+  width: 600px;
+  top: 50%;
+  left: 50%;
+  margin-left: -300px;
 }
 
 .sbgn-input-small {
@@ -522,9 +538,9 @@ menu:not([title]):before{
 }
 
 .property-table {
-    margin: 2px;
-    border: 1px solid rgb(204, 204, 204);
-    display: block;
+	margin: 2px;
+	border: 1px solid rgb(204, 204, 204);
+	display: block;
 }
 
 .sbgn-modal-dialog .modal-header {
@@ -554,13 +570,13 @@ menu:not([title]):before{
 }
 
 .selected-mode-sustainable, .toggle-mode-sustainable {
-    background-color: #b9b9b9;
-    *background-color: #ffffff;
-    background-image: -moz-linear-gradient(top, #ffffff, #b9b9b9);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#b9b9b9));
-    background-image: -webkit-linear-gradient(top, #ffffff, #b9b9b9);
-    background-image: -o-linear-gradient(top, #ffffff, #b9b9b9);
-    background-image: linear-gradient(to bottom, #ffffff, #b9b9b9);
+  background-color: #b9b9b9;
+  *background-color: #ffffff;
+  background-image: -moz-linear-gradient(top, #ffffff, #b9b9b9);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#b9b9b9));
+  background-image: -webkit-linear-gradient(top, #ffffff, #b9b9b9);
+  background-image: -o-linear-gradient(top, #ffffff, #b9b9b9);
+  background-image: linear-gradient(to bottom, #ffffff, #b9b9b9);
 }
 
 #align-button:focus {
@@ -625,7 +641,7 @@ menu:not([title]):before{
 }
 
 /* CSS Method for adding Font Awesome Chevron Icons */
-.accordion-toggle:after {
+ .accordion-toggle:after {
     /* symbol for "opening" panels */
     font-family:'FontAwesome';
     content:"\f077";
@@ -703,6 +719,7 @@ hr.inspector-divider {
 
 .chise-network-tab a {
     border-radius: 0 0 8px 8px !important;
+    font-size: 11px;
     width: 86px;
     white-space: nowrap;
     overflow: hidden;
@@ -721,6 +738,15 @@ hr.inspector-divider {
 
 .chise-network-tab.active a {
     background: white !important;
+}
+
+.close:hover,
+.close:focus {
+  opacity: 0.75;
+}
+
+.closeTab {
+    margin-top: -10px !important;
 }
 
 .chise-tab:hover a {
@@ -797,12 +823,12 @@ img#template-reversible-output-add-button:hover {
 }
 
 .paletteCol {
-    position: relative;
-    display: inline-block;
-    width: 40px;
-    height: 26px;
-    text-align: center;
-    margin: 5px;
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 26px;
+  text-align: center;
+  margin: 5px;
 }
 
 .custom-menu-item {
@@ -812,7 +838,7 @@ img#template-reversible-output-add-button:hover {
 
 #sbgn-inspector-palette
 {
-    overflow: hidden;
+  overflow: hidden;
 }
 
 /*
