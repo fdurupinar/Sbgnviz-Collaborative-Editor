@@ -339,6 +339,7 @@ module.exports =  function(app) {
                     data.cyId = appUtilities.getActiveNetworkId();
 
 
+
                 appUtilities.getCyInstance(data.cyId).remove(appUtilities.getCyInstance(data.cyId).elements());
 
                 let jsonObj = appUtilities.getChiseInstance(data.cyId).convertSbgnmlTextToJson(data.sbgn);

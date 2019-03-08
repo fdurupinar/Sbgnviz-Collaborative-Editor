@@ -7,7 +7,7 @@ var keyboardShortcuts = require('./keyboard-shortcuts');
 inspectorUtilities = window.inspectorUtilities = require('./inspector-utilities'); //FUNDA made this global
 var collaborativeBackboneViews = require("../../collaborative-app/collaborative-backbone-views.js"); //FUNDA
 var tutorial = require('./tutorial');
-var sifFormatFactory = require('./sif-format-factory');
+var sifStyleFactory = require('./sif-style-factory');
 var _ = require('underscore');
 
 // Handle sbgnviz menu functions which are to be triggered on events
@@ -94,7 +94,7 @@ module.exports = function() {
         return chiseInstance.loadSample(filename, 'app/samples/');
     }
 
-    //FUNDA
+    //funda
     // console.log('init the sbgnviz template/page');
     //
     // $(window).on('resize', _.debounce(dynamicResize, 100));
@@ -108,14 +108,15 @@ module.exports = function() {
     mapTabLabelPanel = appUtilities.mapTabLabelPanel = new BackboneViews.MapTabLabelPanel({el: '#map-tab-label-container'});
     mapTabRearrangementPanel = appUtilities.mapTabRearrangementPanel = new BackboneViews.MapTabRearrangementPanel({el: '#map-tab-rearrangement-container'});
     neighborhoodQueryView = appUtilities.neighborhoodQueryView = new BackboneViews.NeighborhoodQueryView({el: '#query-neighborhood-table'});
-    //pathsBetweenQueryView = appUtilities.pathsBetweenQueryView = new BackboneViews.PathsBetweenQueryView({el: '#query-pathsbetween-table'}); //funda
+    // pathsBetweenQueryView = appUtilities.pathsBetweenQueryView = new BackboneViews.PathsBetweenQueryView({el: '#query-pathsbetween-table'}); //funda
     pathsFromToQueryView = appUtilities.pathsFromToQueryView = new BackboneViews.PathsFromToQueryView({el: '#query-pathsfromto-table'});
     commonStreamQueryView = appUtilities.commonStreamQueryView = new BackboneViews.CommonStreamQueryView({el: '#query-commonstream-table'});
-    //pathsByURIQueryView = appUtilities.pathsByURIQueryView = new BackboneViews.PathsByURIQueryView({el: '#query-pathsbyURI-table'}); //funda
+    // pathsByURIQueryView = appUtilities.pathsByURIQueryView = new BackboneViews.PathsByURIQueryView({el: '#query-pathsbyURI-table'});
+    //promptSaveView = appUtilities.promptSaveView = new BackboneViews.PromptSaveView({el: '#prompt-save-table'}); // see PromptSaveView in backbone-views.js //funda
+
     collaborativePathsBetweenQueryView = new collaborativeBackboneViews.PathsBetweenQueryView({el: '#query-pathsbetween-table'});//FUNDA--use collaborative version
     collaborativePathsByURIQueryView = new collaborativeBackboneViews.PathsByURIQueryView({el: '#query-pathsbyURI-table'});//FUNDA--use collaborative versi
 
-    //promptSaveView = appUtilities.promptSaveView = new BackboneViews.PromptSaveView({el: '#prompt-save-table'}); // see PromptSaveView in backbone-views.js
     fileSaveView = appUtilities.fileSaveView = new BackboneViews.FileSaveView({el: '#file-save-table'});
     promptConfirmationView = appUtilities.promptConfirmationView = new BackboneViews.PromptConfirmationView({el: '#prompt-confirmation-table'});
     promptMapTypeView = appUtilities.promptMapTypeView = new BackboneViews.PromptMapTypeView({el: '#prompt-mapType-table'});
@@ -140,6 +141,8 @@ module.exports = function() {
         // check if the event is triggered for the active instance
         var isActiveInstance = ( cy == appUtilities.getActiveCy() );
 
+        var chiseInstance = appUtilities.getChiseInstance(cy);
+
         // set the current file name for cy
         appUtilities.setScratch(cy, 'currentFileName', filename);
         //clean and reset things
@@ -147,7 +150,7 @@ module.exports = function() {
         appUtilities.disableInfoBoxRelocation();
 
         // a new file is being loaded clear the applied flag of topologyGrouping
-        var topologyGrouping = appUtilities.getScratch(cy, 'sifTopologyGrouping');
+        var topologyGrouping = chiseInstance.sifTopologyGrouping;
         topologyGrouping.clearAppliedFlag();
 
         // if the event is triggered for the active instance do the followings
@@ -159,6 +162,7 @@ module.exports = function() {
             if (!$('#inspector-map-tab').hasClass('active')) {
                 $('#inspector-map-tab a').tab('show');
             }
+
         }
 
     });
@@ -195,6 +199,17 @@ module.exports = function() {
                 if(! $("#AF-palette-heading").hasClass("collapsed")) { // collapse AF
                     $("#AF-palette-heading").click();
                 }
+            }
+            else if(chiseInstance.elementUtilities.mapType == "SIF"){
+                if($("#SIF-palette-heading").hasClass("collapsed")) { // expand PD
+                    $("#SIF-palette-heading").click();
+                }
+                if(! $("#SIF-palette-heading").hasClass("collapsed")) { // collapse AF
+                    $("#SIF-palette-heading").click();
+                }
+            }
+            else {
+                console.warn('invalid map type!');
             }
 
         }
@@ -274,6 +289,7 @@ module.exports = function() {
             //FUNDA
             $(document).trigger('newFile');
 
+
         });
 
         // close the active file
@@ -351,8 +367,8 @@ module.exports = function() {
             $("#sif-file-input").trigger('click');
         });
 
-        $("#import-sif-format").click(function () {
-            $("#sif-format-input").trigger('click');
+        $("#import-sif-style").click(function () {
+            $("#sif-style-input").trigger('click');
         });
 
         $("#import-sif-layout").click(function () {
@@ -381,7 +397,7 @@ module.exports = function() {
             }
         });
 
-        $("#sif-format-input").change(function () {
+        $("#sif-style-input").change(function () {
             if ($(this).val() != "") {
                 var file = this.files[0];
                 var reader = new FileReader();
@@ -391,9 +407,9 @@ module.exports = function() {
                     var text = this.result;
 
                     var chiseInstance = appUtilities.getActiveChiseInstance();
-                    var sifFormat = sifFormatFactory();
-                    sifFormat( chiseInstance );
-                    sifFormat.apply( text );
+                    var sifStyle = sifStyleFactory();
+                    sifStyle( chiseInstance );
+                    sifStyle.apply( text );
                 };
 
                 reader.readAsText( file );
@@ -421,34 +437,35 @@ module.exports = function() {
             }
         });
 
-        //FUNDa: there are updated in editor-listener.js
-        // TODO: eliminate code replication in similar functions.
+
+        //FUNDa: they are updated in editor-listener.js
+        // // TODO: eliminate code replication in similar functions.
         // $("#sif-file-input").change(function () {
-        //     var chiseInstance = appUtilities.getActiveChiseInstance();
+        //   var chiseInstance = appUtilities.getActiveChiseInstance();
         //
-        //     // use cy instance assocated with chise instance
-        //     var cy = appUtilities.getActiveCy();
+        //   // use cy instance assocated with chise instance
+        //   var cy = appUtilities.getActiveCy();
         //
-        //     var loadCallbackInvalidityWarning  = function () {
-        //         promptInvalidFileView.render();
-        //     }
+        //   var loadCallbackInvalidityWarning  = function () {
+        //     promptInvalidFileView.render();
+        //   }
         //
-        //     if ($(this).val() != "") {
-        //         var file = this.files[0];
+        //   if ($(this).val() != "") {
+        //     var file = this.files[0];
         //
-        //         var loadFcn = function() {
-        //             var layoutBy = function() {
-        //                 appUtilities.triggerLayout( cy, true );
-        //             };
-        //             chiseInstance.loadSIFFile(file, layoutBy, loadCallbackInvalidityWarning);
-        //         };
-        //         if( cy.elements().length != 0)
-        //             promptConfirmationView.render( loadFcn );
-        //         else
-        //             loadFcn();
+        //     var loadFcn = function() {
+        //       var layoutBy = function() {
+        //         appUtilities.triggerLayout( cy, true );
+        //       };
+        //       chiseInstance.loadSIFFile(file, layoutBy, loadCallbackInvalidityWarning);
+        //     };
+        //     if( cy.elements().length != 0)
+        //       promptConfirmationView.render( loadFcn );
+        //     else
+        //       loadFcn();
         //
-        //         $(this).val("");
-        //     }
+        //     $(this).val("");
+        //   }
         // });
 
 
@@ -471,6 +488,9 @@ module.exports = function() {
 
             // get the network id for cy
             var networkId = cy.container().id;
+
+            // unlock graph topolpgy in case it is locked
+            chiseInstance.elementUtilities.unlockGraphTopology();
 
             // reset map name and description
             // default map name should be a string that contains the network id
@@ -570,6 +590,11 @@ module.exports = function() {
         $("#AF-legend").click(function (e) {
             e.preventDefault();
             $("#AF_legend_modal").modal('show');
+        });
+
+        $("#SIF-legend").click(function (e) {
+            e.preventDefault();
+            $("#SIF_legend_modal").modal('show');
         });
 
         $("#quick-help, #quick-help-icon").click(function (e) {
@@ -987,7 +1012,6 @@ module.exports = function() {
 
         $("#perform-layout, #perform-layout-icon").click(function (e) {
 
-            console.log("layout called");
             // use active chise instance
             var chiseInstance = appUtilities.getActiveChiseInstance();
 
@@ -1042,7 +1066,7 @@ module.exports = function() {
             layoutPropertiesView.applyLayout(preferences);
         });
 
-        //funda
+        //FUNDA
         // $("#undo-last-action, #undo-icon").click(function (e) {
         //
         //   // use active cy instance
@@ -1087,17 +1111,6 @@ module.exports = function() {
             var filename = document.getElementById('file-name').innerHTML;
             filename = filename.substring(0,filename.lastIndexOf('.')) + ".svg";
             chiseInstance.saveAsSvg(filename); // the default filename is 'network.jpg'
-        });
-
-        //TODO: could simply keep/store original input SBGN-ML data and use it here instead of converting from JSON
-        $("#save-as-sbgnml").click(function (evt) {
-            //var filename = document.getElementById('file-name').innerHTML;
-            //chise.saveAsSbgnml(filename);
-            fileSaveView.render("sbgnml", "0.2");
-        });
-
-        $("#export-as-sbgnml3-file").click(function (evt) {
-            fileSaveView.render("sbgnml", "0.3");
         });
 
         $("#save-as-nwt, #save-icon").click(function (evt) {
@@ -1264,7 +1277,8 @@ module.exports = function() {
         $(document).on('mousedown', '.node-palette img', function (e) {
             e.preventDefault(); // needed for dragging, otherwise the mouse release event cannot be fired on another element
             dragAndDropPlacement = true;
-            appUtilities.addDragImage($(this).attr('value')+".svg", $(this).css('width'), $(this).css('height'));
+            var imgPath = appUtilities.getDragImagePath( $(this).attr('value') );
+            appUtilities.addDragImage(imgPath, $(this).css('width'), $(this).css('height'));
 
             $('.node-palette img').removeClass('selected-mode'); // Make any image inside node palettes non selected
             $(this).addClass('selected-mode'); // Make clicked element selected
