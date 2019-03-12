@@ -94,10 +94,13 @@
 if PR(https://github.com/iVis-at-Bilkent/newt/pull/223) is merged*/
 .network-panel {
     /*TODO: Relative causes problems with multiple tabs, but absolute causes problems with the  dockerized version where the canvas covers the whole screen on the second user*/
-    /*position:absolute;*/
-    position: relative;
-    height: 100%;
-    width: 100%;
+    position:absolute;
+    /*position: relative;*/
+    /*height: 100%;*/
+    /*width: 100%;*/
+    width: inherit;
+    height: inherit;
+
 }
 
 #sbgn-inspector-and-canvas {

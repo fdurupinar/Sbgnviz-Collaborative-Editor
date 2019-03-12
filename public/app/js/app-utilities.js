@@ -476,6 +476,8 @@ appUtilities.createNewNetwork = function (networkIdParam) {
     //funda
     newInst.cyId = networkId;
     //FUNDA
+
+
     $(document).trigger('createNewNetwork', [newInst.getCy(), networkId]);
 
 
