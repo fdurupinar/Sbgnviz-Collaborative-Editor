@@ -63,8 +63,6 @@ var PathsBetweenQueryView = Backbone.View.extend({
 
             appUtilities.getActiveChiseInstance().startSpinner('paths-between-spinner');
 
-
-
             queryURL = queryURL + sources;
 
 

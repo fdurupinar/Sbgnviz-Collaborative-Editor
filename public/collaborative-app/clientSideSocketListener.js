@@ -290,12 +290,20 @@ module.exports =  function(app) {
 
 
 
+
+
+
             //Open in another tab
             app.socket.on('openPCQueryWindow', function(data, callback){
 
                 let chiseInst = appUtilities.createNewNetwork(); //opens a new tab
 
-                let jsonObj = chiseInst.convertSbgnmlTextToJson(data.graph);
+                let jsonObj;
+
+                if(data.type && data.type == 'sif')
+                    jsonObj = chiseInst.convertSifTextToJson(data.graph);
+                else
+                    jsonObj = chiseInst.convertSbgnmlTextToJson(data.graph);
 
                 chiseInst.updateGraph(jsonObj, function(){
                     app.modelManager.initModel(appUtilities.getCyInstance(chiseInst.cyId).nodes(), appUtilities.getCyInstance(chiseInst.cyId).edges(), chiseInst.cyId, appUtilities, "me");

@@ -100,6 +100,8 @@ if PR(https://github.com/iVis-at-Bilkent/newt/pull/223) is merged*/
     /*width: 100%;*/
     width: inherit;
     height: inherit;
+    top: inherit;
+    left:inherit;
 
 }
 

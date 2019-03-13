@@ -181,6 +181,9 @@ module.exports = function(modelManager, socket, userId, app){
 
     $(document).on("createNewNetwork", function (e, cy, cyId) {
 
+        modelManager.openCy(cyId, "me");
+
+
         cy.on("afterDo afterRedo", function (event, actionName, args, res) {
 
             console.log(cyId);
