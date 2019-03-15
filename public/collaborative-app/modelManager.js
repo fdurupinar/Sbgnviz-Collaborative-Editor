@@ -187,6 +187,10 @@ class ModelManager{
     setOncoprint(val){
         this.model.set('documents.' + this.docId + '.oncoprint', val);
     }
+
+    getOncoprint(){
+        return this.model.get('documents.' + this.docId + '.oncoprint');
+    }
     /***
      *
      * @param cmd  {opName, opTarget,  elType, elId, opAttr,param, prevParam}
@@ -355,6 +359,7 @@ class ModelManager{
 
 
     openCy(cyId, user){ //to notify other users that a new tab has been opened
+        console.log("Opened cy id is " + cyId);
         let cyPathStr = this.getModelCyPathStr(cyId);
         // this.model.pass({user: user}).set('documents.' + this.docId + '.newCy', cyId); //let others know
         this.model.pass({user:user}).set(cyPathStr + '.cyId', cyId);

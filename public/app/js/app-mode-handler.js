@@ -33,6 +33,7 @@ var modeHandler = {
     // so that users will be able to add the current node type in a sustainable way.
     setAddNodeMode: function (nodeType, language, _cy) {
 
+
         // if _cy param is not set use the active cy instance
         var cy = _cy || appUtilities.getActiveCy();
         $(cy.container()).find('canvas').removeClass('add-edge-cursor');

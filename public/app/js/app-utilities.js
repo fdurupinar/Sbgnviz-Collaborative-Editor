@@ -518,6 +518,9 @@ appUtilities.closeOtherNetworks = function (networkId) {
             continue;
         }
 
+        //FUNDA: close the networks except networkId
+        $(document).trigger('closeNetwork', currentNetworkId);
+
         // remove the chise instance mapped to the network id from the chise instances map
         this.removeFromChiseInstances(currentNetworkId);
 
@@ -537,6 +540,10 @@ appUtilities.closeOtherNetworks = function (networkId) {
 
     // update the network ids stack accordingly
     this.networkIdsStack = [ networkId ];
+
+
+
+
 };
 
 // // creates a new network and returns the new chise.js instance that is created for this network
@@ -684,6 +691,11 @@ appUtilities.closeOtherNetworks = function (networkId) {
 // close the active network
 appUtilities.closeActiveNetwork = function () {
 
+    //FUNDA
+    //should not be able to close all the networks
+    if(this.networkIdsStack.length <=1){
+        return;
+    }
     // active network id is the one that is at the top of the stack
     // pop and get it
     var activeNetworkId = this.networkIdsStack.pop();
@@ -715,7 +727,7 @@ appUtilities.closeActiveNetwork = function () {
 
 
     //FUNDA
-    $(document).trigger('closeActiveNetwork', activeNetworkId);
+    $(document).trigger('closeNetwork', activeNetworkId);
 
 };
 
@@ -801,9 +813,20 @@ appUtilities.createPhysicalNetworkComponents = function (panelId, tabId, tabDesc
     // the container that lists the network tabs
     var tabsList = $('#network-tabs-list');
 
-    var newTabStr = '<li id="' + tabId + '" class="chise-tab chise-network-tab">\n\
-                  <a data-toggle="tab" href="#' + panelId + '">\n\
-                  <button class="close closeTab '+tabId+'closeTab" type="button" >&times</button>' + tabDesc + '</a></li>';
+    // FUNDA
+    // no close icon, don't let users close a tab
+    let newTabStr = '<li id="' + tabId + '" class="chise-tab chise-network-tab">\n<a data-toggle="tab" href="#' + panelId + '">\n' + tabDesc + '</a></li>';
+
+    //always keep the first tab
+    // let newTabStr;
+    // if(this.networkIdsStack.length  <= 0 ) {
+    //     newTabStr = '<li id="' + tabId + '" class="chise-tab chise-network-tab">\n<a data-toggle="tab" href="#' + panelId + '">\n' + tabDesc + '</a></li>';
+    // }
+    // else{
+    //     newTabStr = '<li id="' + tabId + '" class="chise-tab chise-network-tab">\n\
+    //               <a data-toggle="tab" href="#' + panelId + '">\n\
+    //               <button class="close closeTab '+tabId+'closeTab" type="button" >&times</button>' + tabDesc + '</a></li>';
+    // }
 
     $('ul').on('click', 'button.' + tabId +'closeTab', function() {
         var networkId = tabId.substring(17);
@@ -814,6 +837,7 @@ appUtilities.createPhysicalNetworkComponents = function (panelId, tabId, tabDesc
     $('ul').on('mousedown', '#' + tabId, function(e) {
         if( e.which == 2 ) {
             var networkId = tabId.substring(17);
+
             appUtilities.setActiveNetwork(networkId);
             appUtilities.closeActiveNetwork();
         }
@@ -842,6 +866,7 @@ appUtilities.getActiveChiseInstance = function () {
 // sets the active network through the network key to be activated
 appUtilities.setActiveNetwork = function (networkKey) {
 
+
     // get chise instance for network key
     var chiseInstance = this.getChiseInstance(networkKey);
 
@@ -864,6 +889,7 @@ appUtilities.setActiveNetwork = function (networkKey) {
 
     // adjust UI components for †he activated network
     this.adjustUIComponents();
+
 
 };
 

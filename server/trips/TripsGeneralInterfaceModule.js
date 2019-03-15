@@ -95,12 +95,14 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
 
         pattern = {0: 'tell', 1: '&key', content: ['display-sbgn', '.', '*']};
         this.tm.addHandler(pattern,  (text) => {
+            console.log("display sbgn request");
             this.displaySbgn(text);
 
         });
 
         pattern = {0: 'request', 1: '&key', content: ['display-sbgn', '.', '*']};
         this.tm.addHandler(pattern,  (text) => {
+            console.log("display sbgn request");
             this.displaySbgn(text);
         });
 

@@ -207,7 +207,8 @@ app.proto.create = function (model) {
     this.socket = io();
     this.notyView = window.noty({layout: "bottom",theme:"bootstrapTheme", text: "Please wait while model is loading."});
 
-    document.getElementById('oncoprint-tab').style.visibility='hidden';
+
+
     this.listenToUIOperations(model);
 
     let id = model.get('_session.userId');
@@ -246,15 +247,24 @@ app.proto.create = function (model) {
     this.factoidHandler = require('./public/collaborative-app/factoid/factoid-handler')(this) ;
     this.factoidHandler.initialize();
 
+
     this.oncoprintHandler = require('./public/collaborative-app/oncoprint/oncoprint-handler')(this) ;
     this.oncoprintHandler.initialize($('#oncoprint-container').width());
 
 
-
+    let oncoprintData = this.modelManager.getOncoprint();
+    if(oncoprintData) {
+        document.getElementById('oncoprint-tab').style.visibility = 'visible';
+        this.oncoprintHandler.updateData(oncoprintData);
+    }
+    else
+        document.getElementById('oncoprint-tab').style.visibility='hidden';
 
     //Loading cytoscape and clients
 
     let cyIds = this.modelManager.getCyIds();
+
+
 
     cyIds.forEach((cyId) => {
         if(parseInt(cyId) !== parseInt(appUtilities.getActiveNetworkId())) //tab 0: initial tab
@@ -267,6 +277,7 @@ app.proto.create = function (model) {
     if(cyIds.length === 0) //no previous model -- first time loading the document
         this.modelManager.openCy(appUtilities.getActiveNetworkId(), "me");
 
+
     this.notyView.close();
 
 
@@ -274,20 +285,30 @@ app.proto.create = function (model) {
     this.editorListener = require('./public/collaborative-app/editor-listener.js')(this.modelManager,this.socket, id, this);
 
     //HACK: This is normally called when a new network is created, but the initial network is created before editor-listener
-    //Lets editor-listener to subscribe to UI operations
+    //Lets editor-listener subscribe to UI operations
+    // does not actually create a new network, just notifies editor-listener
     $(document).trigger('createNewNetwork', [appUtilities.getActiveCy(), appUtilities.getActiveNetworkId()]);
+
+
+    //HACK
+    //set the initial tab as the active network
+    //hack: otherwise all the tabs look active and they render on top of each other
+    setTimeout(()=> {
+        $('#network-tabs-list a[href="#sbgn-network-container-0"]').trigger('click');
+        appUtilities.getCyInstance(0).panzoom().fit();
+
+    }, 1000);
+
 
     //update the ui
     document.getElementById('wizard-mode').checked = model.get('_page.doc.wizardMode');
 
-
-
     this.atBottom = true;
-
 
     //sort session ids
 
     setTimeout(()=>{
+
         let userIds = this.modelManager.getUserIds();
 
 
@@ -933,9 +954,13 @@ app.proto.listenToModelOperations = function(model){
 
         if(docReady) {
             if(docReady && !passed.user) {
-                appUtilities.setActiveNetwork(cyId);
-                appUtilities.closeActiveNetwork();
-
+                try {
+                    appUtilities.setActiveNetwork(cyId);
+                    appUtilities.closeActiveNetwork();
+                }
+                catch(e){
+                    console.log(e);
+                }
             }
         }
     });

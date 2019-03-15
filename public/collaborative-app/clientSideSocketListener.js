@@ -288,11 +288,6 @@ module.exports =  function(app) {
                 }
             });
 
-
-
-
-
-
             //Open in another tab
             app.socket.on('openPCQueryWindow', function(data, callback){
 
@@ -566,12 +561,11 @@ module.exports =  function(app) {
                 let cyIds = app.modelManager.getCyIds();
 
                 cyIds.forEach(function(cyId) {
-                    console.log(cyId);
+                    console.log("Clean tab:" + cyId);
                     appUtilities.getCyInstance(cyId).remove(appUtilities.getCyInstance(cyId).elements());
                     app.modelManager.newModel(cyId, "me"); //do not delete cytoscape, only the model
 
                 });
-
 
                 appUtilities.closeOtherNetworks(0);
 
