@@ -250,11 +250,16 @@ appUtilities.updateNetworkTabDesc = function (networkKey) {
 
     // if mapName is empty set it to "Pathway" #219
     if (!mapName)
-        mapName = "Pathway";
+        mapName = "";
+        // mapName = "Pathway"; //funda
 
     // update the content of 'a' element that is contained by the related tab
+
+    //FUNDA
+    //Close tab'i kaldirdigimiz icin 3 tane child nodeu yok
     var relatedTab = document.getElementById(tabId).childNodes[1];
-    var relatedTabTextField = relatedTab.childNodes[2];
+    // var relatedTabTextField = relatedTab.childNodes[2]; //funda
+    var relatedTabTextField = relatedTab.childNodes[0]; //funda
     relatedTabTextField.nodeValue = mapName;
 };
 

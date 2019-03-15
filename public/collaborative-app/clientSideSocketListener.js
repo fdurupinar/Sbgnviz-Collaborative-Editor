@@ -345,7 +345,11 @@ module.exports =  function(app) {
 
                 appUtilities.getCyInstance(data.cyId).remove(appUtilities.getCyInstance(data.cyId).elements());
 
+                console.log(data.sbgn);
+
                 let jsonObj = appUtilities.getChiseInstance(data.cyId).convertSbgnmlTextToJson(data.sbgn);
+
+                console.log(jsonObj);
 
                 appUtilities.getChiseInstance(data.cyId).updateGraph(jsonObj, () => {
 
