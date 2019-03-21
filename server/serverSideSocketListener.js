@@ -650,6 +650,17 @@ module.exports.start = function(io, model, cancerDataOrganizer){
             });
         });
 
+        socket.on('agentDisplaySifRequest', function(data, callback){
+
+            let requestStr = "displaySif";
+
+
+            askHuman(data.userId, data.room,  requestStr, data, function(val){
+
+                if (callback) callback(val);
+            });
+        });
+
         socket.on('agentAddProvenanceRequest', function(data, callback){
 
             let requestStr = "addProvenance";
