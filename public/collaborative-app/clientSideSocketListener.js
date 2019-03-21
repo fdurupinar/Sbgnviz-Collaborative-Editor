@@ -336,7 +336,49 @@ module.exports =  function(app) {
 
             });
 
-            app.socket.on("displaySbgn", function(data, callback){
+
+            app.socket.on("displaySif", function(data, callback) {
+
+                if (!data.cyId)
+                    data.cyId = appUtilities.getActiveNetworkId();
+
+
+                appUtilities.getCyInstance(data.cyId).remove(appUtilities.getCyInstance(data.cyId).elements());
+
+
+                let jsonObj = appUtilities.getChiseInstance(data.cyId).convertSifTextToJson(data.sif);
+
+
+                appUtilities.getChiseInstance(data.cyId).updateGraph(jsonObj, () => {
+
+                    app.modelManager.newModel(appUtilities.getActiveNetworkId(), "me"); //delete the existing model first so that ids don't get mixed up
+
+
+                    app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(), data.cyId, appUtilities, "me");
+
+
+                    appUtilities.setActiveNetwork(data.cyId);
+
+                    setTimeout(() => {
+
+                        // $("#perform-layout")[0].click();
+
+                        // app.callLayout(data.cyId);
+                        //open the network view and rerender it otherwise the graph becomes invisible
+                        $("#defaultOpen")[0].click();
+
+                        app.dynamicResize();
+                        appUtilities.getCyInstance(data.cyId).panzoom().fit();
+
+
+                        if (callback) callback("success");
+                    }, 1000);
+
+
+                }, true);
+            });
+
+             app.socket.on("displaySbgn", function(data, callback){
 
                 if(!data.cyId)
                     data.cyId = appUtilities.getActiveNetworkId();
@@ -345,11 +387,9 @@ module.exports =  function(app) {
 
                 appUtilities.getCyInstance(data.cyId).remove(appUtilities.getCyInstance(data.cyId).elements());
 
-                console.log(data.sbgn);
 
                 let jsonObj = appUtilities.getChiseInstance(data.cyId).convertSbgnmlTextToJson(data.sbgn);
 
-                console.log(jsonObj);
 
                 appUtilities.getChiseInstance(data.cyId).updateGraph(jsonObj, () => {
 

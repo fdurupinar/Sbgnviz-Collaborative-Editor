@@ -106,6 +106,18 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
             this.displaySbgn(text);
         });
 
+
+        pattern = {0: 'tell', 1: '&key', content: ['display-sif', '.', '*']};
+        this.tm.addHandler(pattern,  (text) => {
+            this.displaySif(text);
+
+        });
+
+        pattern = {0: 'request', 1: '&key', content: ['display-sif', '.', '*']};
+        this.tm.addHandler(pattern,  (text) => {
+            this.displaySif(text);
+        });
+
         pattern = {0: 'request', 1: '&key', content: ['open-query-window', '.', '*']};
         this.tm.addHandler(pattern, (text) => {
             this.openQueryWindow(text);
@@ -339,6 +351,26 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
 
     }
 
+    displaySif(text) {
+
+        let contentObj = KQML.keywordify(text.content);
+        if (contentObj) {
+
+            let sifModel = contentObj.graph;
+
+
+            sifModel = trimDoubleQuotes(sifModel);
+
+            sifModel = sifModel.replace(/(\\")/g, '"');
+
+            //The socket connection is between the interface and the agent, so we cannot directly emit messages
+            //we must ask the client with the browser to do it for us
+            //TODO: get the cyId from TRIPS
+            this.askHuman(this.agentId, this.room, "displaySif", {sif: sifModel, cyId: contentObj.cyId || "0"},  (val) => {
+
+            });
+        }
+    }
     displaySbgn(text) {
 
         let contentObj = KQML.keywordify(text.content);
