@@ -288,14 +288,17 @@ module.exports =  function(app) {
                 }
             });
 
-
-
             //Open in another tab
             app.socket.on('openPCQueryWindow', function(data, callback){
 
                 let chiseInst = appUtilities.createNewNetwork(); //opens a new tab
 
-                let jsonObj = chiseInst.convertSbgnmlTextToJson(data.graph);
+                let jsonObj;
+
+                if(data.type && data.type == 'sif')
+                    jsonObj = chiseInst.convertSifTextToJson(data.graph);
+                else
+                    jsonObj = chiseInst.convertSbgnmlTextToJson(data.graph);
 
                 chiseInst.updateGraph(jsonObj, function(){
                     app.modelManager.initModel(appUtilities.getCyInstance(chiseInst.cyId).nodes(), appUtilities.getCyInstance(chiseInst.cyId).edges(), chiseInst.cyId, appUtilities, "me");
@@ -333,15 +336,60 @@ module.exports =  function(app) {
 
             });
 
-            app.socket.on("displaySbgn", function(data, callback){
 
-                if(!data.cyId)
+            app.socket.on("displaySif", function(data, callback) {
+
+                if (!data.cyId)
                     data.cyId = appUtilities.getActiveNetworkId();
 
 
                 appUtilities.getCyInstance(data.cyId).remove(appUtilities.getCyInstance(data.cyId).elements());
 
+
+                let jsonObj = appUtilities.getChiseInstance(data.cyId).convertSifTextToJson(data.sif);
+
+
+                appUtilities.getChiseInstance(data.cyId).updateGraph(jsonObj, () => {
+
+                    app.modelManager.newModel(appUtilities.getActiveNetworkId(), "me"); //delete the existing model first so that ids don't get mixed up
+
+
+                    app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(), data.cyId, appUtilities, "me");
+
+
+                    appUtilities.setActiveNetwork(data.cyId);
+
+                    setTimeout(() => {
+
+                        // $("#perform-layout")[0].click();
+
+                        // app.callLayout(data.cyId);
+                        //open the network view and rerender it otherwise the graph becomes invisible
+                        $("#defaultOpen")[0].click();
+
+                        app.dynamicResize();
+                        appUtilities.getCyInstance(data.cyId).panzoom().fit();
+
+
+                        if (callback) callback("success");
+                    }, 1000);
+
+
+                }, true);
+            });
+
+             app.socket.on("displaySbgn", function(data, callback){
+
+                if(!data.cyId)
+                    data.cyId = appUtilities.getActiveNetworkId();
+
+
+
+                appUtilities.getCyInstance(data.cyId).remove(appUtilities.getCyInstance(data.cyId).elements());
+
+
                 let jsonObj = appUtilities.getChiseInstance(data.cyId).convertSbgnmlTextToJson(data.sbgn);
+
 
                 appUtilities.getChiseInstance(data.cyId).updateGraph(jsonObj, () => {
 
@@ -557,12 +605,11 @@ module.exports =  function(app) {
                 let cyIds = app.modelManager.getCyIds();
 
                 cyIds.forEach(function(cyId) {
-                    console.log(cyId);
+                    console.log("Clean tab:" + cyId);
                     appUtilities.getCyInstance(cyId).remove(appUtilities.getCyInstance(cyId).elements());
                     app.modelManager.newModel(cyId, "me"); //do not delete cytoscape, only the model
 
                 });
-
 
                 appUtilities.closeOtherNetworks(0);
 

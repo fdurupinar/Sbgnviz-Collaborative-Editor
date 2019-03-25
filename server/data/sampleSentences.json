@@ -1,5 +1,30 @@
 [
   {
+    "text": "__Mechanism and path search__",
+    "disabled": true
+  },
+  {
+    "text": "What does MAP4K2 interact with?"
+  },
+  {
+    "text": "Does MAP2K1 activate MAPK1?"
+  },
+  {
+    "text": "What phosphorylates SOCS1?"
+  },
+  {
+    "text": "Does phosphorylation at T185 activate MAPK1?"
+  },
+  {
+    "text": "How does KRAS affect ELK1?"
+  },
+  {
+    "text": "What are the paths between MAPK3 and FOS?"
+  },
+  {
+    "text": "What pathways affect BRAF?"
+  },
+  {
     "text": "__Cancer genomics__",
     "disabled": true
   },
@@ -40,31 +65,7 @@
  {
   "text": "What genes are regulated by elk1 and srf?"
  },
- {
-  "text": "__Mechanism and path search__",
-  "disabled": true
- },
- {
-  "text": "What does MAP4K2 interact with?"
- },
- {
-  "text": "Does MAP2K1 activate MAPK1?"
- },
- {
-  "text": "What phosphorylates SOCS1?"
- },
- {
-  "text": "Does phosphorylation at T185 activate MAPK1?"
- },
- {
-  "text": "How does KRAS affect ELK1?"
- },
- {
-  "text": "What are the paths between MAPK3 and FOS?"
- },
- {
-  "text": "What pathways affect BRAF?"
- },
+
  {
   "text": "__Drug targets__",
   "disabled": true

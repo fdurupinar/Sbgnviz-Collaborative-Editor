@@ -60,7 +60,6 @@ inspectorUtilities.updateInputBoxesFromSet = function( ele, fieldName, parentSel
                 chiseInstance.updateSetField( ele, fieldName, oldVal, newVal, callback );
             });
         })( key, i );
-
     } );
 
     var addId = "inspector-add-" + subId;
@@ -595,7 +594,7 @@ inspectorUtilities.handleSBGNInspector = function () {
 
             // annotations handling part
             addCollapsibleSection("annotations", "Custom Properties", false);
-            // annotHandler.fillAnnotationsContainer(selectedEles[0]); //funda
+            annotHandler.fillAnnotationsContainer(selectedEles[0]);
         }
 
         if (type == "node") {

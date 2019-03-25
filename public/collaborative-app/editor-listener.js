@@ -94,10 +94,14 @@ module.exports = function(modelManager, socket, userId, app){
     });
 
 
-    $(document).on("closeActiveNetwork", function (e, cyId) {
-        console.log("close cy is called");
+
+
+    $(document).on("closeNetwork", function (e, cyId) {
+        console.log("close cy is called for " + cyId);
+
         modelManager.closeCy(cyId, "me");
     });
+
 
     $("#file-input").change(function () {
         if ($(this).val() != "") {
@@ -176,21 +180,18 @@ module.exports = function(modelManager, socket, userId, app){
     });
 
 
-
-
-
     $(document).on("createNewNetwork", function (e, cy, cyId) {
+
+        modelManager.openCy(cyId, "me");
+
 
         cy.on("afterDo afterRedo", function (event, actionName, args, res) {
 
             console.log(cyId);
 
-
             console.log(actionName);
             console.log(args);
             console.log(res);
-
-
 
             if (actionName === "changeData" || actionName === "changeFontProperties" ) {
 
@@ -208,7 +209,6 @@ module.exports = function(modelManager, socket, userId, app){
                 modelManager.changeModelElementGroupAttribute("data", modelElList, cyId,paramList,  "me");
 
             }
-
 
             else if (actionName === "changeNodeLabel" ||actionName === "resizeNodes"||
                 actionName === "addStateOrInfoBox" || actionName === "setMultimerStatus" ||
@@ -445,6 +445,7 @@ module.exports = function(modelManager, socket, userId, app){
             }
 
             else if (actionName === "addNode") {
+
                 res.eles.data("annotationsView", null);
                 var newNode = args.newNode;
                 var id = res.eles.id();

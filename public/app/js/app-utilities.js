@@ -230,7 +230,6 @@ appUtilities.getDefaultMapName = function (networkId) {
     return '#' +(networkId + 1); //FUNDA
 };
 
-
 // update the string that represents the tab for the given networkKey
 appUtilities.updateNetworkTabDesc = function (networkKey) {
 
@@ -251,11 +250,16 @@ appUtilities.updateNetworkTabDesc = function (networkKey) {
 
     // if mapName is empty set it to "Pathway" #219
     if (!mapName)
-        mapName = "Pathway";
+        mapName = "";
+        // mapName = "Pathway"; //funda
 
     // update the content of 'a' element that is contained by the related tab
+
+    //FUNDA
+    //Close tab'i kaldirdigimiz icin 3 tane child nodeu yok
     var relatedTab = document.getElementById(tabId).childNodes[1];
-    var relatedTabTextField = relatedTab.childNodes[2];
+    // var relatedTabTextField = relatedTab.childNodes[2]; //funda
+    var relatedTabTextField = relatedTab.childNodes[0]; //funda
     relatedTabTextField.nodeValue = mapName;
 };
 
@@ -314,20 +318,20 @@ appUtilities.getChiseInstance = function (key) {
 // If there is just one network then network tabs should not be rendered.
 // This function is to adjust that.
 appUtilities.adjustVisibilityOfNetworkTabs = function () {
-    /* //FUNDA don't use in cwc
-      var tabsContainer = $('#network-tabs-list-container');
 
-      // if there is just one tab hide tabs container else show it
-      if ( this.networkIdsStack.length === 1 ) {
-        tabsContainer.hide();
-      }
-      else {
-        tabsContainer.show();
-      }
-    */
+    //FUNDA don't use in cwc
+    //
+    // var tabsContainer = $('#network-tabs-list-container');
+    //
+    // // if there is just one tab hide tabs container else show it
+    // if ( this.networkIdsStack.length === 1 ) {
+    //   tabsContainer.hide();
+    // }
+    // else {
+    //   tabsContainer.show();
+    // }
 
 };
-
 
 //FUNDA
 appUtilities.getCyInstance = function(key){
@@ -477,6 +481,8 @@ appUtilities.createNewNetwork = function (networkIdParam) {
     //funda
     newInst.cyId = networkId;
     //FUNDA
+
+
     $(document).trigger('createNewNetwork', [newInst.getCy(), networkId]);
 
 
@@ -517,6 +523,9 @@ appUtilities.closeOtherNetworks = function (networkId) {
             continue;
         }
 
+        //FUNDA: close the networks except networkId
+        $(document).trigger('closeNetwork', currentNetworkId);
+
         // remove the chise instance mapped to the network id from the chise instances map
         this.removeFromChiseInstances(currentNetworkId);
 
@@ -536,11 +545,162 @@ appUtilities.closeOtherNetworks = function (networkId) {
 
     // update the network ids stack accordingly
     this.networkIdsStack = [ networkId ];
+
+
+
+
 };
+
+// // creates a new network and returns the new chise.js instance that is created for this network
+// appUtilities.createNewNetwork = function () {
+//
+//   // id of the div panel associated with the new network
+//   var networkPanelId = appUtilities.getNetworkPanelId(appUtilities.nextNetworkId);
+//
+//   // id of the tab for the new network
+//   var networkTabId = appUtilities.getNetworkTabId(appUtilities.nextNetworkId);
+//
+//   // use the default map name for the given next network id
+//   var mapName = appUtilities.getDefaultMapName(appUtilities.nextNetworkId);
+//
+//   // create physical html components for the new network
+//   // use map name as the tab description
+//   appUtilities.createPhysicalNetworkComponents(networkPanelId, networkTabId, mapName);
+//
+//   // generate network panel selector from the network panel id
+//   var networkPanelSelector = appUtilities.getNetworkPanelSelector(appUtilities.nextNetworkId);
+//
+//   // initialize current properties for the new instance by copying the default properties
+//   var currentLayoutProperties = jquery.extend(true, {}, appUtilities.defaultLayoutProperties);
+//   var currentGridProperties = jquery.extend(true, {}, appUtilities.defaultGridProperties);
+//   var currentGeneralProperties = jquery.extend(true, {}, appUtilities.defaultGeneralProperties);
+//
+//   // update the map name with the default map name specific for network id
+//   currentGeneralProperties.mapName = mapName;
+//
+//   // Create a new chise.js instance
+//   var newInst = chise({
+//     networkContainerSelector: networkPanelSelector,
+//     // whether to fit label to nodes
+//     fitLabelsToNodes: function () {
+//       var currentGeneralProperties = appUtilities.getScratch(newInst.getCy(), 'currentGeneralProperties');
+//       return currentGeneralProperties.fitLabelsToNodes;
+//     },
+//     // whether to fit label to nodes
+//     fitLabelsToInfoboxes: function () {
+//       var currentGeneralProperties = appUtilities.getScratch(newInst.getCy(), 'currentGeneralProperties');
+//       return currentGeneralProperties.fitLabelsToInfoboxes;
+//     },
+//     // dynamic label size it may be 'small', 'regular', 'large'
+//     dynamicLabelSize: function () {
+//       var currentGeneralProperties = appUtilities.getScratch(newInst.getCy(), 'currentGeneralProperties');
+//       return currentGeneralProperties.dynamicLabelSize;
+//     },
+//     // Whether to infer nesting on load
+//     inferNestingOnLoad: function () {
+//       var currentGeneralProperties = appUtilities.getScratch(newInst.getCy(), 'currentGeneralProperties');
+//       return currentGeneralProperties.inferNestingOnLoad;
+//     },
+//     // percentage used to calculate compound paddings
+//     compoundPadding: function () {
+//       var currentGeneralProperties = appUtilities.getScratch(newInst.getCy(), 'currentGeneralProperties');
+//       return currentGeneralProperties.compoundPadding;
+//     },
+//     // arrow size changed by a slider on a scale from 0.5-2
+//     arrowScale: function () {
+//       var currentGeneralProperties = appUtilities.getScratch(newInst.getCy(), 'currentGeneralProperties');
+//       return currentGeneralProperties.arrowScale;
+//     },
+//     extraCompartmentPadding: currentGeneralProperties.extraCompartmentPadding,
+//     extraComplexPadding: currentGeneralProperties.extraComplexPadding,
+//     showComplexName: currentGeneralProperties.showComplexName,
+//     // Whether to adjust node label font size automatically.
+//     // If this option return false do not adjust label sizes according to node height uses node.data('labelsize')
+//     // instead of doing it.
+//     adjustNodeLabelFontSizeAutomatically: function() {
+//       var currentGeneralProperties = appUtilities.getScratch(newInst.getCy(), 'currentGeneralProperties');
+//       return currentGeneralProperties.adjustNodeLabelFontSizeAutomatically;
+//     },
+//     // whether to improve flow (swap nodes)
+//     improveFlow: function () {
+//       var currentGeneralProperties = appUtilities.getScratch(newInst.getCy(), 'currentGeneralProperties');
+//       return currentGeneralProperties.improveFlow;
+//     },
+//     undoable: appUtilities.undoable,
+//     undoableDrag: function() {
+//       return appUtilities.ctrlKeyDown !== true;
+//     }
+//   });
+//
+//   //set border-width of selected nodes to a fixed value
+//   newInst.getCy().style()
+//     .selector('node:selected')
+//     .css({
+//       'border-width': function(ele){
+//         return Math.max(ele.data("border-width"), 3);
+//       }
+//     })
+//     .selector('edge:selected')
+//     .css({
+//       'width': function(ele){
+//         return Math.max(ele.data("width"), 3);
+//       }
+//     });
+//
+//   // set scracth pad of the related cy instance with these properties
+//   appUtilities.setScratch(newInst.getCy(), 'currentLayoutProperties', currentLayoutProperties);
+//   appUtilities.setScratch(newInst.getCy(), 'currentGridProperties', currentGridProperties);
+//   appUtilities.setScratch(newInst.getCy(), 'currentGeneralProperties', currentGeneralProperties);
+//
+//   // init the current file name for the map
+//   appUtilities.setScratch(newInst.getCy(), 'currentFileName', 'new_file.sbgnml');
+//
+//   // register cy extensions, bind cy events etc.
+//   var appCy = require('./app-cy');
+//   appCy(newInst);
+//
+//   var modeHandler = require('./app-mode-handler');
+//   modeHandler.initModeProperties(newInst.getCy());
+//
+//   // maintain networkIdToChiseInstance map
+//   appUtilities.putToChiseInstances(appUtilities.nextNetworkId, newInst);
+//
+//   // push network id to the top of network ids stack
+//   this.networkIdsStack.push(appUtilities.nextNetworkId);
+//
+//   // if this is the first network to be created set it as active network here
+//   // otherwise it will be activated (by listening html events) when the new tab is choosen
+//   if (appUtilities.nextNetworkId === 0) {
+//     appUtilities.setActiveNetwork(appUtilities.nextNetworkId);
+//   }
+//
+//   // physically open the new tab
+//   appUtilities.chooseNetworkTab(appUtilities.nextNetworkId);
+//
+//   // activate palette tab
+//   if (!$('#inspector-palette-tab').hasClass('active')) {
+//     $('#inspector-palette-tab a').tab('show');
+//     $('#inspector-style-tab a').blur();
+//   }
+//
+//   // increment new network id
+//   appUtilities.nextNetworkId++;
+//
+//   // adjust the visibility of network tabs
+//   appUtilities.adjustVisibilityOfNetworkTabs();
+//
+//   // return the new instance
+//   return newInst;
+// };
 
 // close the active network
 appUtilities.closeActiveNetwork = function () {
 
+    //FUNDA
+    //should not be able to close all the networks
+    if(this.networkIdsStack.length <=1){
+        return;
+    }
     // active network id is the one that is at the top of the stack
     // pop and get it
     var activeNetworkId = this.networkIdsStack.pop();
@@ -570,16 +730,10 @@ appUtilities.closeActiveNetwork = function () {
     // adjust the visibility of network tabs
     this.adjustVisibilityOfNetworkTabs();
 
+
     //FUNDA
-    $(document).trigger('closeActiveNetwork', activeNetworkId);
+    $(document).trigger('closeNetwork', activeNetworkId);
 
-};
-
-//FUNDA
-appUtilities.getActiveNetworkId = function(){
-    if(this.networkIdsStack.length  <= 0 )
-        return 0;
-    return this.networkIdsStack[this.networkIdsStack.length - 1];
 };
 
 // removes physical html components for the network that is represented by given networkKey
@@ -664,9 +818,20 @@ appUtilities.createPhysicalNetworkComponents = function (panelId, tabId, tabDesc
     // the container that lists the network tabs
     var tabsList = $('#network-tabs-list');
 
-    var newTabStr = '<li id="' + tabId + '" class="chise-tab chise-network-tab">\n\
-                  <a data-toggle="tab" href="#' + panelId + '">\n\
-                  <button class="close closeTab '+tabId+'closeTab" type="button" >&times</button>' + tabDesc + '</a></li>';
+    // FUNDA
+    // no close icon, don't let users close a tab
+    let newTabStr = '<li id="' + tabId + '" class="chise-tab chise-network-tab">\n<a data-toggle="tab" href="#' + panelId + '">\n' + tabDesc + '</a></li>';
+
+    //always keep the first tab
+    // let newTabStr;
+    // if(this.networkIdsStack.length  <= 0 ) {
+    //     newTabStr = '<li id="' + tabId + '" class="chise-tab chise-network-tab">\n<a data-toggle="tab" href="#' + panelId + '">\n' + tabDesc + '</a></li>';
+    // }
+    // else{
+    //     newTabStr = '<li id="' + tabId + '" class="chise-tab chise-network-tab">\n\
+    //               <a data-toggle="tab" href="#' + panelId + '">\n\
+    //               <button class="close closeTab '+tabId+'closeTab" type="button" >&times</button>' + tabDesc + '</a></li>';
+    // }
 
     $('ul').on('click', 'button.' + tabId +'closeTab', function() {
         var networkId = tabId.substring(17);
@@ -677,12 +842,20 @@ appUtilities.createPhysicalNetworkComponents = function (panelId, tabId, tabDesc
     $('ul').on('mousedown', '#' + tabId, function(e) {
         if( e.which == 2 ) {
             var networkId = tabId.substring(17);
+
             appUtilities.setActiveNetwork(networkId);
             appUtilities.closeActiveNetwork();
         }
     });
     // create new tab inside the list of network tabs
     tabsList.append(newTabStr);
+};
+
+//FUNDA
+appUtilities.getActiveNetworkId = function(){
+    if(this.networkIdsStack.length  <= 0 )
+        return 0;
+    return this.networkIdsStack[this.networkIdsStack.length - 1];
 };
 
 // basically get the active chise instance
@@ -697,6 +870,7 @@ appUtilities.getActiveChiseInstance = function () {
 
 // sets the active network through the network key to be activated
 appUtilities.setActiveNetwork = function (networkKey) {
+
 
     // get chise instance for network key
     var chiseInstance = this.getChiseInstance(networkKey);
@@ -720,6 +894,7 @@ appUtilities.setActiveNetwork = function (networkKey) {
 
     // adjust UI components for †he activated network
     this.adjustUIComponents();
+
 
 };
 
@@ -771,10 +946,10 @@ appUtilities.defaultLayoutProperties = {
     numIter: 2500,
     tile: true,
     animationEasing: 'cubic-bezier(0.17,0.72,0.41,0.98)',
+    animate: false, //funda
     // animate: 'end', //funda
-    animate: false,
-    // animationDuration: 2000,//funda
-    animationDuration: 500,//funda
+    // animationDuration: 2000, //funda
+    animationDuration: 500, //funda
     randomize: false,
     tilingPaddingVertical: 20,
     tilingPaddingHorizontal: 20,
@@ -826,7 +1001,7 @@ appUtilities.defaultGeneralProperties = {
     rearrangeOnComplexityManagement: true,
     animateOnDrawingChanges: true,
     adjustNodeLabelFontSizeAutomatically: false,
-    // enablePorts: true,
+    // enablePorts: true, //funda
     enablePorts: false, //funda
     enableSIFTopologyGrouping: false,
     allowCompoundNodeResize: true,
@@ -854,9 +1029,8 @@ appUtilities.setFileContent = function (fileName) {
         displayedSpan.appendChild(document.createTextNode(fileName.substring(0, 34) + "..." + fileName.substring(fileName.lastIndexOf('.')+1, fileName.length)));
     };
 
-    //FUNDA
+    //funda
     // displayedSpan.style.display = 'block';
-    displayedSpan.style.display = 'none';
     span.style.display = 'none';
 };
 
@@ -2096,9 +2270,24 @@ appUtilities.dragImageMouseMoveHandler = function (e) {
     $("#drag-image").css({left:e.pageX, top:e.pageY});
 };
 
-appUtilities.addDragImage = function (img, width, height){
+// get drag image for the given html value
+// html value corresponds to sbgnclass where space char is
+// replaced by '-' char
+appUtilities.getDragImagePath = function (htmlValue) {
+    var imgNameMap = {
+        'SIF-macromolecule': 'macromolecule',
+        'SIF-simple-chemical': 'simple-chemical'
+    };
+
+    var imgName = imgNameMap[ htmlValue ] || htmlValue;
+    var imgPath = 'app/img/nodes/' + imgName + '.svg';
+
+    return imgPath;
+}
+
+appUtilities.addDragImage = function (imgPath, width, height){
     // see: http://stackoverflow.com/questions/38838508/make-a-dynamic-image-follow-mouse
-    $(document.body).append('<img id="drag-image" src="app/img/nodes/'+img+'" style="position: absolute;'+
+    $(document.body).append('<img id="drag-image" src="'+imgPath+'" style="position: absolute;'+
         'width:'+width+'; height:'+height+'; left: -100px; top: -100px;" >');
     $(document).on("mousemove", appUtilities.dragImageMouseMoveHandler);
 };
@@ -2416,7 +2605,7 @@ appUtilities.setMapProperties = function(mapProperties, _chiseInstance) {
         chiseInstance.disablePorts();
     }
 
-    var topologyGrouping = appUtilities.getScratch(chiseInstance.getCy(), 'sifTopologyGrouping');
+    var topologyGrouping = chiseInstance.sifTopologyGrouping;
     if (currentGeneralProperties.enableSIFTopologyGrouping) {
         topologyGrouping.apply();
     }
@@ -2477,8 +2666,8 @@ appUtilities.launchWithModelFile = function() {
         loadFromURL(url_path, chiseInstance, promptInvalidURLWarning);
     else if(uri_path != undefined)
         loadFromURI(uri_path, chiseInstance, promptInvalidURIWarning);
-    // else
-    //     tutorial.introduction(false); //funda
+    // else //funda
+    //   tutorial.introduction(true);
 
     function loadFromURL(filepath, chiseInstance, promptInvalidURLWarning){
         // get current general properties
@@ -3034,6 +3223,9 @@ appUtilities.transformClassInfo = function( classInfo ) {
     }
     else if (res.includes("Ba ")){
         res = "BA " + res.substr(3);
+    }
+    else if (res.includes("Sif ")) {
+        res = "SIF " + res.substr(3);
     }
 
     return res;

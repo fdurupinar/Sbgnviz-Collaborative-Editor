@@ -80,15 +80,42 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
         });
 
 
+        pattern = {0: 'tell', 1: '&key', content: ['display-pc-path', '.', '*']};
+        this.tm.addHandler(pattern,  (text) => {
+            this.displayPCPath(text);
+
+        });
+
+        pattern = {0: 'request', 1: '&key', content: ['display-pc-path', '.', '*']};
+        this.tm.addHandler(pattern,  (text) => {
+            this.displayPCPath(text);
+
+        });
+
+
         pattern = {0: 'tell', 1: '&key', content: ['display-sbgn', '.', '*']};
         this.tm.addHandler(pattern,  (text) => {
+            console.log("display sbgn request");
             this.displaySbgn(text);
 
         });
 
         pattern = {0: 'request', 1: '&key', content: ['display-sbgn', '.', '*']};
         this.tm.addHandler(pattern,  (text) => {
+            console.log("display sbgn request");
             this.displaySbgn(text);
+        });
+
+
+        pattern = {0: 'tell', 1: '&key', content: ['display-sif', '.', '*']};
+        this.tm.addHandler(pattern,  (text) => {
+            this.displaySif(text);
+
+        });
+
+        pattern = {0: 'request', 1: '&key', content: ['display-sif', '.', '*']};
+        this.tm.addHandler(pattern,  (text) => {
+            this.displaySif(text);
         });
 
         pattern = {0: 'request', 1: '&key', content: ['open-query-window', '.', '*']};
@@ -216,6 +243,90 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
     }
 
 
+    displayPCPath(text) {
+        let self = this;
+
+
+
+        let contentObj = KQML.keywordify(text.content);
+        if (contentObj) {
+
+            this.getTermName(contentObj.source, (source) => {
+                this.getTermName(contentObj.target, (target) => {
+
+
+                    self.callPCQuery("pathsbetween?directed=false", source, target, 1, (result) => {
+
+
+                        if (result == "success")
+                            self.tm.replyToMsg(text, {0: 'reply', content: {0: 'success', type:"pathsbetween", limit: 1}});
+                        else if (result === "failure")
+                            self.tm.replyToMsg(text, {0: 'reply', content: {0: 'failure'}});
+                        else {
+                            console.log("looking at limit = 2");
+                            self.callPCQuery("pathsbetween?directed=false", source, target, 2, (result2) => {
+                                if (result2 == "success")
+                                    self.tm.replyToMsg(text, {0: 'reply', content: {0: 'success', type:"pathsbetween", limit:2}});
+                                else if (result2 === "failure")
+                                    self.tm.replyToMsg(text, {0: 'reply', content: {0: 'failure'}});
+                                else {
+
+                                    console.log("looking at neighborhood");
+                                    self.callPCQuery("neighborhood?direction=BOTHSTREAM", source, target, 1, (result3) => {
+
+                                        console.log(result3);
+                                        if (result3 == "success")
+                                            self.tm.replyToMsg(text, {0: 'reply', content: {0: 'success', type:"neighborhood", limit:1}});
+                                        else
+                                            self.tm.replyToMsg(text, {0: 'reply', content: {0: 'failure'}});
+                                    });
+                                }
+                            });
+                        }
+
+
+                    });
+                });
+            });
+        }
+    }
+
+    callPCQuery(queryType, source, target, limit, callback){
+        let self = this;
+        let responseHeaders = {
+            "access-control-allow-origin": "*",
+            "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
+            "access-control-allow-headers": "content-type, accept",
+            // "access-control-max-age": 10,
+            // "Content-Type": "application/json"
+        };
+
+        let url = 'https://www.pathwaycommons.org/sifgraph/v1/'+ queryType + '&limit=' + limit + '&source=' +  source + "&source=" + target;
+
+        console.log(url);
+        request({
+            url: url,
+            method: 'GET',
+            headers: responseHeaders,
+
+        }, function (error, response, body) {
+
+            if (error) {
+                callback("failure")
+            }
+            else {
+                if (response.statusCode === 200) {
+                    if(body.length == 0)
+                        callback("");
+                    else {
+                        self.askHuman(self.agentId, self.room, "openPCQueryWindow", {graph: body, type: 'sif'}, () => {
+                            callback("success");
+                        });
+                    }
+                }
+            }
+        });
+    }
 
     openQueryWindow(text){
         let self = this;
@@ -240,6 +351,26 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
 
     }
 
+    displaySif(text) {
+
+        let contentObj = KQML.keywordify(text.content);
+        if (contentObj) {
+
+            let sifModel = contentObj.graph;
+
+
+            sifModel = trimDoubleQuotes(sifModel);
+
+            sifModel = sifModel.replace(/(\\")/g, '"');
+
+            //The socket connection is between the interface and the agent, so we cannot directly emit messages
+            //we must ask the client with the browser to do it for us
+            //TODO: get the cyId from TRIPS
+            this.askHuman(this.agentId, this.room, "displaySif", {sif: sifModel, cyId: contentObj.cyId || "0"},  (val) => {
+
+            });
+        }
+    }
     displaySbgn(text) {
 
         let contentObj = KQML.keywordify(text.content);

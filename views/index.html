@@ -1,11 +1,9 @@
+
 <Title:>
     SBGNViz Collaborative Editor  ({{count(_page.doc.messages)}})  - {{_page.doc.users[_session.userId].name}}
 
     <Head:>
 
-
-        <!--<meta charset="utf-8">-->
-        <!--<meta http-equiv="X-UA-Compatible" content="IE=Edge">-->
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
 
@@ -23,12 +21,15 @@
         <!--
          <!--<link href="lib/css/jquery.qtip.css" rel="stylesheet" type="text/css" />-->
         <link href="lib/css/cytoscape-context-menus.css" rel="stylesheet" type="text/css" />
+
+
         <!-- app's style -->
         <!--<link href="node_modules/cytoscape-context-menus/cytoscape-context-menus.css" rel="stylesheet" type="text/css" />-->
         <link href="app/css/chise.css" rel="stylesheet">
 
         <link href="lib/css/jquery.highlighttextarea.css" rel="stylesheet">
         <link href="lib/css/jquery-ui.css" rel="stylesheet">
+        <!--For oncoprint-->
         <link href="lib/css/rangeslider.css" rel="stylesheet">
 
 
@@ -38,30 +39,25 @@
 
         <Body:>
 
-            <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>-->
-            <!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
 
-            <!---->
+            <!--<script src="lib/js/ocanvas.min.js"></script>-->
 
-            <script src="lib/js/ocanvas.min.js"></script>
             <script src="app/bundle.js"></script>
             <!-- libraries -->
 
 
-
-            <!--<script src="node_modules/bootstrap/dist/js/bootstrap.js"></script>-->
-
-
-            <!--<script src="lib/js/bootstrap.min.js"></script>-->
-
             <script src="lib/js/jquery.noty.packaged.js"></script>
 
 
+            <!--For zooming in and out of images-->
             <script src="lib/js/jquery.panzoom.js"></script>
             <script src="lib/js/jquery.mousewheel.js"></script>
 
+
+            <!--For factoid-->
             <script src="lib/js/jquery.highlighttextarea.js"></script>
 
+            <!--For canvas-tab resizable-->
             <script src="lib/js/jquery-ui.js"></script>
 
 
@@ -70,14 +66,6 @@
             <script src="lib/js/rangeslider.js"></script>
 
 
-
-
-            <!---->
-            <!--<script src="node_modules/ocanvas/build/dist/latest/ocanvas.min.js"></script>-->
-            <script src="node_modules/jquery/dist/jquery.js"></script>
-            <!--<script src="node_modules/qtip2/dist/jquery.qtip.js"></script>-->
-
-            <!--<script src="node_modules/cytoscape-qtip/cytoscape-qtip.js"></script>-->
 
             <script src="lib/js/socket.io.js"></script>
 
@@ -284,27 +272,27 @@
                                 </ul>
                             </li>
 
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                    Query
-                                    <b class="caret"></b>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li class="dropdown-submenu">
-                                        <a href="#" id="query-pathwaycommons" class="dropdown-toggle" data-toggle="dropdown">
-                                            Pathway Commons
-                                            <!--<b class="right-caret"></b>-->
-                                        </a>
-                                        <ul class="dropdown-menu">
-                                            <li><a href="#" id="query-pathsbetween">Paths Between...</a></li>
-                                            <li><a href="#" id="query-pathsbyURI">By URI...</a></li>
-                                            <li><a href="#" id="query-pathsfromto">Paths From To...</a></li>
-                                            <li><a href="#" id="query-commonstream">Common Stream...</a></li>
-                                            <li><a href="#" id="query-neighborhood">Neighborhood...</a></li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </li>
+                            <!--<li class="dropdown">-->
+                                <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown">-->
+                                    <!--Query-->
+                                    <!--<b class="caret"></b>-->
+                                <!--</a>-->
+                                <!--<ul class="dropdown-menu">-->
+                                    <!--<li class="dropdown-submenu">-->
+                                        <!--<a href="#" id="query-pathwaycommons" class="dropdown-toggle" data-toggle="dropdown">-->
+                                            <!--Pathway Commons-->
+                                            <!--&lt;!&ndash;<b class="right-caret"></b>&ndash;&gt;-->
+                                        <!--</a>-->
+                                        <!--<ul class="dropdown-menu">-->
+                                            <!--<li><a href="#" id="query-pathsbetween">Paths Between...</a></li>-->
+                                            <!--<li><a href="#" id="query-pathsbyURI">By URI...</a></li>-->
+                                            <!--<li><a href="#" id="query-pathsfromto">Paths From To...</a></li>-->
+                                            <!--<li><a href="#" id="query-commonstream">Common Stream...</a></li>-->
+                                            <!--<li><a href="#" id="query-neighborhood">Neighborhood...</a></li>-->
+                                        <!--</ul>-->
+                                    <!--</li>-->
+                                <!--</ul>-->
+                            <!--</li>-->
 
                             <!--<li class="dropdown">-->
                                 <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown">-->
@@ -332,7 +320,7 @@
                             </li>
                         </ul>
                         <a href="http://newteditor.org" target="_blank"><img class="newt-logo" height="25" width="auto" src="app/img/newt-logo.png"/></a>
-                        <span class="input-file" id="displayed-file-name"></span>
+                        <span class="input-file" id="displayed-file-name" style="display: none"></span>
                         <span class="input-file" id="file-name"></span>
                     </div>
                 </nav>
@@ -423,10 +411,10 @@
                     <img id="layout-properties-icon" class="sbgn-toolbar-element" src="app/img/toolbar/layout-properties.svg" title="Layout Properties: Modify parameters used during layout" >
                 </div>
 
-                <div class="menu-break-large sbgn-toolbar-element"></div>
-                <div class="inside-menu">
-                    <img id="query-pathsbetween-icon" class="sbgn-toolbar-element" src="app/img/toolbar/PC-logo.svg" title="Perform PC Query: Perform a PathwayCommons query to get a map of interest between specified genes" >
-                </div>
+                <!--<div class="menu-break-large sbgn-toolbar-element"></div>-->
+                <!--<div class="inside-menu">-->
+                    <!--<img id="query-pathsbetween-icon" class="sbgn-toolbar-element" src="app/img/toolbar/PC-logo.svg" title="Perform PC Query: Perform a PathwayCommons query to get a map of interest between specified genes" >-->
+                <!--</div>-->
 
                 <div class="menu-break-large sbgn-toolbar-element"></div>
                 <div class="inside-menu">
@@ -2260,6 +2248,7 @@
                 </div>
             </script>
 
+
             <!-- ChemicalView template for backbone.js -->
             <script type="text/template" id="chemical-template">
                 <!--<div class='node-details-text'>-->
@@ -2405,7 +2394,7 @@
                                 <li class = "active tab-link"><a data-toggle="tab"  href="#chat-area">Chat</a></li>
                                 <li class = "tab-link"><a data-toggle="tab"  href="#provenance-area">Provenance</a></li>
                                 <!--<li class = "tab-link"><a data-toggle="tab" href="#image-area">Images</a></li>-->
-                                <!--<li class = "tab-link"><a data-toggle="tab" href="#sbgn-inspector">Inspector</a></li>-->
+                                <li class = "tab-link"><a data-toggle="tab" href="#sbgn-inspector">Inspector</a></li>
                                 <!--<li class = "tab-link"><a data-toggle="tab" href="#command-history-area">Operations</a></li>-->
                                 <!--<li class = "tab-link"><a data-toggle="tab" href="#factoid-area">Reach</a></li>-->
                                 <!--<li class = "tab-link"><a data-toggle="tab" href="#visualization-test-area">VTest</a></li>-->
@@ -2421,7 +2410,7 @@
                                 <li id='inspector-style-tab' class="chise-tab"><a data-toggle="tab" href="#sbgn-inspector-style"><img width="18px" height="18px" src="app/img/tabs/properties.svg"/>Object</a></li>
                                 <!--<li id='inspector-map-tab' class="chise-tab"><a data-toggle="tab" href="#sbgn-inspector-map"><img width="18px" height="18px" src="app/img/toolbar/settings.svg"/>Map</a></li>-->
                                 <li id='inspector-map-tab' class="chise-tab"><a data-toggle="tab" href="#sbgn-inspector-map"><img width="18px" height="18px" src="app/img/toolbar/settings.svg"/>&nbsp;Map</a></li>
-                                <li id='inspector-palette-tab' class="chise-tab active"><a data-toggle="tab" href="#sbgn-inspector-palette"><img width="18px" height="18px" src="app/img/tabs/palette.svg"/>Palette</a></li>
+                                <!--<li id='inspector-palette-tab' class="chise-tab active"><a data-toggle="tab" href="#sbgn-inspector-palette"><img width="18px" height="18px" src="app/img/tabs/palette.svg"/>Palette</a></li>-->
                             </ul>
                             <div class="tab-content">
                                 <div id="sbgn-inspector-style" class="tab-pane fade">
@@ -2576,33 +2565,33 @@
                                                 <div class="panel-body">
                                                     <div id="sif-node-palette" class="element-palette node-palette">
                                                         <div class="paletteWrapper">
-                                                            <div class="paletteCol"><img src="app/img/nodes/macromolecule.svg" language="SIF" value="protein" title="Protein"/></div>
-                                                            <div class="paletteCol"><img src="app/img/nodes/macromolecule.svg" language="SIF" value="small molecule" title="Small Molecule"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/macromolecule.svg" language="SIF" value="SIF-macromolecule" title="Macromolecule"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/simple-chemical.svg" language="SIF" value="SIF-simple-chemical" title="Simple Chemical"/></div>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="panel-body" style="padding-bottom: 0px;">
                                                     <div id="sif-edge-palette" class="element-palette edge-palette">
                                                         <div class="paletteWrapper">
-                                                            <div class="paletteCol"><img src="app/img/edges/production.svg" language="SIF" value="controls-state-change-of" title="Controls State Change of"/></div>
-                                                            <div class="paletteCol"><img src="app/img/edges/production.svg" language="SIF" value="controls-transport-of" title="Controls Transport of"/></div>
-                                                            <div class="paletteCol"><img src="app/img/edges/production.svg" language="SIF" value="controls-phosphorylation-of" title="Controls Phosphorylation of"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/controls-state-change-of.svg" language="SIF" value="controls-state-change-of" title="Controls State Change of"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/controls-transport-of.svg" language="SIF" value="controls-transport-of" title="Controls Transport of"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/controls-phosphorylation-of.svg" language="SIF" value="controls-phosphorylation-of" title="Controls Phosphorylation of"/></div>
                                                             <div class="paletteCol"><img src="app/img/edges/controls-expression-of.svg" language="SIF" value="controls-expression-of" title="Controls Expression of"/></div>
-                                                            <div class="paletteCol"><img src="app/img/edges/production.svg" language="SIF" value="catalysis-precedes" title="Catalysis Precedes"/></div>
-                                                            <div class="paletteCol"><img src="app/img/edges/consumption.svg" language="SIF" value="in-complex-with" title="In Complex With"/></div>
-                                                            <div class="paletteCol"><img src="app/img/edges/consumption.svg" language="SIF" value="interacts-with" title="Interacts With"/></div>
-                                                            <div class="paletteCol"><img src="app/img/edges/consumption.svg" language="SIF" value="neighbor-of" title="Neighbor of"/></div>
-                                                            <div class="paletteCol"><img src="app/img/edges/production.svg" language="SIF" value="consumption-controled-by" title="Neighbor of"/></div>
-                                                            <div class="paletteCol"><img src="app/img/edges/production.svg" language="SIF" value="controls-production-of" title="Controls Production of"/></div>
-                                                            <div class="paletteCol"><img src="app/img/edges/production.svg" language="SIF" value="controls-transport-of-chemical" title="Controls Transport of Chemical"/></div>
-                                                            <div class="paletteCol"><img src="app/img/edges/production.svg" language="SIF" value="chemical-affects" title="Chemical Affects"/></div>
-                                                            <div class="paletteCol"><img src="app/img/edges/consumption.svg" language="SIF" value="reacts-with" title="Reacts With"/></div>
-                                                            <div class="paletteCol"><img src="app/img/edges/production.svg" language="SIF" value="used-to-produce" title="Used to Produce"/></div>
-                                                            <div class="paletteCol"><img src="app/img/edges/production.svg" language="SIF" value="activates" title="Activates"/></div>
-                                                            <div class="paletteCol"><img src="app/img/edges/inhibition.svg" language="SIF" value="inhibits" title="Inhibits"/></div>
-                                                            <div class="paletteCol"><img src="app/img/edges/production.svg" language="SIF" value="phosphorylates" title="Phosphorylates"/></div>
-                                                            <div class="paletteCol"><img src="app/img/edges/inhibition.svg" language="SIF" value="dephosphorylates" title="Dephosphorylates"/></div>
-                                                            <div class="paletteCol"><img src="app/img/edges/controls-expression-of.svg" language="SIF" value="upregulates-expression" title="Upregulates Expression"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/catalysis-precedes.svg" language="SIF" value="catalysis-precedes" title="Catalysis Precedes"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/in-complex-with.svg" language="SIF" value="in-complex-with" title="In Complex With"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/interacts-with.svg" language="SIF" value="interacts-with" title="Interacts With"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/neighbor-of.svg" language="SIF" value="neighbor-of" title="Neighbor of"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/consumption-controled-by.svg" language="SIF" value="consumption-controled-by" title="Consumption Controled By"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/controls-production-of.svg" language="SIF" value="controls-production-of" title="Controls Production of"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/controls-transport-of-chemical.svg" language="SIF" value="controls-transport-of-chemical" title="Controls Transport of Chemical"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/chemical-affects.svg" language="SIF" value="chemical-affects" title="Chemical Affects"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/reacts-with.svg" language="SIF" value="reacts-with" title="Reacts With"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/used-to-produce.svg" language="SIF" value="used-to-produce" title="Used to Produce"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/activates.svg" language="SIF" value="activates" title="Activates"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/inhibits.svg" language="SIF" value="inhibits" title="Inhibits"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/phosphorylates.svg" language="SIF" value="phosphorylates" title="Phosphorylates"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/dephosphorylates.svg" language="SIF" value="dephosphorylates" title="Dephosphorylates"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/upregulates-expression.svg" language="SIF" value="upregulates-expression" title="Upregulates Expression"/></div>
                                                             <div class="paletteCol"><img src="app/img/edges/downregulates-expression.svg" language="SIF" value="downregulates-expression" title="Downregulates Expression"/></div>
                                                         </div>
                                                     </div>
@@ -2610,6 +2599,7 @@
                                             </div>
                                         </div>
                                         <!-- SIF End -->
+
                                     </div>
                                 </div>
 
