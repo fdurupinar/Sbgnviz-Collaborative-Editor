@@ -24,7 +24,8 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
 
         setTimeout(function(){
 
-            self.tm.sendMsg({0: 'tell', content: ['start-conversation']});
+            // self.tm.sendMsg({0: 'tell', content: ['start-conversation']});
+            self.tm.sendMsg({0: 'broadcast', content: ['tell','start-conversation']});
             self.updateListeners();
 
         }, 2000);
