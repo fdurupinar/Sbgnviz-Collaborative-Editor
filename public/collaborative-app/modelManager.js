@@ -1259,6 +1259,11 @@ class ModelManager{
             if(edgeData.siteLocSet){ //dots in Pathway Commons links are causing problems
                 edgeData.siteLocSet = JSON.stringify(edgeData.siteLocSet);
             }
+            if(edgeData.pcIDSet){ //same workaround
+                edgeData.pcIDSet = JSON.stringify(edgeData.pcIDSet);
+
+            }
+
 
             this.changeModelEdgeAttribute('data', edge.id(), cyId, edgeData, user, noHistUpdate);
         }
