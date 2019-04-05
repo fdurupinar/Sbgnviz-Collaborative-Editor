@@ -61,6 +61,9 @@ module.exports = function(modelManager, socket, userId, app){
         //     });
         // },1000);
 
+        setTimeout(function () {
+            appUtilities.triggerLayout(cy, true);
+        }, 1000);
 
 
     });
@@ -158,6 +161,7 @@ module.exports = function(modelManager, socket, userId, app){
                 var loadFcn = function() {
                     var layoutBy = function() {
                         appUtilities.triggerLayout( cy, true );
+
                     };
                     chiseInstance.loadSIFFile(file, layoutBy, null);
 
@@ -168,7 +172,7 @@ module.exports = function(modelManager, socket, userId, app){
                 $(this).val("");
             }
         }
-        //TODO: is this unnecessary?
+
 
         setTimeout(function () {
             modelManager.initModel(appUtilities.getActiveCy().nodes(), appUtilities.getActiveCy().edges(),
