@@ -205,6 +205,7 @@ app.proto.create = function (model) {
     docReady = true;
 
     this.socket = io();
+
     this.notyView = window.noty({layout: "bottom",theme:"bootstrapTheme", text: "Please wait while model is loading."});
 
 

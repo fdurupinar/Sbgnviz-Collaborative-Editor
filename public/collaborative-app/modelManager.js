@@ -1183,6 +1183,7 @@ class ModelManager{
                 nodeData = node._private.data;
 
 
+            nodeData.annotationsView = null;
 
             if(nodeData.statesandinfos) {
 
@@ -1238,7 +1239,7 @@ class ModelManager{
 
         edgePath.set('id', edge.id());
 
-        // edge._private.data.annotationsView = null;
+
 
         //make this initially unselected
         //edgePath.set('highlightColor', null);
@@ -1250,11 +1251,14 @@ class ModelManager{
             edge.data(data);
 
         else {
+
+
             let edgeData = edge.data();
             if(edgeData == null)
                 edgeData = edge._private.data;
 
 
+            edgeData.annotationsView = null;
             //This is a workaround to handle (.) dots in mongo
             if(edgeData.siteLocSet){ //dots in Pathway Commons links are causing problems
                 edgeData.siteLocSet = JSON.stringify(edgeData.siteLocSet);
