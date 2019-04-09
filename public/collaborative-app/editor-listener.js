@@ -6,7 +6,7 @@
 let modelMergeFunctions = require('./model-merge-functions.js')();
 // Use mousetrap library to listen keyboard events
 let Mousetrap = require('mousetrap');
-
+let Tippy = require('tippy.js');
 
 module.exports = function(modelManager, socket, userId, app){
 
@@ -190,6 +190,7 @@ module.exports = function(modelManager, socket, userId, app){
 
         console.log("create new network with id: " + cyId);
         modelManager.openCy(cyId, "me");
+
 
 
         cy.on("afterDo afterRedo", function (event, actionName, args, res) {
@@ -565,9 +566,10 @@ module.exports = function(modelManager, socket, userId, app){
             modelManager.unselectModelNode(this, cyId, "me");
         });
 
-        // cy.on("cxttap", "edge", function () {
-        //     this.qtip(this.data().class);
-        // });
+
+        cy.on("cxttap", "edge", function (event) {
+            showTooltip(event, cy);
+        });
 
 
         cy.on('select', 'node', function (event) { //Necessary for multiple selections
@@ -597,6 +599,62 @@ module.exports = function(modelManager, socket, userId, app){
 
 
 
+    function showTooltip(event, cy) {
+        var edge = event.target || event.cyTarget;
+
+
+
+
+        var ref; // used only for positioning
+        var pos = event.position || event.cyPosition;
+
+        var zoom = cy.zoom();
+
+
+        var tooltipContent = event.target.data().class;
+
+        ref = edge.popperRef();
+
+
+        var placement =  'bottom';
+        var destroyTippy;
+
+        var tippy = Tippy.one(ref, {
+            content: (() => {
+                var content = document.createElement('div');
+
+                content.style['font-size'] = 2 * zoom + 'px';
+                content.innerHTML = tooltipContent;
+
+                return content;
+            })(),
+            trigger: 'manual',
+            hideOnClick: true,
+            arrow: true,
+            placement,
+            duration: 1000,
+            onHidden: function() {
+                cy.off('pan zoom', destroyTippy);
+                edge.off('position', destroyTippy);
+                cy.off('tapdrag', destroyTippy);
+            }
+        });
+
+        destroyTippy = function(){
+            tippy.destroy();
+        };
+
+        cy.on('pan zoom', destroyTippy);
+        edge.on('position', destroyTippy);
+        cy.on('tapdrag', destroyTippy);
+
+        setTimeout( () => tippy.show(), 0 );
+    }
+
+
+
+
 
 }
+
 
