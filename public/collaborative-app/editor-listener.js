@@ -7,6 +7,7 @@ let modelMergeFunctions = require('./model-merge-functions.js')();
 // Use mousetrap library to listen keyboard events
 let Mousetrap = require('mousetrap');
 
+
 module.exports = function(modelManager, socket, userId, app){
 
     // get a new mousetrap instance
@@ -17,6 +18,7 @@ module.exports = function(modelManager, socket, userId, app){
 
     // the cy from which some elements are copied last time
     var lastCopiedElesCy;
+
 
     // listen to "ctrl/command + m" keyboard event
     mt.bind(["ctrl+m", "command+m"], function () {
@@ -186,6 +188,7 @@ module.exports = function(modelManager, socket, userId, app){
 
     $(document).on("createNewNetwork", function (e, cy, cyId) {
 
+        console.log("create new network with id: " + cyId);
         modelManager.openCy(cyId, "me");
 
 
@@ -561,6 +564,10 @@ module.exports = function(modelManager, socket, userId, app){
         cy.on("mouseup", "node", function () {
             modelManager.unselectModelNode(this, cyId, "me");
         });
+
+        // cy.on("cxttap", "edge", function () {
+        //     this.qtip(this.data().class);
+        // });
 
 
         cy.on('select', 'node', function (event) { //Necessary for multiple selections

@@ -32,6 +32,7 @@
     "cytoscape-node-resize": "github:iVis-at-Bilkent/cytoscape.js-node-resize#unstable",
     "cytoscape-panzoom": "~2.5.2",
     "cytoscape-popper": "^1.0.2",
+    "cytoscape-qtip": "^2.7.1",
     "cytoscape-undo-redo": "github:iVis-at-Bilkent/cytoscape.js-undo-redo#master",
     "cytoscape-view-utilities": "github:iVis-at-Bilkent/cytoscape.js-view-utilities#unstable",
     "filesaverjs": "~0.2.2",

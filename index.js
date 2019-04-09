@@ -205,7 +205,6 @@ app.proto.create = function (model) {
     docReady = true;
 
     this.socket = io();
-
     this.notyView = window.noty({layout: "bottom",theme:"bootstrapTheme", text: "Please wait while model is loading."});
 
 
@@ -273,22 +272,34 @@ app.proto.create = function (model) {
 
         this.loadCyFromModel(cyId, function (isModelEmpty) {
         });
+
+        //To initialize the editor
+        this.editorListener = require('./public/collaborative-app/editor-listener.js')(this.modelManager,this.socket, id, this);
+
+        //HACK: This is normally called when a new network is created, but the initial network is created before editor-listener
+        //Lets editor-listener subscribe to UI operations
+        // does not actually create a new network, just notifies editor-listener
+        // triggers event listeners
+        $(document).trigger('createNewNetwork', [appUtilities.getCyInstance(cyId), cyId]);
+
+
     });
 
-    if(cyIds.length === 0) //no previous model -- first time loading the document
+    if(cyIds.length === 0) { //no previous model -- first time loading the document
         this.modelManager.openCy(appUtilities.getActiveNetworkId(), "me");
+
+        //To initialize the editor
+        this.editorListener = require('./public/collaborative-app/editor-listener.js')(this.modelManager,this.socket, id, this);
+
+        $(document).trigger('createNewNetwork', [appUtilities.getActiveCy(), appUtilities.getActiveNetworkId()]);
+    }
 
 
     this.notyView.close();
 
 
-    //To initialize the editor
-    this.editorListener = require('./public/collaborative-app/editor-listener.js')(this.modelManager,this.socket, id, this);
 
-    //HACK: This is normally called when a new network is created, but the initial network is created before editor-listener
-    //Lets editor-listener subscribe to UI operations
-    // does not actually create a new network, just notifies editor-listener
-    $(document).trigger('createNewNetwork', [appUtilities.getActiveCy(), appUtilities.getActiveNetworkId()]);
+
 
 
     //HACK
