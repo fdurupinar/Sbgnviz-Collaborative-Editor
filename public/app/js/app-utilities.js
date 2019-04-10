@@ -736,6 +736,11 @@ appUtilities.closeActiveNetwork = function () {
 
 };
 
+//FUNDA
+appUtilities.doesNetworkExist = function(id){
+    return id in this.networkIdsStack;
+}
+
 // removes physical html components for the network that is represented by given networkKey
 appUtilities.removePhysicalNetworkComponents = function (networkKey) {
 
