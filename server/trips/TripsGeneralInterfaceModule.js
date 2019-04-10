@@ -62,6 +62,8 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
 
     sendTripsRequest(req, data){
         let pattern = {0: 'request', content: {0: req, data: data}};
+
+        console.log("trips request " + req + " " + data);
         this.tm.sendMsg(pattern);
 
     }
