@@ -57,13 +57,21 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
 
         });
 
-
+        //
+        // this.askHuman(this.agentId, this.room, "displaySif", {sif: "", cyId: "0"},  (val) => {
+        //
+        // });
+        //
+        // this.askHuman(this.agentId, this.room, "displaySbgn", {sbgn: "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n" +
+        //         "<sbgn xmlns=\"http://sbgn.org/libsbgn/0.2\">\n" +
+        //         "  <map language=\"process description\"> </map>\n" +
+        //         "</sbgn>", cyId: "1"},  (val) => {
+        //
+        // });
     }
 
     sendTripsRequest(req, data){
         let pattern = {0: 'request', content: {0: req, data: data}};
-
-        console.log("trips request " + req + " " + data);
         this.tm.sendMsg(pattern);
 
     }
@@ -366,7 +374,7 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
         let contentObj = KQML.keywordify(text.content);
         if (contentObj) {
 
-            let sifModel = contentObj.graph;
+            let sifModel = contentObj.sif;
 
 
             sifModel = trimDoubleQuotes(sifModel);
@@ -386,7 +394,7 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
         let contentObj = KQML.keywordify(text.content);
         if (contentObj) {
 
-            let sbgnModel = contentObj.graph;
+            let sbgnModel = contentObj.sbgn;
 
             
             sbgnModel = trimDoubleQuotes(sbgnModel);
