@@ -27,6 +27,9 @@ module.exports = {
         var newTarget;
         var maxsize = newId.length;
 
+        if(!js.nodes || js.nodes.length <= 0 )
+            return;
+
         for(i = 0; i < js.nodes.length; i++) {
             old2newIds[js.nodes[i].data.id] = "ele" + newId;
             js.nodes[i].data.id = "ele" + newId;

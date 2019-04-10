@@ -339,17 +339,29 @@ module.exports =  function(app) {
 
             app.socket.on("displaySif", function(data, callback) {
 
-                if (!data.cyId)
+                let chiseInst;
+                if (!data.cyId) {
                     data.cyId = appUtilities.getActiveNetworkId();
+                    chiseInst = appUtilities.getActiveChiseInstance();
+                }
 
+                else{
+
+                    if(!appUtilities.doesNetworkExist())
+                        chiseInst = appUtilities.createNewNetwork(data.cyId); //opens a new tab
+                    else
+                        chiseInst =  appUtilities.getChiseInstance(data.cyId);
+
+                }
 
                 appUtilities.getCyInstance(data.cyId).remove(appUtilities.getCyInstance(data.cyId).elements());
 
 
-                let jsonObj = appUtilities.getChiseInstance(data.cyId).convertSifTextToJson(data.sif);
+
+                let jsonObj = chiseInst.convertSifTextToJson(data.sif);
 
 
-                appUtilities.getChiseInstance(data.cyId).updateGraph(jsonObj, () => {
+                chiseInst.updateGraph(jsonObj, () => {
 
                     app.modelManager.newModel(appUtilities.getActiveNetworkId(), "me"); //delete the existing model first so that ids don't get mixed up
 
@@ -379,19 +391,31 @@ module.exports =  function(app) {
             });
 
              app.socket.on("displaySbgn", function(data, callback){
+                 let chiseInst;
 
-                if(!data.cyId)
+                if(!data.cyId) {
                     data.cyId = appUtilities.getActiveNetworkId();
+                    chiseInst = appUtilities.getActiveChiseInstance();
+                }
+                else{
+
+                        if(!appUtilities.doesNetworkExist())
+                            chiseInst = appUtilities.createNewNetwork(data.cyId); //opens a new tab
+                        else
+                            chiseInst =  appUtilities.getChiseInstance(data.cyId);
+
+
+                }
 
 
 
                 appUtilities.getCyInstance(data.cyId).remove(appUtilities.getCyInstance(data.cyId).elements());
 
 
-                let jsonObj = appUtilities.getChiseInstance(data.cyId).convertSbgnmlTextToJson(data.sbgn);
+                let jsonObj = chiseInst.convertSbgnmlTextToJson(data.sbgn);
 
 
-                appUtilities.getChiseInstance(data.cyId).updateGraph(jsonObj, () => {
+                 chiseInst.updateGraph(jsonObj, () => {
 
                     app.modelManager.newModel( appUtilities.getActiveNetworkId(), "me"); //delete the existing model first so that ids don't get mixed up
 

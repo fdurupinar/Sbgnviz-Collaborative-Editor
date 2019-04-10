@@ -637,6 +637,12 @@ app.proto.listenToNodeOperations = function(model){
             appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).data(att, val);
             if(att === "parent")
                 appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).move({"parent":val});
+
+
+            let chiseInstance = appUtilities.getChiseInstance(cyId);
+
+            let sif = chiseInstance.getCurrentSif();
+            self.tripsAgent.sendTripsRequest({request:"updateTrips", data:sif});
         }
     });
 

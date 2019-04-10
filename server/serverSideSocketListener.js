@@ -975,6 +975,12 @@ module.exports.start = function(io, model, cancerDataOrganizer){
             }
         });
 
+        socket.on('agentSendTripsRequestRequest', function(data){
+            if(tripsGeneralInterfaceInstance ) {
+                tripsGeneralInterfaceInstance.sendTripsRequest(data.request, data.data);
+            }
+
+        });
         socket.on('agentConnectToTripsRequest', function(param){
             console.log("Agent trips connection request");
             if(!tripsGeneralInterfaceInstance || !tripsGeneralInterfaceInstance.isConnectedToTrips()) {

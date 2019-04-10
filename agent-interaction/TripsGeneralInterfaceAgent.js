@@ -32,6 +32,12 @@ TripsGeneralInterfaceAgent.prototype.relayMessage = function(text){
     this.tripsUttNum++;
 }
 
+TripsGeneralInterfaceAgent.prototype.sendTripsRequest = function(data){
+
+    this.sendRequest('agentSendTripsRequestRequest', data);
+
+}
+
 /***
  * Listen to messages from other actors and act accordingly
  * @param callback

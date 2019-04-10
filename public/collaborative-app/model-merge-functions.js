@@ -6,7 +6,16 @@ module.exports = function(){
         //Merge an array of json objects with the json of the current sbgn network
         //on display to output a single json object.
         mergeJsonWithCurrent: function (jsonGraph, cyId, modelManager, callback) {
-            let currJson = appUtilities.getChiseInstance(cyId).createJson();
+
+            let chiseInstance = appUtilities.getChiseInstance(cyId);
+            let currJson;
+            if(chiseInstance.getMapType()!='PD' && chiseInstance.getMapType()!='AF' )
+                currJson = chiseInstance.createJsonFromSif();
+            else
+                currJson = chiseInstance.createJsonFromSBGN();
+
+            console.log(jsonGraph);
+
             modelManager.setRollbackPoint(cyId); //before merging.. for undo
 
             let jsonObj = jsonMerger.mergeJsonWithCurrent(jsonGraph, currJson);
