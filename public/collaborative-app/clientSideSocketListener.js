@@ -347,7 +347,10 @@ module.exports =  function(app) {
 
                 else{
 
-                    if(!appUtilities.doesNetworkExist())
+                    data.cyId = parseInt(data.cyId);
+
+
+                    if(!appUtilities.doesNetworkExist(data.cyId))
                         chiseInst = appUtilities.createNewNetwork(data.cyId); //opens a new tab
                     else
                         chiseInst =  appUtilities.getChiseInstance(data.cyId);
@@ -399,7 +402,8 @@ module.exports =  function(app) {
                 }
                 else{
 
-                        if(!appUtilities.doesNetworkExist())
+                        data.cyId = parseInt(data.cyId);
+                        if(!appUtilities.doesNetworkExist(data.cyId))
                             chiseInst = appUtilities.createNewNetwork(data.cyId); //opens a new tab
                         else
                             chiseInst =  appUtilities.getChiseInstance(data.cyId);
