@@ -371,6 +371,7 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
 
     displaySif(text) {
 
+
         let contentObj = KQML.keywordify(text.content);
         if (contentObj) {
 
@@ -381,18 +382,27 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
 
             sifModel = sifModel.replace(/(\\")/g, '"');
 
+
+            let cyId = trimDoubleQuotes(contentObj.cyid);
+            cyId = cyId.replace(/(\\")/g, '"');
+
+
             //The socket connection is between the interface and the agent, so we cannot directly emit messages
             //we must ask the client with the browser to do it for us
             //TODO: get the cyId from TRIPS
-            this.askHuman(this.agentId, this.room, "displaySif", {sif: sifModel, cyId: contentObj.cyId || "0"},  (val) => {
+            this.askHuman(this.agentId, this.room, "displaySif", {sif: sifModel, cyId: cyId || "0"},  (val) => {
 
             });
         }
     }
     displaySbgn(text) {
 
+
+
         let contentObj = KQML.keywordify(text.content);
         if (contentObj) {
+
+
 
             let sbgnModel = contentObj.sbgn;
 
@@ -402,10 +412,14 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
             sbgnModel = sbgnModel.replace(/(\\")/g, '"');
             sbgnModel = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n" + sbgnModel;
 
+
+            let cyId = trimDoubleQuotes(contentObj.cyid);
+            cyId = cyId.replace(/(\\")/g, '"');
+
             //The socket connection is between the interface and the agent, so we cannot directly emit messages
             //we must ask the client with the browser to do it for us
             //TODO: get the cyId from TRIPS
-            this.askHuman(this.agentId, this.room, "displaySbgn", {sbgn: sbgnModel, cyId: contentObj.cyId || "0"},  (val) => {
+            this.askHuman(this.agentId, this.room, "displaySbgn", {sbgn: sbgnModel, cyId: cyId || "0"},  (val) => {
             // this.askHuman(this.agentId, this.room, "mergeSbgn", {graph: sbgnModel,  type:'sbgn', cyId: contentObj.cyId || "0"},  (val) => {
 
             // this.tm.replyToMsg(text, {0: 'reply', content: {das: 'success'}});

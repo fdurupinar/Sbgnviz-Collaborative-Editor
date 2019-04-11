@@ -236,6 +236,17 @@ module.exports = function(modelManager, socket, userId, app){
                 });
                 modelManager.changeModelElementGroupAttribute("data", modelElList,  cyId,paramList,  "me");
 
+
+
+
+                let chiseInstance = appUtilities.getChiseInstance(cyId);
+
+                let sif = chiseInstance.getCurrentSif();
+                console.log("sent trips request");
+                console.log(sif);
+                app.tripsAgent.sendTripsRequest({request:"update-sif", data:sif});
+
+
             }
             else if(actionName === "resize"){
 
