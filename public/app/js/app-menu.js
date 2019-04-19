@@ -1412,10 +1412,21 @@ module.exports = function() {
 
         // on active network tab change
         $(document).on('shown.bs.tab', '#network-tabs-list  a[data-toggle="tab"]', function (e) {
-            var target = $(e.target).attr("href"); // activated tab
-            console.log(target);
+
+
+
+            // setTimeout(()=> {
+                var target = $(e.target).attr("href"); // activated tab
+
+            $("#defaultOpen")[0].click(); //FUNDA: make sure networks tab is active
+            $('#network-tabs-list a[href="' + target + '"]').trigger('click'); //FUNDA reclick this
+
+
+
             appUtilities.setActiveNetwork(target);
             inspectorUtilities.handleSBGNInspector();
+            // }
+            //     ,1000);
         });
     }
 };

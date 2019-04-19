@@ -462,19 +462,15 @@
 
                             <div class="tab-content">
                                 <!--focus should be here add tabindex -->
-                                <!--<div id="sbgn-network-container" tabindex="0" class = "tab-pane fade in active"></div>-->
 
-                                <div id="network-panels-container" class="tab-content" tabindex="0" class = "tab-pane fade in active"> </div>
-
+                                <!--FUNDA: don't add fade in to the following tab as it hides the cy content-->
+                                <div id="network-panels-container" class="tab-content" tabindex="0" class = "tab-pane  active"> </div>
                                 <div id ="notes-container" class="tab-content" class = "tab-pane">
                                     <form id="notes-form" on-submit="saveNotes($event)">
 
                                         <textarea id="notes-input"  wrap ="soft">{{_page.doc.notes}}</textarea>
 
-
                                     </form>
-
-
 
                                 </div>
 
@@ -557,12 +553,15 @@
                         <div id = "canvas-tabs" class = "tabbable boxed parentTabs">
                             <ul class="nav nav-tabs">
                                 <li class = "active tab-link" >
-                                    <a data-toggle="tab" id = "defaultOpen" href="#network-panels-container">Networks</a></li>
-                                <div class tabbable>
-                                    <ul id="network-tabs-list" class="nav nav-tabs">
-                                    </ul>
+                                    <a data-toggle="tab" id = "defaultOpen" href="#network-panels-container">Networks</a>
+                                    <div class tabbable>
+                                        <ul id="network-tabs-list" class="nav nav-tabs">
+                                        </ul>
 
-                                </div>
+                                    </div>
+
+                                </li>
+
 
                                 <li class = "tab-link" id = "notes-tab">
                                     <a data-toggle="tab"  href="#notes-container">Notes</a>
@@ -572,7 +571,6 @@
                                     <a data-toggle="tab"  href="#oncoprint-container">Oncoprint</a>
                                 </li>
 
-                                <!--<li class = "active tab-link" ><a data-toggle="tab" id = "defaultOpen" href="#network-panels-container">Sbgn</a></li>-->
 
                                 {{ each _page.doc.images as #imageFile}}
 
