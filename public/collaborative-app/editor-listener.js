@@ -614,8 +614,6 @@ module.exports = function(modelManager, socket, userId, app){
         var edge = event.target || event.cyTarget;
 
 
-
-
         var ref; // used only for positioning
         var pos = event.position || event.cyPosition;
 
@@ -627,14 +625,14 @@ module.exports = function(modelManager, socket, userId, app){
         ref = edge.popperRef();
 
 
-        var placement =  'bottom';
+
         var destroyTippy;
 
         var tippy = Tippy.one(ref, {
             content: (() => {
                 var content = document.createElement('div');
 
-                content.style['font-size'] = 2 * zoom + 'px';
+                content.style['font-size'] = 3 * zoom + 'px';
                 content.innerHTML = tooltipContent;
 
                 return content;
@@ -642,12 +640,13 @@ module.exports = function(modelManager, socket, userId, app){
             trigger: 'manual',
             hideOnClick: true,
             arrow: true,
-            placement,
-            duration: 1000,
+            placement: "top",
+            duration: 200,
+            size: 'large',
             onHidden: function() {
-                cy.off('pan zoom', destroyTippy);
-                edge.off('position', destroyTippy);
-                cy.off('tapdrag', destroyTippy);
+                // cy.off('pan zoom', destroyTippy);
+                // edge.off('position', destroyTippy);
+                // cy.off('tapdrag', destroyTippy);
             }
         });
 
@@ -655,9 +654,9 @@ module.exports = function(modelManager, socket, userId, app){
             tippy.destroy();
         };
 
-        cy.on('pan zoom', destroyTippy);
-        edge.on('position', destroyTippy);
-        cy.on('tapdrag', destroyTippy);
+        // cy.on('pan zoom', destroyTippy);
+        // edge.on('position', destroyTippy);
+        // cy.on('tapdrag', destroyTippy);
 
         setTimeout( () => tippy.show(), 0 );
     }
