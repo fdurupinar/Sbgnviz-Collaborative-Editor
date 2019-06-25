@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../../">
+  <title data-ice="title">collaborative-app/js/reach-functions/idxCard-info.js | Sbgnviz-Collaborative-Editor</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js">js</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/modelManager.js~ModelManager.html">ModelManager</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-clientSideSocketListener">clientSideSocketListener</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-merger">js/merger</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/merger/json-merger.js~JsonMerger.html">JsonMerger</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/merger/rephrase-handler.js~RephraseHandler.html">RephraseHandler</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-modelmergefunctions">modelmergefunctions</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-newt-functions">js/newt-functions</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-editorlistener">editorlistener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-PathsBetweenQueryView">PathsBetweenQueryView</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-PathsByURIQueryView">PathsByURIQueryView</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-oncoprint">js/oncoprint</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/oncoprint/oncoprint-handler.js~OncoprintHandler.html">OncoprintHandler</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-reach-functions">js/reach-functions</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-idxCardinfo">idxCardinfo</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-idxCardToJson">idxCardToJson</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-visual-manipulation">js/visual-manipulation</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/visual-manipulation/vis-handler.js~VisHandler.html">VisHandler</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">collaborative-app/js/reach-functions/idxCard-info.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/*
+ * Copyright 2013 Memorial-Sloan Kettering Cancer Center.
+ *
+ * This file is part of PCViz.
+ *
+ * PCViz is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * PCViz is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with PCViz. If not, see &lt;http://www.gnu.org/licenses/&gt;.
+ */
+
+
+var _ = require(&apos;underscore&apos;);
+
+module.exports = function( model){
+
+
+    return{
+        el:&apos;#idxCard-container&apos;,
+        render: function() {
+            // pass variables in using Underscore.js template
+            var variables = {
+                idxCards: model
+            };
+
+            // compile the template using underscore
+            var template = _.template( $(&quot;#idxCard-template&quot;).html()); //funda
+
+            // load the compiled HTML into the Backbone &quot;el&quot;
+            $(this.el).html(template(variables));  //funda!!! has to be called like this
+
+
+
+            return this;
+        },
+
+
+    }
+};</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

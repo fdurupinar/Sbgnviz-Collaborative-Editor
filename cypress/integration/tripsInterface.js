@@ -5,7 +5,20 @@
 //
 //
 // describe('TRIPS Interface Test', function () {
+//     function connect(){
+//         it('Access global window object', function (done) {
+//             cy.visit('http://localhost:3000');
+//             cy.window().should(function (window) {
+//                 expect(window.testApp).to.be.ok;
+//                 expect(window.testApp.model).to.be.ok;
+//                 expect(window.testApp.docId).to.be.ok;
+//                 expect(window.$).to.be.ok;
+//                 expect(window.location.hostname).to.eq('localhost');
 //
+//                 done();
+//             });
+//         });
+//     }
 //
 //     function testGetTripsAgent() {
 //        it('get Trips Agent', function (done) {
@@ -31,6 +44,8 @@
 //
 //                 setTimeout(function () {
 //                     let pageList = app.model.get('_page.list');
+//
+//
 //                     expect(pageList[pageList.length - 1].comment).to.equal("Tell me what you want to do now.");
 //
 //                     let images = app.modelManager.getImages();
@@ -38,8 +53,8 @@
 //                     let modelCy = app.modelManager.getModelCy();
 //                     let provenance = app.model.get('_page.doc.provenance');
 //
-//                     expect(!modelCy.nodes || Object.keys(modelCy.nodes).length === 0).to.be.ok;
-//                     expect(!modelCy.edges || Object.keys(modelCy.edges).length === 0).to.be.ok;
+//                     expect(!modelCy ||!modelCy.nodes || Object.keys(modelCy.nodes).length === 0).to.be.ok;
+//                     expect(!modelCy ||!modelCy.edges || Object.keys(modelCy.edges).length === 0).to.be.ok;
 //
 //                     expect(provenance).to.be.not.ok;
 //                     expect(images).to.be.not.ok;
@@ -126,7 +141,7 @@
 //         });
 //     }
 //
-//
+//     connect();
 //     testGetTripsAgent();
 //     resetConversation(1000);
 //     speak("hello", "hello",1, 1000);

@@ -21,7 +21,7 @@
     "chise": "github:metincansiper/chise.js#sif-support",
     "chroma-js": "^1.3.4",
     "cytoscape": "github:iVis-at-Bilkent/cytoscape.js#unstable",
-    "cytoscape-autopan-on-drag": "^2.0.2",
+    "cytoscape-autopan-on-drag": "^2.2.0",
     "cytoscape-clipboard": "github:iVis-at-Bilkent/cytoscape.js-clipboard#master",
     "cytoscape-context-menus": "^3.0.2",
     "cytoscape-cose-bilkent": "github:cytoscape/cytoscape.js-cose-bilkent#unstable",
@@ -45,7 +45,7 @@
     "lodash.set": "^4.3.2",
     "mousetrap": "^1.6.3",
     "request": "^2.81.0",
-    "sbgnviz": "github:metincansiper/sbgnviz.js#sif-support",
+    "sbgnviz": "github:fdurupinar/sbgnviz.js#sif-support",
     "tippy.js": "^3.4.0",
     "underscore": "1.8.3"
   },

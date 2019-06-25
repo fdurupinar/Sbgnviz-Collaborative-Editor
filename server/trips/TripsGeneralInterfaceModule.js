@@ -57,28 +57,16 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
 
         });
 
-        //
-        // this.askHuman(this.agentId, this.room, "displaySif", {sif: "", cyId: "0"},  (val) => {
-        //
-        // });
-        //
-        // this.askHuman(this.agentId, this.room, "displaySbgn", {sbgn: "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n" +
-        //         "<sbgn xmlns=\"http://sbgn.org/libsbgn/0.2\">\n" +
-        //         "  <map language=\"process description\"> </map>\n" +
-        //         "</sbgn>", cyId: "1"},  (val) => {
-        //
-        // });
     }
 
     sendTripsRequest(req, data){
+
         let pattern = {0: 'request', content: {0: req, data: data}};
         this.tm.sendMsg(pattern);
 
     }
 
     setHandlers() {
-        let self = this;
-
         //Listen to spoken sentences
         let pattern = {0: 'tell', 1: '&key', content: ['spoken', '.', '*']};
         this.tm.addHandler(pattern, (text) => {
@@ -247,7 +235,7 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
 
                     //The socket connection is between the interface and the agent, so we cannot directly emit messages
                     //we must ask the client with the browser to do it for us
-                    self.askHuman(self.agentId, self.room, "addImage", imgData, function (val) {
+                    self.askHuman(self.agentId, self.room, "addImage", imgData, function () {
                       // self.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
                     });
 
@@ -361,7 +349,7 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
 
             //The socket connection is between the interface and the agent, so we cannot directly emit messages
             //we must ask the client with the browser to do it for us
-            self.askHuman(self.agentId, self.room, "openPCQueryWindow", {graph: sbgnModel}, function (val) {
+            self.askHuman(self.agentId, self.room, "openPCQueryWindow", {graph: sbgnModel}, function () {
 
                 // self.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
             });
@@ -390,7 +378,7 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
             //The socket connection is between the interface and the agent, so we cannot directly emit messages
             //we must ask the client with the browser to do it for us
             //TODO: get the cyId from TRIPS
-            this.askHuman(this.agentId, this.room, "displaySif", {sif: sifModel, cyId: cyId || "0"},  (val) => {
+            this.askHuman(this.agentId, this.room, "displaySif", {sif: sifModel, cyId: cyId || "0"},  () => {
 
             });
         }
@@ -419,8 +407,8 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
             //The socket connection is between the interface and the agent, so we cannot directly emit messages
             //we must ask the client with the browser to do it for us
             //TODO: get the cyId from TRIPS
-            this.askHuman(this.agentId, this.room, "displaySbgn", {sbgn: sbgnModel, cyId: cyId || "0"},  (val) => {
-            // this.askHuman(this.agentId, this.room, "mergeSbgn", {graph: sbgnModel,  type:'sbgn', cyId: contentObj.cyId || "0"},  (val) => {
+            this.askHuman(this.agentId, this.room, "displaySbgn", {sbgn: sbgnModel, cyId: cyId || "0"},  () => {
+            // this.askHuman(this.agentId, this.room, "mergeSbgn", {graph: sbgnModel,  type:'sbgn', cyId: contentObj.cyId || "0"},  () => {
 
             // this.tm.replyToMsg(text, {0: 'reply', content: {das: 'success'}});
             });
@@ -470,7 +458,7 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
             try {
 
                 let json = JSON.parse(data);
-                this.askHuman(this.agentId, this.room, "displayOncoprint", json, (val) => {
+                this.askHuman(this.agentId, this.room, "displayOncoprint", json, () => {
                 });
             }
             catch(e) {
@@ -480,7 +468,7 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
     }
 
     //Clean model request comes from another agent
-    cleanModel(){
+    cleanModel(shouldCleanProvenance){
         let responseHeaders = {
             "access-control-allow-origin": "*",
             "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
@@ -505,7 +493,7 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
         });
 
         //this will clean the image tabs and sbgn model
-        this.askHuman(this.agentId, this.room, "cleanModel",{},  function (val) {
+        this.askHuman(this.agentId, this.room, "cleanModel", shouldCleanProvenance,  function () {
         });
 
 
@@ -513,43 +501,12 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
     }
 
 
-    //Similar to clean model, but also cleans the provenance
-    cleanAll(){
-        let responseHeaders = {
-            "access-control-allow-origin": "*",
-            "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
-            "access-control-allow-headers": "content-type, accept",
-            "access-control-max-age": 10,
-            "Content-Type": "application/json"
-        };
-
-        //The socket connection is between the interface and the agent, so we cannot directly emit messages
-        //we must ask the client with the browser to do it for us
-        //Reset through clic
-        request({
-            url: 'http://localhost:8000/clic/initiate-reset', //URL to hit
-            headers: responseHeaders,
-            form: ''
-
-        }, function (error) {
-
-            if (error) {
-                console.log(error);
-            }
-        });
-
-        //this will clean the image tabs and sbgn model
-        this.askHuman(this.agentId, this.room, "cleanAll",{},  function (val) {
-        });
-
-
-        this.sendResetCausalityRequest();
-    }
 
     sendResetCausalityRequest(){
         let pattern = {0: 'request', content: {0: 'RESET-CAUSALITY-INDICES'}};
         this.tm.sendMsg(pattern);
     }
+
 
     /***
      * Extra messages that agents send
@@ -557,8 +514,6 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
      */
     addProvenance(text){
 
-        console.log("add provenance");
-        let self = this;
         let contentObj = KQML.keywordify(text.content);
         if(contentObj.html)
             contentObj.html = trimDoubleQuotes(contentObj.html);

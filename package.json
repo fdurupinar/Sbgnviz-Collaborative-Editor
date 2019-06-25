@@ -1,17 +1,20 @@
 {
   "name": "Sbgnviz-Collaborative-Editor",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "cypress run --config video=false"
+    "test": "cypress run --config video=false",
+    "lint:js": "eslint ./public/collaborative-app &&  eslint ./index.js && eslint ./agent-interaction/src/js && eslint ./server ",
+    "lint": "run-s lint:*",
+    "esdoc": "esdoc -c .esdoc.json"
   },
   "repository": {
     "type": "git",
     "url": "git://github.com/fdurupinar/sbgnviz-collaborative-editor.git"
   },
-  "author": "",
+  "author": "Funda Durupinar Babur",
   "license": "LGPL-3.0",
   "bugs": {
     "url": "https://github.com/fdurupinar/sbgnviz-collaborative-editor/issues"
@@ -20,20 +23,23 @@
   "dependencies": {
     "backbone": "1.3.3",
     "better-sqlite3": "^4.2.0",
-    "bluebird": "^3.5.3",
-    "bootstrap": "^3.3.7",
+    "bluebird": "^3.5.5",
+    "bootstrap": "^3.4.1",
     "circular-json": "^0.3.3",
     "coffeeify": "^2.0.1",
-    "compression": "^1.7.3",
+    "compression": "^1.7.4",
     "connect-mongo": "^1.1.0",
-    "cytoscape": "^3.2.20",
-    "derby": "^0.10.9",
-    "express": "^4.16.4",
-    "express-session": "^1.15.6",
+    "cytoscape": "^3.7.2",
+    "derby": "^0.10.10",
+    "esdoc-node": "^1.0.4",
+    "esdoc-standard-plugin": "^1.0.0",
+    "express": "^4.17.1",
+    "express-session": "^1.16.2",
     "jquery": "~3.3.1",
     "jquery-expander": "1.7.0",
     "mongodb": "^2.2.36",
-    "mousetrap": "^1.6.2",
+    "mousetrap": "^1.6.3",
+    "npm-run-all": "^4.1.2",
     "oncoprintjs": "^1.1.16",
     "onecolor": "^3.1.0",
     "pdf2text": "^1.1.0",
@@ -47,14 +53,21 @@
     "sharedb-mongo": "^1.0.0-beta.8",
     "socket-io": "^1.0.0",
     "socket.io": "^1.0.0",
-    "sqlite3": "^4.0.4",
+    "sqlite3": "^4.0.9",
+    "tippy.js": "^3.4.0",
     "underscore": "^1.9.1",
-    "ws": "^3.3.3",
-    "tippy.js": "^3.4.0"
+    "ws": "^3.3.3"
   },
   "devDependencies": {
     "@cypress/releaser": "^0.2.2",
-    "cypress": "^3.1.2",
+    "cypress": "^3.3.1",
+    "esdoc": "^1.1.0",
+    "eslint": "^4.15.0",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-node": "^5.1.1",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1",
     "qunitjs": "^2.4.1"
   }
 }

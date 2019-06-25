@@ -47,8 +47,7 @@ describe('modelManager User Operations Test', function () {
                 expect(userIds).to.be.ok;
                 expect(userIds[userIds.length - 1]).to.equal(userId);
 
-                let user = modelManager.getUserId(userId);
-                expect(user).to.be.ok;
+
             });
         });
     }

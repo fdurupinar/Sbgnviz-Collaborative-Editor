@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../../">
+  <title data-ice="title">collaborative-app/js/newt-functions/editor-listener.js | Sbgnviz-Collaborative-Editor</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js">js</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/modelManager.js~ModelManager.html">ModelManager</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-clientSideSocketListener">clientSideSocketListener</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-merger">js/merger</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/merger/json-merger.js~JsonMerger.html">JsonMerger</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/merger/rephrase-handler.js~RephraseHandler.html">RephraseHandler</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-modelmergefunctions">modelmergefunctions</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-newt-functions">js/newt-functions</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-editorlistener">editorlistener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-PathsBetweenQueryView">PathsBetweenQueryView</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-PathsByURIQueryView">PathsByURIQueryView</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-oncoprint">js/oncoprint</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/oncoprint/oncoprint-handler.js~OncoprintHandler.html">OncoprintHandler</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-reach-functions">js/reach-functions</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-idxCardinfo">idxCardinfo</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-idxCardToJson">idxCardToJson</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-visual-manipulation">js/visual-manipulation</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/visual-manipulation/vis-handler.js~VisHandler.html">VisHandler</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">collaborative-app/js/newt-functions/editor-listener.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/**
+ * Author: Funda Durupinar
+ * Created by durupina on 2/10/17.
+ * Listens and responds to cytoscape events triggered by cytoscape-undo-redo.js
+ */
+
+
+let modelMergeFunctions = require(&apos;../merger/model-merge-functions.js&apos;)();
+let Mousetrap = require(&apos;mousetrap&apos;); //used to listen to keyboard events
+let Tippy = require(&apos;tippy.js&apos;);
+let appUtilities = window.appUtilities;
+
+/**
+ *
+ * @param {Object} modelManager Model operations handler
+ * @param {Object} socket
+ * @param {string} userId
+ * @param {Object} app Derby.js application
+ */
+module.exports = function(modelManager, socket, userId, app){
+
+    // get a new mousetrap instance
+    let mt = new Mousetrap();
+
+    // jsons for the last copied elements
+    let lastCopiedElesJsons;
+
+    // the cy from which some elements are copied last time
+    let lastCopiedElesCy;
+
+
+    // listen to &quot;ctrl/command + m&quot; keyboard event
+    mt.bind([&quot;ctrl+m&quot;, &quot;command+m&quot;], function () {
+
+        console.log(&apos;to perform merge operation here&apos;);
+
+        // get the active chise instance
+        let chiseInstance = appUtilities.getActiveChiseInstance();
+
+        // get the related cy instance
+        let cy = chiseInstance.getCy();
+
+        // If the eles are already copied from this cy instance then merge is meaningless.
+        // Therefore return directly if that is the case.
+        if ( cy == lastCopiedElesCy ) {
+            return;
+        }
+
+        modelMergeFunctions.mergeJsonWithCurrent(lastCopiedElesJsons, appUtilities.getActiveNetworkId(), modelManager);
+
+        // return false to prevent default browser behavior
+        // and stop event from bubbling
+        return false;
+    });
+
+
+    //A new sample or file is loaded --update model and inform others
+    $(document).on(&quot;sbgnvizLoadSampleEnd sbgnvizLoadFileEnd&quot;,  function(event, file, cy){
+
+
+        console.log(&quot;Loading new sample&quot;);
+        //remove annotations view
+
+        //FIXME
+       modelManager.newModel( appUtilities.getActiveNetworkId(), &quot;me&quot;); //do not delete cytoscape, only the model
+       modelManager.initModel(cy.nodes(), cy.edges(), appUtilities.getActiveNetworkId());
+
+        // setTimeout(function(){
+        //         cy.elements().forEach(function(ele){
+        //         ele.data(&quot;annotationsView&quot;, null);
+        //         ele._private.data.annotationsView = null;
+        //     });
+        // },1000);
+
+        setTimeout(function () {
+            appUtilities.triggerLayout(cy, true);
+        }, 1000);
+
+
+    });
+
+    // call dynamicResize of CWC when dynamicResize is called for newt
+    $(document).on(&apos;newtAfterDynamicResize&apos;, function () {
+      app.dynamicResize();
+    });
+
+    $(document).on(&quot;CWC_after_copy&quot;, function (event, eleJsons, cy) {
+
+        console.log(&apos;common clipboard is updated&apos;);
+
+        // update jsons for the last copied elements
+        lastCopiedElesJsons = eleJsons;
+
+        // update the cy from which some elements are copied last time
+        lastCopiedElesCy = cy;
+    } );
+
+    // listen &apos;resizestop&apos; event on canvas tab area and force each of the cytoscape.js
+    // instance renderer to recalculate the viewport bounds.
+    $(&quot;#canvas-tab-area&quot;).on(&apos;resizestop&apos;, function () {
+
+        app.resizeCyCanvases();
+
+    });
+
+    $(&quot;#new-file, #new-file-icon&quot;).click(function () {
+        modelManager.openCy(appUtilities.getActiveNetworkId(), &quot;me&quot;);
+    });
+
+
+
+
+    $(document).on(&quot;closeNetwork&quot;, function (e, cyId) {
+        console.log(&quot;close cy is called for &quot; + cyId);
+
+        modelManager.closeCy(cyId, &quot;me&quot;);
+    });
+
+
+    $(&quot;#file-input&quot;).change(function () {
+        if ($(this).val() != &quot;&quot;) {
+            let file = this.files[0];
+
+            let extension = file.name.split(&apos;.&apos;).pop().toLowerCase();
+
+            if (extension === &quot;owl&quot;) {
+
+                let reader = new FileReader();
+
+                reader.onload = function () {
+
+                    socket.emit(&apos;BioPAXRequest&apos;, this.result, &quot;sbgn&quot;, function (sbgnData) { //convert to sbgn
+                        console.log(sbgnData);
+                        appUtilities.getActiveSbgnvizInstance().loadSBGNMLText(sbgnData.graph);
+                    });
+                };
+                reader.readAsText(file, &apos;UTF-8&apos;);
+            }
+            else {
+                appUtilities.getActiveChiseInstance().loadSBGNMLFile(file);
+            }
+        }
+        setTimeout(function () {
+            //remove annotations view first
+            // appUtilities.getActiveCy().elements().forEach(function(ele){
+            //     ele.data(&quot;annotationsView&quot;, null);
+            //     ele._private.data.annotationsView = null;
+            // });
+            modelManager.initModel(appUtilities.getActiveCy().nodes(), appUtilities.getActiveCy().edges(), appUtilities.getActiveNetworkId(),&quot;me&quot;);
+
+
+
+        }, 1000);
+
+        });
+
+    $(&quot;#sif-file-input&quot;).change(function () {
+        if ($(this).val() != &quot;&quot;) {
+            let file = this.files[0];
+
+            let chiseInstance = appUtilities.getActiveChiseInstance();
+
+                // use cy instance assocated with chise instance
+            let cy = appUtilities.getActiveCy();
+
+
+
+                let loadFcn = function() {
+                    let layoutBy = function() {
+                        appUtilities.triggerLayout( cy, true );
+
+                    };
+                    chiseInstance.loadSIFFile(file, layoutBy, null);
+
+                };
+
+                loadFcn();
+
+                $(this).val(&quot;&quot;);
+        }
+
+
+        setTimeout(function () {
+            modelManager.initModel(appUtilities.getActiveCy().nodes(), appUtilities.getActiveCy().edges(),
+                appUtilities.getActiveNetworkId(),  &quot;me&quot;);
+
+
+        }, 1000);
+
+    });
+
+
+    $(document).on(&quot;createNewNetwork&quot;, function (e, cy, cyId) {
+
+        console.log(&quot;create new network with id: &quot; + cyId);
+        modelManager.openCy(cyId, &quot;me&quot;);
+
+
+
+        cy.on(&quot;afterDo afterRedo&quot;, function (event, actionName, args, res) {
+
+            let modelElList = [];
+            let paramList = [];
+            let paramListPos = [];
+            let paramListData = [];
+            let modelNodeList = [];
+            let param;
+
+            console.log(cyId);
+
+            console.log(actionName);
+            console.log(args);
+            console.log(res);
+
+
+
+            if (actionName === &quot;changeData&quot; || actionName === &quot;changeFontProperties&quot; ) {
+
+                modelElList = [];
+                paramList = [];
+                args.eles.forEach(function (ele) {
+
+                    modelElList.push({id: ele.id(), isNode: ele.isNode()});
+
+                    ele.data(&quot;annotationsView&quot;, null);
+                    paramList.push(ele.data());
+
+                });
+                modelManager.changeModelElementGroupAttribute(&quot;data&quot;, modelElList, cyId, paramList,  &quot;me&quot;);
+
+            }
+
+            else if (actionName === &quot;changeNodeLabel&quot; ||actionName === &quot;resizeNodes&quot;||
+                actionName === &quot;addStateOrInfoBox&quot; || actionName === &quot;setMultimerStatus&quot; ||
+                actionName === &quot;setCloneMarkerStatus&quot; || actionName === &quot;changeStateOrInfoBox&quot; ||
+                actionName === &quot;removeStateOrInfoBox&quot; || actionName === &quot;setPortsOrdering&quot;) {
+
+                modelElList = [];
+                paramList = [];
+                args.nodes.forEach(function (ele) {
+
+                    modelElList.push({id: ele.id(), isNode: true});
+
+                    ele.data(&quot;annotationsView&quot;, null);
+                    paramList.push(ele.data());
+
+                });
+                modelManager.changeModelElementGroupAttribute(&quot;data&quot;, modelElList,  cyId,paramList,  &quot;me&quot;);
+
+
+                app.informTripsAboutModelChange(cyId);
+                
+
+            }
+            else if(actionName === &quot;resize&quot;){
+
+                modelElList = [{id: res.node.id(), isNode: true}];
+                paramList = [res.node.data()];
+
+                res.node.data(&quot;annotationsView&quot;, null);
+
+                modelManager.changeModelElementGroupAttribute(&quot;data&quot;, modelElList, cyId,paramList,  &quot;me&quot;);
+            }
+
+            else if (actionName === &quot;changeBendPoints&quot;) {
+
+                modelElList = [];
+                paramList = [];
+
+
+                modelElList.push({id: res.edge.id(), isNode: false});
+
+                res.edge.data(&quot;annotationsView&quot;, null);
+                res.edge._private.data.annotationsView = null;
+
+                console.log(res.edge._private.data.annotationsView);
+                console.log(res.edge._private.data);
+                console.log(res.edge.data());
+                paramList.push({weights: args.edge.data(&apos;cyedgebendeditingWeights&apos;), distances:res.edge.data(&apos;cyedgebendeditingDistances&apos;)});
+
+                modelManager.changeModelElementGroupAttribute(&quot;bendPoints&quot;, modelElList, cyId,paramList,  &quot;me&quot;);
+
+            }
+
+            else if(actionName === &quot;batch&quot;){
+                res.forEach(function(arg){
+                    console.log(arg.name);
+                   console.log(arg.param);
+                    if(arg.name === &quot;thinBorder&quot; || arg.name === &apos;thickenBorder&apos;){
+                        modelElList = [];
+                        paramList = [];
+                        arg.param.forEach(function (ele) {
+                            //let ele = param.ele;
+
+                            modelElList.push({id: ele.id(), isNode: ele.isNode()});
+
+                            ele.data(&quot;annotationsView&quot;, null);
+                            paramList.push(ele.data());
+
+                        });
+                        modelManager.changeModelElementGroupAttribute(&quot;data&quot;, modelElList, cyId, paramList,  &quot;me&quot;);
+                    }
+                    else if(arg.name === &apos;hideAndPerformLayout&apos; || arg.name === &apos;hide&apos;){
+                        modelElList = [];
+                        paramList = [];
+                        paramListPos = [];
+                        paramListData = [];
+
+                        if(arg.param) {
+                            let eles = arg.param.eles;
+                            if(!eles) eles = arg.param;
+
+                            eles.forEach(function (ele) {
+                                modelElList.push({id: ele.id(), isNode: ele.isNode()});
+                                paramList.push(&quot;hide&quot;);
+                                paramListPos.push(ele.position());
+                                ele.data(&quot;annotationsView&quot;, null);
+                                paramListData.push(ele.data());
+
+                            });
+                        }
+
+                        modelManager.changeModelElementGroupAttribute(&quot;data&quot;, modelElList, cyId, paramListData,  &quot;me&quot;);
+
+
+                        modelManager.changeModelElementGroupAttribute(&quot;visibilityStatus&quot;, modelElList, cyId, paramList, &quot;me&quot;);
+                        modelManager.changeModelElementGroupAttribute(&quot;position&quot;, modelElList, cyId, paramListPos,   &quot;me&quot;);
+
+                    }
+                    else if(arg.name === &apos;showAndPerformLayout&apos; || arg.name === &apos;show&apos; ){
+                        modelElList = [];
+                        paramList = [];
+
+
+
+                        if(arg.param) {
+                            let eles = arg.param.eles;
+                            if(!eles) eles = arg.param;
+
+                            eles.forEach(function (ele) {
+                                modelElList.push({id: ele.id(), isNode: ele.isNode()});
+                                paramList.push(&quot;show&quot;);
+                                paramListPos.push(ele.position());
+
+                                ele.data(&quot;annotationsView&quot;, null);
+                                paramListData.push(ele.data());
+
+                            });
+                        }
+
+                        modelManager.changeModelElementGroupAttribute(&quot;data&quot;, modelElList, cyId, paramListData,  &quot;me&quot;);
+                        modelManager.changeModelElementGroupAttribute(&quot;visibilityStatus&quot;, modelElList,  cyId, paramList,&quot;me&quot;);
+                        modelManager.changeModelElementGroupAttribute(&quot;position&quot;, modelElList,  cyId,paramListPos, &quot;me&quot;);
+
+
+                    }
+                })
+
+
+            }
+            // else if (actionName === &quot;hide&quot; || actionName === &quot;show&quot;) {
+            //     let modelElList = [];
+            //     let paramList = [];
+            //
+            //     args.forEach(function (ele) {
+            //         modelElList.push({id: ele.id(), isNode: ele.isNode()});
+            //         paramList.push(actionName);
+            //
+            //     });
+            //
+            //     modelManager.changeModelElementGroupAttribute(&quot;visibilityStatus&quot;, modelElList, cyId,paramList,  &quot;me&quot;);
+            // }
+
+            else if (actionName === &quot;highlight&quot;) {
+                modelElList = [];
+                paramList = [];
+
+
+                args.forEach(function (ele) {
+                    modelElList.push({id: ele.id(), isNode: ele.isNode()});
+                    paramList.push(&quot;highlighted&quot;);
+                });
+
+                modelManager.changeModelElementGroupAttribute(&quot;highlightStatus&quot;, modelElList, cyId,paramList,   &quot;me&quot;);
+            }
+
+            else if(actionName === &quot;removeHighlights&quot;){
+                modelElList = [];
+                paramList = [];
+
+
+                cy.elements().forEach(function (ele) {
+                    modelElList.push({id: ele.id(), isNode: ele.isNode()});
+                    paramList.push(&quot;unhighlighted&quot;);
+
+                });
+
+                modelManager.changeModelElementGroupAttribute(&quot;highlightStatus&quot;, modelElList,  cyId,paramList, &quot;me&quot;);
+
+            }
+            else if (actionName === &quot;expand&quot; || actionName === &quot;collapse&quot;) {
+
+                modelElList = [];
+                paramList = [];
+                args.nodes.forEach(function (ele) {
+                    modelElList.push({id: ele.id(), isNode: true});
+                    paramList.push(actionName);
+
+                });
+                modelManager.changeModelElementGroupAttribute(&quot;expandCollapseStatus&quot;, modelElList,  cyId,paramList, &quot;me&quot;);
+            }
+
+
+            else if (actionName === &quot;drag&quot; || actionName === &quot;align&quot;) {
+
+                modelElList = [];
+                paramList = [];
+                args.nodes.forEach(function (ele) {
+                    //let ele = param.ele;
+                    modelElList.push({id: ele.id(), isNode: true});
+                    paramList.push(ele.position());
+                });
+
+                modelManager.changeModelElementGroupAttribute(&quot;position&quot;, modelElList, cyId,paramList,  &quot;me&quot;);
+            }
+
+            else if (actionName === &quot;layout&quot;) {
+                cy.on(&apos;layoutstop&apos;, function() {
+
+                    console.log(&apos;Layout stopped&apos;);
+                    modelElList = [];
+                    paramList = [];
+
+
+                    args.eles.forEach(function (ele) {
+                        if(ele.isNode()){ //check if element is in the model already, otherwise don&apos;t try to add it
+                            // if(modelManager.isNodeInModel(cyId, ele.id()){
+                                modelElList.push({id: ele.id(), isNode: true});
+                                ele.data(&quot;annotationsView&quot;, null);
+                                paramList.push(ele.position());
+                            }
+                        // }
+                    });
+
+                    modelManager.changeModelElementGroupAttribute(&quot;position&quot;, modelElList, cyId, paramList,  &quot;me&quot;);
+
+                });
+            }
+
+
+            else if(actionName === &quot;deleteElesSimple&quot; || actionName === &quot;deleteNodesSmart&quot;){
+
+
+                let nodeList = [];
+                let edgeList = [];
+
+                res.forEach(function (el) {
+                    if(el.isNode())
+                        nodeList.push({id:el.id()});
+                    else
+                        edgeList.push({id:el.id()});
+                });
+
+                modelManager.deleteModelElementGroup({nodes:nodeList,edges: edgeList}, cyId, &quot;me&quot;);
+
+                app.informTripsAboutModelChange(cyId);
+            }
+
+            else if (actionName === &quot;addNode&quot;) {
+
+                res.eles.data(&quot;annotationsView&quot;, null);
+                let newNode = args.newNode;
+                let id = res.eles.id();
+                param = {position: {x: newNode.x, y: newNode.y}, data:{class: newNode.class, parent: newNode.parent}};
+                //Add to the graph first
+                modelManager.addModelNode(id,  cyId, param, &quot;me&quot;);
+                //assign other node properties-- css and data
+                modelManager.initModelNode(res.eles[0],  cyId, &quot;me&quot;, true);
+
+                app.informTripsAboutModelChange(cyId);
+
+            }
+
+            else if(actionName === &quot;addEdge&quot;){
+
+                let newEdge = args.newEdge;
+                param = {data:{ source: newEdge.source, target:newEdge.target, class: newEdge.class}};
+                //Add to the graph first
+                modelManager.addModelEdge(res.eles.id(),  cyId,param, &quot;me&quot;);
+                //assign other edge properties-- css and data
+                modelManager.initModelEdge(res.eles[0],  cyId,&quot;me&quot;, true);
+
+                app.informTripsAboutModelChange(cyId);
+
+            }
+
+            else if(actionName === &quot;paste&quot;){
+                res.forEach(function(el){ //first add nodes
+                    if(el.isNode()){
+
+                        el.data(&quot;annotationsView&quot;, null);
+                        param = {position: {x: el.position(&quot;x&quot;), y: el.position(&quot;y&quot;)}, data:el.data()};
+
+                        modelManager.addModelNode(el.id(),  cyId, param, &quot;me&quot;);
+
+                        modelManager.initModelNode(el,  cyId, &quot;me&quot;, true);
+
+
+                    }
+                });
+
+                res.forEach(function(el){ //first add nodes
+                    if(el.isEdge()){
+                        param = { source: el.data(&quot;source&quot;), target:el.data(&quot;target&quot;), class: el.data(&quot;class&quot;)};
+                        modelManager.addModelEdge(el.id(),  cyId,param, &quot;me&quot;);
+                        modelManager.initModelEdge(el,  cyId,&quot;me&quot;, true);
+                    }
+                });
+
+                app.informTripsAboutModelChange(cyId);
+
+            }
+            else if(actionName === &quot;changeParent&quot;){
+                modelElList = [];
+                paramList = [];
+                paramListData = [];
+                paramListPos = [];
+
+                modelNodeList = [];
+
+                res.movedEles.forEach(function (ele) {
+
+                    modelElList.push({id: ele.id(), isNode: ele.isNode()});
+                    ele.data(&quot;annotationsView&quot;, null);
+                    paramListData.push(ele.data());
+                    paramListPos.push(ele.position());
+
+                });
+
+                res.movedEles.forEach(function (ele) {
+                    //let ele = param.ele;
+
+                    if(ele.isNode()) {
+                        modelNodeList.push({id: ele.id(), isNode: ele.isNode()});
+                        paramListPos.push(ele.position());
+                    }
+
+                });
+
+                modelManager.changeModelElementGroupAttribute(&quot;data&quot;, modelElList, cyId, paramListData, &quot;me&quot;);
+                modelManager.changeModelElementGroupAttribute(&quot;position&quot;, modelNodeList, cyId, paramListPos, &quot;me&quot;);
+                app.informTripsAboutModelChange(cyId);
+
+            }
+            else if(actionName === &quot;createCompoundForGivenNodes&quot;){
+                paramListData = [];
+                modelElList = [];
+                modelNodeList = [];
+
+
+                //Last element is the compound, skip it and add the children
+                for(let i = 0; i &lt; res.newEles.length - 1; i++){
+                    let ele = res.newEles[i];
+
+                    if(ele.isNode()) {
+                        modelElList.push({id: ele.id(), isNode: true});
+                        ele.data(&quot;annotationsView&quot;, null);
+                        paramListData.push(ele.data()); //includes parent information
+                    }
+                }
+
+                let compoundId = res.newEles[0].data(&quot;parent&quot;);
+                let compound = cy.getElementById(compoundId);
+
+
+                let compoundAtts = {position:{x: compound.position(&quot;x&quot;), y: compound.position(&quot;y&quot;)}, data:compound.data()};
+
+                modelManager.addModelCompound(compound.id(), cyId, compoundAtts, modelElList, paramListData, &quot;me&quot; ); //handles data field update
+
+                //assign other node properties-- css and data
+                app.informTripsAboutModelChange(cyId);
+            }
+        });
+
+        cy.on(&quot;mouseup&quot;, &quot;node&quot;, function () {
+            modelManager.unselectModelNode(this, cyId, &quot;me&quot;);
+        });
+
+
+        cy.on(&quot;cxttap&quot;, &quot;edge&quot;, function (event) {
+            showTooltip(event, cy);
+        });
+
+
+        cy.on(&apos;select&apos;, &apos;node&apos;, function () { //Necessary for multiple selections
+            modelManager.selectModelNode(this,   cyId,userId, &quot;me&quot;);
+
+        });
+
+        cy.on(&apos;unselect&apos;, &apos;node&apos;, function () { //causes sync problems in delete op
+            modelManager.unselectModelNode(this,  cyId,&quot;me&quot;);
+        });
+        cy.on(&apos;grab&apos;, &apos;node&apos;, function () { //Also works as &apos;select&apos;
+            modelManager.selectModelNode(this,  cyId,userId, &quot;me&quot;);
+        });
+
+        cy.on(&apos;select&apos;, &apos;edge&apos;, function () {
+            modelManager.selectModelEdge(this,  cyId,userId, &quot;me&quot;);
+
+        });
+
+        cy.on(&apos;unselect&apos;, &apos;edge&apos;, function () {
+            modelManager.unselectModelEdge(this,  cyId,&quot;me&quot;);
+        });
+
+    });
+
+
+    /**
+     * Tooltip function for showing edge type information
+     * @param {Event} event
+     */
+    function showTooltip(event) {
+
+        let edge = event.target || event.cyTarget;
+        let tooltipContent = event.target.data().class;
+        let ref = edge.popperRef();
+
+        let tippy = Tippy.one(ref, {
+            content: (() =&gt; {
+                let content = document.createElement(&apos;div&apos;);
+
+                content.style[&apos;font-size&apos;] = &apos;12px&apos;; //make it independent of the zoom amount
+                content.innerHTML = tooltipContent;
+
+                return content;
+            })(),
+            trigger: &apos;manual&apos;,
+            hideOnClick: true,
+            arrow: true,
+            placement: &quot;top&quot;,
+            duration: 200,
+            size: &apos;large&apos;,
+        });
+
+
+        setTimeout( () =&gt; tippy.show(), 0 );
+    }
+
+}
+
+
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

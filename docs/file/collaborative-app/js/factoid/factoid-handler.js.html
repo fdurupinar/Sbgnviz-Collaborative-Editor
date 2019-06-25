@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../../">
+  <title data-ice="title">collaborative-app/js/factoid/factoid-handler.js | Sbgnviz-Collaborative-Editor</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js">js</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/modelManager.js~ModelManager.html">ModelManager</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-clientSideSocketListener">clientSideSocketListener</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-factoid">js/factoid</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-factoidhandler">factoidhandler</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-merger">js/merger</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-modelmergefunctions">modelmergefunctions</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-newt-functions">js/newt-functions</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-editorlistener">editorlistener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-PathsBetweenQueryView">PathsBetweenQueryView</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-PathsByURIQueryView">PathsByURIQueryView</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-oncoprint">js/oncoprint</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/oncoprint/oncoprint-handler.js~OncoprintHandler.html">OncoprintHandler</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-reach-functions">js/reach-functions</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-idxCardinfo">idxCardinfo</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-visual-manipulation">js/visual-manipulation</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/visual-manipulation/vis-handler.js~VisHandler.html">VisHandler</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">collaborative-app/js/factoid/factoid-handler.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/**
+ * Created by durupina on 11/14/16.
+ */
+
+let modelMergeFunctions = require(&apos;../merger/model-merge-functions.js&apos;)();
+let appUtilities = window.appUtilities;
+
+module.exports =  function(app) {
+
+    let idxcardjson = require(&apos;../reach-functions/idxcardjson-to-json-converter.js&apos;);
+
+    let socket = io();
+    let jsonGraphs;
+    let nodeMap;
+    let text= &apos;We introduce a new method. MDM2 phosphorylates TP53.  MDM2 deactivates RAF. A Sos-1-E3b1 complex directs Rac activation by entering into a tricomplex with Eps8.&apos;;
+
+    return   {
+        initialize: function(){
+
+            $(&apos;#factoidBox&apos;)[0].value = text;
+
+            let factoidModel = app.modelManager.getFactoidModel();
+
+            if(factoidModel != null){
+
+                jsonGraphs = factoidModel.jsonGraphs;
+                nodeMap = factoidModel.nodeMap;
+                this.updateTextBox(jsonGraphs);
+            }
+
+            this.listenToEvents();
+
+        },
+
+        updateTextBox: function(jsonGraphs){
+            let textFromJsons = &quot;&quot;;
+            for(let i = 0; i &lt; jsonGraphs.length; i++)
+                textFromJsons+= jsonGraphs[i].sentence + &apos;. &apos;;
+
+            text = textFromJsons;
+            $(&apos;#factoidBox&apos;)[0].value = text = textFromJsons;
+        },
+
+        loadFactoidModel: function(inputStr){
+            //parse each input sentence one by one
+
+
+            let jsonGraphs = [];
+
+            let notyView = window.noty({layout: &quot;bottom&quot;,text: &quot;Sending REACH queries&quot;});
+
+                socket.emit(&quot;REACHQuery&quot;, &quot;indexcard&quot;, inputStr, function (data) {
+                    let cards = JSON.parse(data).cards;
+
+                    cards.forEach(function(card){
+                        let jsonData = idxcardjson.createJson({cards: [card]});
+                            jsonGraphs.push({sentence: card.evidence[0], json: jsonData, idxCard:card});
+                    });
+
+                    notyView.setText( &quot;Merging graphs...&quot;);
+
+                    nodeMap = modelMergeFunctions.mergeJsons(jsonGraphs, appUtilities.getActiveNetworkId(), app.modelManager, function(){
+
+                        //save it to the model -- no hist update
+                        app.modelManager.updateFactoidModel({jsonGraphs: jsonGraphs, nodeMap: nodeMap, text: text}, &quot;me&quot;, true);
+                    }); //mapping between sentences and node labels
+                    notyView.close();
+
+                 });
+        },
+
+
+
+        highlightSentenceInText: function(nodeId, highlightColor){
+
+            try {
+                let el = $(&apos;#factoidBox&apos;);
+
+
+                if (highlightColor == null) {
+                    el.highlightTextarea(&apos;destroy&apos;);
+                    return;
+                }
+
+                if(nodeMap) {
+                    let sentences = nodeMap.sentences[nodeId];
+
+                    // let idxCards = nodeMap.idxCards[nodeId];
+
+
+                    //TODO: open this!!!!!! qtip not working
+                    // try {
+                    //     cy.$((&apos;#&apos; + nodeId)).qtip({
+                    //         content: {
+                    //             text: function (event, api) {
+                    //
+                    //                 let info = (new idxCardView(idxCards)).render();
+                    //                 let html = $(&apos;#idxCard-container&apos;).html();
+                    //
+                    //
+                    //                 api.set(&apos;content.text&apos;, html);
+                    //
+                    //                 return html;
+                    //
+                    //
+                    //             }
+                    //         },
+                    //         show: {
+                    //             ready: true
+                    //         },
+                    //         position: {
+                    //             my: &apos;top center&apos;,
+                    //             at: &apos;top middle&apos;,
+                    //             adjust: {
+                    //                 cyViewport: true
+                    //             },
+                    //             effect: false
+                    //         },
+                    //         style: {
+                    //             classes: &apos;qtip-bootstrap&apos;,
+                    //             tip: {
+                    //                 width: 20,
+                    //                 height: 20
+                    //             }
+                    //         }
+                    //     });
+                    //
+                    // }
+                    // catch(e){
+                    //     console.log(e);
+                    // }
+
+
+                    if (sentences) {
+
+                        let ranges = [];
+
+                        for (let i = 0; i &lt; sentences.length; i++) {
+                            let startInd = el[0].value.indexOf(sentences[i]);
+                            let endInd = startInd + sentences[i].length;
+                            ranges.push([startInd, endInd]);
+                        }
+                        console.log(ranges);
+
+                        el.highlightTextarea({
+                            ranges: [{
+                                color: highlightColor,//(&apos;#FFFF0&apos;),
+                                ranges: ranges
+                            }]
+                        });
+
+                    }
+                }
+            }
+            catch(e){
+                console.log(e);
+            }
+        },
+
+        setFactoidModel: function(factoidModel){
+            nodeMap = factoidModel.nodeMap;
+            jsonGraphs = factoidModel.jsonGraphs;
+            text = factoidModel.text;
+        },
+
+
+        loadFactoidPMC: function() {
+
+            let link = &quot;https://www.ncbi.nlm.nih.gov/pmc/articles/&quot; + $(&apos;#pmcBox&apos;).val() ;
+            socket.emit(&quot;HTTPRequest&quot;, link,  function(result){
+
+                $(&apos;#factoidBox&apos;)[0].value = result;
+            });
+        },
+
+        loadFactoidFile: function(){
+
+            let extension = $(&quot;#factoid-file-input&quot;)[0].files[0].name.split(&apos;.&apos;).pop().toLowerCase();
+
+
+            if(extension == &quot;pdf&quot;) {
+
+                let reader = new FileReader();
+                reader.onload = function () {
+
+                    socket.emit(&apos;pdfConvertRequest&apos;,this.result, function(pages){
+
+                        //Combine pages
+                        let txt  = &quot;&quot;;
+                        pages.forEach(function(page){
+
+                            page.forEach(function(el){
+
+                                txt += el + &quot; &quot;;
+                            });
+                        });
+
+                        //TODO txtData needs some kind of cleaning
+                        $(&apos;#factoidBox&apos;)[0].value = txt;
+
+                    });
+
+                };
+                reader.readAsArrayBuffer($(&quot;#factoid-file-input&quot;)[0].files[0]);
+
+
+
+            }
+            else{
+                let reader = new FileReader();
+                reader.onload = function () {
+
+                    $(&apos;#factoidBox&apos;)[0].value =  this.result; //change text
+
+                };
+                reader.readAsText($(&quot;#factoid-file-input&quot;)[0].files[0]);
+            }
+        },
+
+        listenToEvents: function(){
+            let self = this;
+
+            $(&apos;#factoid-text-submit-button&apos;).click(function () {
+                self.loadFactoidModel($(&apos;#factoidBox&apos;).val());
+
+            });
+
+            $(&apos;#factoid-text-clear-button&apos;).click(function () {
+                self.text = &apos;&apos;;
+                $(&apos;#factoidBox&apos;)[0].value = &apos;&apos;;
+
+            });
+
+
+            $(&apos;#factoid-file-input&apos;).change(function () {
+                self.loadFactoidFile();
+
+            });
+
+            $(&apos;#pmc-id-submit-button&apos;).click(function () {
+                self.loadFactoidPMC();
+
+            });
+
+        }
+
+    };
+}
+
+//TODO
+
+// if( typeof module !== &apos;undefined&apos; &amp;&amp; module.exports){ // expose as a nodejs module
+//     module.exports = new FactoidInput();</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

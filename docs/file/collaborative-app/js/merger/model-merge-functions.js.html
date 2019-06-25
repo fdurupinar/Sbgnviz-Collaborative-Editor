@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../../">
+  <title data-ice="title">collaborative-app/js/merger/model-merge-functions.js | Sbgnviz-Collaborative-Editor</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js">js</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/modelManager.js~ModelManager.html">ModelManager</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-clientSideSocketListener">clientSideSocketListener</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-merger">js/merger</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/merger/json-merger.js~JsonMerger.html">JsonMerger</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/merger/rephrase-handler.js~RephraseHandler.html">RephraseHandler</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-modelmergefunctions">modelmergefunctions</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-newt-functions">js/newt-functions</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-editorlistener">editorlistener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-PathsBetweenQueryView">PathsBetweenQueryView</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-PathsByURIQueryView">PathsByURIQueryView</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-oncoprint">js/oncoprint</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/oncoprint/oncoprint-handler.js~OncoprintHandler.html">OncoprintHandler</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-reach-functions">js/reach-functions</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-idxCardinfo">idxCardinfo</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-idxCardToJson">idxCardToJson</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-visual-manipulation">js/visual-manipulation</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/visual-manipulation/vis-handler.js~VisHandler.html">VisHandler</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">collaborative-app/js/merger/model-merge-functions.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">let JsonMerger = require(&apos;./json-merger.js&apos;);
+let jsonMerger = new JsonMerger();
+let appUtilities = window.appUtilities;
+
+
+module.exports = function(){
+
+    return {
+        //Merge an array of json objects with the json of the current sbgn network
+        //on display to output a single json object.
+        mergeJsonWithCurrent: function (jsonGraph, cyId, modelManager, callback) {
+
+            let chiseInstance = appUtilities.getChiseInstance(cyId);
+            let currJson;
+            if(chiseInstance.getMapType()!=&apos;PD&apos; &amp;&amp; chiseInstance.getMapType()!=&apos;AF&apos; )
+                currJson = chiseInstance.createJsonFromSif();
+            else
+                currJson = chiseInstance.createJsonFromSBGN();
+
+
+            console.log(jsonGraph);
+
+            modelManager.setRollbackPoint(cyId); //before merging.. for undo
+
+            let jsonObj = jsonMerger.mergeJsonWithCurrent(jsonGraph, currJson);
+
+            //get another sbgncontainer and display the new SBGN model.
+            modelManager.newModel(cyId, &quot;me&quot;, true);
+
+            //this takes a while so wait before initiating the model
+            appUtilities.getChiseInstance(cyId).updateGraph(jsonObj, function () {
+
+                modelManager.initModel(appUtilities.getCyInstance(cyId).nodes(), appUtilities.getCyInstance(cyId).edges(), cyId,  &quot;me&quot;);
+
+                //select the new graph
+                jsonGraph.nodes.forEach(function (node) {
+                    appUtilities.getCyInstance(cyId).getElementById(node.data.id).select();
+                });
+
+                $(&quot;#perform-layout&quot;).trigger(&apos;click&apos;);
+
+                appUtilities.getCyInstance(cyId).elements().unselect();
+
+                // Call merge notification after the layout
+                setTimeout(function () {
+                    modelManager.mergeJsons(cyId, &quot;me&quot;);
+                    if (callback) callback(&quot;success&quot;);
+                }, 1000);
+
+            }, true);
+        },
+
+        //Merge an array of json objects to output a single json object.
+        mergeJsons: function (jsonGraph, cyId, modelManager, callback) {
+            let idxCardNodeMap = {};
+            let sentenceNodeMap = {};
+
+            modelManager.setRollbackPoint(cyId); //before merging.. for undo
+
+            let jsonObj = jsonMerger.mergeJsons(jsonGraph, sentenceNodeMap, idxCardNodeMap);
+
+            modelManager.newModel(cyId, &quot;me&quot;, true);
+
+
+            console.log(jsonObj);
+
+            appUtilities.getChiseInstance(cyId).updateGraph(jsonObj, function(){
+
+                modelManager.initModel( appUtilities.getCyInstance(cyId).nodes(), appUtilities.getCyInstance(cyId).edges(), cyId,  &quot;me&quot;);
+
+                //Call layout after init
+                $(&quot;#perform-layout&quot;).trigger(&apos;click&apos;);
+
+
+                //Call merge notification after the layout
+                setTimeout(function () {
+                    modelManager.mergeJsons(cyId, &quot;me&quot;, true);
+
+                    if (callback) callback();
+                }, 1000);
+
+            }, true);
+
+            return {sentences: sentenceNodeMap, idxCards: idxCardNodeMap};
+        },
+
+
+
+    }
+}</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

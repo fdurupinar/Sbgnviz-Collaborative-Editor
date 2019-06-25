@@ -27,7 +27,7 @@ describe('Agent API Test', function () {
     }
     function newAgent() {
        it('new Agent', function () {
-           let Agent = require("../../agent-interaction/agentAPI.js");
+           let Agent = require("../../public/agent-interaction/src/js/agentAPI.js");
            agent = new Agent(agentName, agentId, io);
            expect(agent).to.be.ok;
         });
@@ -583,24 +583,27 @@ describe('Agent API Test', function () {
         expect(globalTestData.sbgnData2).to.be.ok;
 
         agent.sendRequest('agentMergeGraphRequest', {type: 'sbgn', graph: globalTestData.sbgnData2, cyId:cyId}, function (data) {
-            expect(data).to.be.ok;
-            done();
+            setTimeout(function () { //should wait here as well
+                expect(data).to.be.ok;
+                done();
+            }, 100);
         });
      });
     }
 
     function newFile(cyId){
-        it('agent.cleanAllRequest', function(done) {
+        //Cleans everything and the provenance
+        it('agent.cleanModelRequest', function(done) {
             cy.window().should(function (window) {
                 let modelManager = window.testApp.modelManager;
                 let jQuery = window.jQuery;
 
-                agent.sendRequest("agentCleanAllRequest", {}, function(){
+                agent.sendRequest("agentCleanModelRequest", {shouldCleanProvenance:true}, function(){
                     setTimeout(function () { //should wait here as well
                         let cy = modelManager.getModelCy(cyId);
                         expect(jQuery.isEmptyObject(window.appUtilities.getActiveCy().nodes) && jQuery.isEmptyObject(window.appUtilities.getActiveCy().edges)).to.equal(true);
                         done();
-                    },100);
+                    },1000);
                 });
             });
         });

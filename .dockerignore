@@ -1,5 +1,5 @@
 node_modules
 npm-debug.log
 .idea
-agent-interaction/PNNL-ovarian-correlations.txt
-agent-interaction/PC.sif
+public/agent-interaction/PNNL-ovarian-correlations.txt
+public/agent-interaction/PC.sif

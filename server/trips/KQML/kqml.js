@@ -139,6 +139,7 @@ function keywordArgs(kqml) {
 function patternMatches(pattern, message, useNamedWildcards) {
     var pt = typeof pattern;
     var mt = typeof message;
+    var match;
     if (pt == 'string' && pattern == '*') { // match anything
         if (useNamedWildcards) {
             return {};
@@ -146,7 +147,7 @@ function patternMatches(pattern, message, useNamedWildcards) {
             return [message];
         }
     } else if (useNamedWildcards && pt == 'string' && /^\$\w+$/.test(pattern)) {
-        var match = {};
+        match = {};
         match[pattern.substr(1)] = message;
         return match;
     } else if (pt == 'string' && mt == 'string' && !isKQMLString(pattern)) {
@@ -166,11 +167,13 @@ function patternMatches(pattern, message, useNamedWildcards) {
             message = keywordify(message);
         }
         var i;
+        var k;
         var hasRest = false;
         var hasKeys = false;
-        var match = (useNamedWildcards ? {} : []);
+        var submatch;
+        match = (useNamedWildcards ? {} : []);
         for (i = 0; i in pattern; i++) { // iterate over positional args
-            var submatch = undefined;
+            submatch = undefined;
             if (pattern[i] == '.' && (i+1) in pattern && pattern[i+1] == '*') {
                 hasRest = true;
                 break;
@@ -203,7 +206,7 @@ function patternMatches(pattern, message, useNamedWildcards) {
             for (var j = 0; i in message; i++, j++) {
                 restMatch[j] = message[i];
             }
-            for (var k in message) {
+            for (k in message) {
                 if (/^\d+$/.test(k)) {
                     continue;
                 }
@@ -230,7 +233,7 @@ function patternMatches(pattern, message, useNamedWildcards) {
                     keys.push(camelize(patternArray[i]));
                 }
             } else {
-                for (var k in pattern) { // iterate over keyword args
+                for (k in pattern) { // iterate over keyword args
                     if (!/^\d+$/.test(k)) {
                         keys.push(k);
                     }
@@ -238,8 +241,8 @@ function patternMatches(pattern, message, useNamedWildcards) {
                 keys.reverse();
             }
             for (i = keys.length - 1; i >= 0; i--) {
-                var k = keys[i];
-                var submatch = undefined;
+                k = keys[i];
+                submatch = undefined;
                 if (!(k in message &&
                     (submatch = patternMatches(pattern[k], message[k], useNamedWildcards)))) {
                     return false;
@@ -279,7 +282,6 @@ function deepEquals(a, b) {
         (Array.isArray(a) || a.constructor === Object)) {
         // keywordify both sides if necessary
         if (Array.isArray(a)) {
-            var aArray = a;
             a = keywordify(a);
         }
         if (Array.isArray(b)) {
@@ -391,8 +393,8 @@ KQMLStream.prototype.onWrappedData = function(string) {
             // otherwise try to parse up to the point the parse failed
             var prefix = this.dataSoFar.slice(0,errorOffset);
             try {
-                var data = parse(prefix);
-                this.safeOnData(data);
+
+                this.safeOnData( parse(prefix));
             } catch (e2) { // failing that, just log it and discard the failing bit
                 console.error(e2);
             }

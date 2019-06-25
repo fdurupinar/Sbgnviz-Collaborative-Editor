@@ -1,34 +1,3 @@
-let readline = require('readline');
-let fs = require('fs');
-
-
-/***
- * Calls cmdStr on console and runs callback function with parameter content
- * @param cmdStr
- * @param callback
- */
-let executeCommandLineProcess = function (cmdStr, callback){
-    try {
-        let exec = require('child_process').exec;
-
-        exec(cmdStr, function (error, stdout, stderr) {
-            console.log('stdout: ' + stdout);
-            if (stderr)
-                console.log('stderr: ' + stderr);
-            if (error !== null) {
-                if (callback) callback(error);
-                console.log('exec error: ' + error);
-            }
-
-            if (callback) callback();
-        });
-    }
-    catch(error){
-        console.log(error);
-        if(callback) callback();
-
-    }
-};
 
 /***
  * Read the file to visualize and return its contents in callback
@@ -71,7 +40,6 @@ module.exports.start = function(io, model, cancerDataOrganizer){
     let modelManagerList = {}; //not an array!
     let roomList = [];
     let humanList = [];
-    let pnnlArr  = [];
     let sampleSentencesJson;
     let tripsGeneralInterfaceInstance;
 
@@ -173,89 +141,6 @@ module.exports.start = function(io, model, cancerDataOrganizer){
         if(callback) callback();
     };
 
-    /***
-     * Read all the gene names in causal path data
-     * @param callback
-     */
-    let readGeneList = function(callback){
-        let filePath = './agent-interaction/CausalPath/causative-data-centric.sif';
-        let inStream = fs.createReadStream(filePath);
-        let rl = readline.createInterface(inStream);
-
-        let geneList = [];
-        rl.on('line', function (line) {
-            let vals = line.split("\t");
-
-            let id1 = vals[0].toUpperCase();
-            let id2 = vals[2].toUpperCase();
-
-            geneList[id1] = true;
-            geneList[id2] = true;
-        });
-
-        rl.on('close', function () {
-
-            if(callback) callback(geneList);
-        });
-    };
-
-    /***
-     * Read PNNL ovarian correlation data
-     * @param geneList
-     * @param callback
-     */
-    let readPNNLData = function(geneList, callback){
-        if(pnnlArr.length <= 0){
-            let filePathCorr = './agent-interaction/CausalPath/PNNL-ovarian-correlations.txt';
-            let instreamCorr = fs.createReadStream(filePathCorr);
-            let rlCorr = readline.createInterface(instreamCorr);
-
-            let i = 0;
-
-            rlCorr.on('line', function (line) {
-                let vals = line.split("\t");
-
-                let id1 = vals[0].toUpperCase();
-                let id2 = vals[1].toUpperCase();
-
-
-                if (id1.indexOf('/') < 0 && id2.indexOf('/') < 0) { //exclude incorrect formats
-                    let idStr1 = id1.split('-');
-                    let geneName1 = idStr1[0];
-                    let pSite1 = idStr1[1];
-
-                    let idStr2 = id2.split('-');
-                    let geneName2 = idStr2[0];
-                    let pSite2 = idStr2[1];
-
-                  //  if(Number(vals[2]) < 0.95 ) {
-
-                    if((geneList && (geneList[geneName1] || geneList[geneName2])) || !geneList){
-                        pnnlArr.push({
-                            id1: geneName1,
-                            id2: geneName2,
-                            pSite1: pSite1,
-                            pSite2: pSite2,
-                            correlation: vals[2],
-                            pVal: vals[3]
-                        });
-                        i++;
-                        console.log(i);
-                    }
-                }
-            });
-
-            rlCorr.on('close', function () {
-                console.log("PNNL data reading into memory complete.");
-                if (callback) callback(pnnlArr);
-
-            });
-        }
-        else{
-            if (callback) callback(pnnlArr);
-        }
-
-    };
 
     /***
      *
@@ -352,7 +237,7 @@ module.exports.start = function(io, model, cancerDataOrganizer){
                     sampleSentences.subscribe(function(){
                     });
                     users.subscribe(function () {
-                        let ModelManager = require("../public/collaborative-app/modelManager.js");
+                        let ModelManager = require("../public/collaborative-app/js/modelManager.js");
 
                         modelManagerList[data.room] = new ModelManager(model, data.room);
 
@@ -378,6 +263,9 @@ module.exports.start = function(io, model, cancerDataOrganizer){
                     });
                 });
 
+                model.on('all', (docPath + '.pysb.*.indraSif'), function (cyId, op, val) {
+                    tripsGeneralInterfaceInstance.updateIndraSif(cyId, val);
+                });
                 //Notify agents of model changes
                 model.on('insert', (docPath + '.history.**'), function (id, cmdInd) {
                         if (socket.subscribed) { //humans are connected through sockets as well,check userType to prevent notifying twice
@@ -442,16 +330,12 @@ module.exports.start = function(io, model, cancerDataOrganizer){
          * Reset Clic conversation and the BA
          */
         socket.on('resetConversationRequest', function(){
-            let p = new Promise((resolve, reject) => {
+            let p = new Promise((resolve) => {
                 if(tripsGeneralInterfaceInstance && tripsGeneralInterfaceInstance.isConnectedToTrips())
-
-
                     resolve("success");
             });
-            p.then((val) => {
-
-                tripsGeneralInterfaceInstance.cleanAll();
-
+            p.then(() => {
+                tripsGeneralInterfaceInstance.cleanModel(true);
             });
 
             //Send this to agents listening to conversations,  such as Clare
@@ -567,11 +451,6 @@ module.exports.start = function(io, model, cancerDataOrganizer){
             callback(roomList[roomList.length - 1]);
         });
 
-        socket.on('agentPNNLRequest', function(data, callback){
-            readGeneList(function(geneList){
-                readPNNLData(geneList, callback);
-            });
-        });
 
         socket.on('agentUndoRequest', function(data, callback){ //from computer agent
             try {
@@ -679,11 +558,6 @@ module.exports.start = function(io, model, cancerDataOrganizer){
             if(callback) callback("success");
         });
 
-        socket.on('agentDisconnectBobRequest', function(callback){
-
-
-        });
-
 
         //done via sockets as data conversion to json is done in menu-functions
         socket.on('agentLoadFileRequest',  function(data, callback){
@@ -716,8 +590,8 @@ module.exports.start = function(io, model, cancerDataOrganizer){
         });
 
 
-        socket.on('agentCleanAllRequest',  function(data, callback){
-            askHuman(data.userId, data.room,  "cleanAll", data, function(val){
+        socket.on('agentCleanModelRequest',  function(data, callback){
+            askHuman(data.userId, data.room,  "cleanModel", data, function(val){
                 if (callback) callback(val);
             });
         });
@@ -798,7 +672,7 @@ module.exports.start = function(io, model, cancerDataOrganizer){
             try {
                 //we know the edge id so add directly to the model
                 //second parameter needs to have a data field
-                let status = modelManagerList[data.room].addModelEdge(data.id,  data.cyId, data, "me");
+                modelManagerList[data.room].addModelEdge(data.id,  data.cyId, data, "me");
                 if (callback) callback(data.id);
             }
             catch(e){
@@ -861,8 +735,12 @@ module.exports.start = function(io, model, cancerDataOrganizer){
                 room: data.room
             });
             messagesQuery.fetch( function(err){
-                if(err) next(err);
-                callback(messagesQuery.get());
+                if(err){
+                    console.log(err);
+                    callback("error");
+                }
+                else
+                    callback(messagesQuery.get());
             });
         });
 
@@ -922,9 +800,7 @@ module.exports.start = function(io, model, cancerDataOrganizer){
         socket.on('agentPageDocRequest', function(data, callback){ //from computer agent
             try {
 
-
                 let pageDoc = modelManagerList[data.room].getPageDoc();
-
                 callback(pageDoc);
 
             }
@@ -938,7 +814,6 @@ module.exports.start = function(io, model, cancerDataOrganizer){
         //For testing purposes only
         socket.on('agentManualDisconnectRequest', function(data, callback){
             try {
-
 
                 //do not delete socket but remove agent from the list of users
                 modelManagerList[data.room].deleteUserId(data.userId);
@@ -1000,7 +875,6 @@ module.exports.start = function(io, model, cancerDataOrganizer){
                 tripsVisualizationInterfaceInstance.updateWebSocket(socket);
             }
         });
-
 
     };
 

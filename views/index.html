@@ -54,8 +54,6 @@
             <script src="lib/js/jquery.mousewheel.js"></script>
 
 
-            <!--For factoid-->
-            <script src="lib/js/jquery.highlighttextarea.js"></script>
 
             <!--For canvas-tab resizable-->
             <script src="lib/js/jquery-ui.js"></script>
@@ -362,8 +360,9 @@
                 <div class="inside-menu">
 
                     <div style="padding: 1px;" class="sbgn-toolbar-element"><img id="select-mode-icon" src="app/img/toolbar/select.svg" title="Select / Edit" ></div>
+                    <!--FUNDA CWC-->
                     <div style="padding: 1px;" class="sbgn-toolbar-element"><img id="add-node-mode-icon" src="app/img/nodes/unspecified-entity.svg" title="Create a new Unspecified Entity" ></div>
-                    <!--<div style="padding: 1px;" class="sbgn-toolbar-element"><img id="add-edge-mode-icon" src="app/img/edges/consumption.svg" title="Create a new Consumption" ></div>-->
+                    <div style="padding: 1px;" class="sbgn-toolbar-element"><img id="add-edge-mode-icon" src="app/img/edges/consumption.svg" title="Create a new Consumption" ></div>
 
                     <!--FUNDA: CWC-->
                     <!--<div class="menu-break-small sbgn-toolbar-element"></div>-->
@@ -2425,7 +2424,6 @@
                                 <!--<li class = "tab-link"><a data-toggle="tab" href="#image-area">Images</a></li>-->
                                 <li class = "tab-link"><a data-toggle="tab" href="#sbgn-inspector">Inspector</a></li>
                                 <!--<li class = "tab-link"><a data-toggle="tab" href="#command-history-area">Operations</a></li>-->
-                                <!--<li class = "tab-link"><a data-toggle="tab" href="#factoid-area">Reach</a></li>-->
                                 <!--<li class = "tab-link"><a data-toggle="tab" href="#visualization-test-area">VTest</a></li>-->
 
                             </ul>
@@ -2439,7 +2437,7 @@
                                 <li id='inspector-style-tab' class="chise-tab"><a data-toggle="tab" href="#sbgn-inspector-style"><img width="18px" height="18px" src="app/img/tabs/properties.svg"/>Object</a></li>
                                 <!--<li id='inspector-map-tab' class="chise-tab"><a data-toggle="tab" href="#sbgn-inspector-map"><img width="18px" height="18px" src="app/img/toolbar/settings.svg"/>Map</a></li>-->
                                 <li id='inspector-map-tab' class="chise-tab"><a data-toggle="tab" href="#sbgn-inspector-map"><img width="18px" height="18px" src="app/img/toolbar/settings.svg"/>&nbsp;Map</a></li>
-                                <!--<li id='inspector-palette-tab' class="chise-tab active"><a data-toggle="tab" href="#sbgn-inspector-palette"><img width="18px" height="18px" src="app/img/tabs/palette.svg"/>Palette</a></li>-->
+                                <li id='inspector-palette-tab' class="chise-tab active"><a data-toggle="tab" href="#sbgn-inspector-palette"><img width="18px" height="18px" src="app/img/tabs/palette.svg"/>Palette</a></li>
                             </ul>
                             <div class="tab-content">
                                 <div id="sbgn-inspector-style" class="tab-pane fade">
@@ -2485,218 +2483,175 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <!--CWC-->
                                 </div>
-                                <!--<div id="sbgn-inspector-palette" class="tab-pane fade in active">-->
-                                    <!--<div class="panel-group">-->
-                                        <!--<div class="panel">-->
-                                            <!--<div id="PD-palette-heading" class="panel-heading" data-toggle="collapse" data-target="#expand-collapse-pd-nodes-palette">-->
-                                                <!--<p class="panel-title accordion-toggle">-->
-                                                    <!--Process Description-->
-                                                <!--</p>-->
-                                            <!--</div>-->
-                                            <!--<div id="expand-collapse-pd-nodes-palette" class="panel-collapse collapse in">-->
-                                                <!--<div class="panel-body">-->
-                                                    <!--<div id="pd-node-palette" class="element-palette node-palette">-->
-                                                        <!--<div class="paletteWrapper">-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/macromolecule.svg" language="PD" value="macromolecule" title="Macromolecule"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/complex.svg" language="PD" value="complex" title="Complex"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/simple-chemical.svg" language="PD" value="simple-chemical" title="Simple Chemical"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/unspecified-entity.svg" language="PD" value="unspecified-entity" title="Unspecified Entity"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/nucleic-acid-feature.svg" language="PD" value="nucleic-acid-feature" title="Nucleic Acid Feature"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/perturbing-agent.svg" language="PD" value="perturbing-agent" title="Perturbing Agent"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/source-and-sink.svg" language="PD" value="source-and-sink" title="Source and Sink"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/phenotype.svg" language="PD" value="phenotype" title="Phenotype"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/process.svg" language="PD" value="process" title="Process"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/omitted-process.svg" language="PD" value="omitted-process" title="Omitted Process"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/uncertain-process.svg" language="PD" value="uncertain-process" title="Uncertain Process"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/association.svg" language="PD" value="association" title="Association"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/dissociation.svg" language="PD" value="dissociation" title="Dissociation"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/tag.svg" language="PD" value="tag" title="Tag"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/compartment.svg" language="PD" value="compartment" title="Compartment"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/submap.svg" language="PD" value="submap" title="Submap"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/and.svg" language="PD" value="and" title="AND"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/or.svg" language="PD" value="or" title="OR"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/not.svg" language="PD" value="not" title="NOT"/></div>-->
-                                                        <!--</div>-->
-                                                    <!--</div>-->
-                                                <!--</div>-->
-                                                <!--<div class="panel-body" style="padding-bottom: 0px;">-->
-                                                    <!--<div id="pd-edge-palette" class="element-palette edge-palette">-->
-                                                        <!--<div class="paletteWrapper">-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/consumption.svg" language="PD" value="consumption" title="Consumption"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/production.svg" language="PD" value="production" title="Production"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/modulation.svg" language="PD" value="modulation" title="Modulation"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/stimulation.svg" language="PD" value="stimulation" title="Stimulation"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/catalysis.svg" language="PD" value="catalysis" title="Catalysis"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/inhibition.svg" language="PD" value="inhibition" title="Inhibition"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/necessary-stimulation.svg" language="PD" value="necessary-stimulation" title="Necessary Stimulation"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/consumption.svg" language="PD" value="logic-arc" title="Logic Arc"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/consumption.svg" language="PD" value="equivalence arc" title="Equivalence Arc"/></div>-->
-                                                        <!--</div>-->
-                                                    <!--</div>-->
-                                                <!--</div>-->
-                                            <!--</div>-->
-                                        <!--</div>-->
-                                        <!--&lt;!&ndash; AF Nodes Panel &ndash;&gt;-->
-                                        <!--<div class="panel">-->
-                                            <!--<div id="AF-palette-heading" class="panel-heading collapsed" data-toggle="collapse" data-target="#expand-collapse-af-nodes-palette">-->
-                                                <!--<p class="panel-title accordion-toggle">-->
-                                                    <!--Activity Flow-->
-                                                <!--</p>-->
-                                            <!--</div>-->
+                                <div id="sbgn-inspector-palette" class="tab-pane fade in active">
+                                    <div class="panel-group">
+                                        <div class="panel">
+                                            <div id="PD-palette-heading" class="panel-heading" data-toggle="collapse" data-target="#expand-collapse-pd-nodes-palette">
+                                                <p class="panel-title accordion-toggle">
+                                                    Process Description
+                                                </p>
+                                            </div>
+                                            <div id="expand-collapse-pd-nodes-palette" class="panel-collapse collapse in">
+                                                <div class="panel-body">
+                                                    <div id="pd-node-palette" class="element-palette node-palette">
+                                                        <div class="paletteWrapper">
+                                                            <div class="paletteCol"><img src="app/img/nodes/macromolecule.svg" language="PD" value="macromolecule" title="Macromolecule"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/complex.svg" language="PD" value="complex" title="Complex"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/simple-chemical.svg" language="PD" value="simple-chemical" title="Simple Chemical"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/unspecified-entity.svg" language="PD" value="unspecified-entity" title="Unspecified Entity"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/nucleic-acid-feature.svg" language="PD" value="nucleic-acid-feature" title="Nucleic Acid Feature"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/perturbing-agent.svg" language="PD" value="perturbing-agent" title="Perturbing Agent"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/source-and-sink.svg" language="PD" value="source-and-sink" title="Source and Sink"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/phenotype.svg" language="PD" value="phenotype" title="Phenotype"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/process.svg" language="PD" value="process" title="Process"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/omitted-process.svg" language="PD" value="omitted-process" title="Omitted Process"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/uncertain-process.svg" language="PD" value="uncertain-process" title="Uncertain Process"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/association.svg" language="PD" value="association" title="Association"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/dissociation.svg" language="PD" value="dissociation" title="Dissociation"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/tag.svg" language="PD" value="tag" title="Tag"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/compartment.svg" language="PD" value="compartment" title="Compartment"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/submap.svg" language="PD" value="submap" title="Submap"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/and.svg" language="PD" value="and" title="AND"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/or.svg" language="PD" value="or" title="OR"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/not.svg" language="PD" value="not" title="NOT"/></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="panel-body" style="padding-bottom: 0px;">
+                                                    <div id="pd-edge-palette" class="element-palette edge-palette">
+                                                        <div class="paletteWrapper">
+                                                            <div class="paletteCol"><img src="app/img/edges/consumption.svg" language="PD" value="consumption" title="Consumption"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/production.svg" language="PD" value="production" title="Production"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/modulation.svg" language="PD" value="modulation" title="Modulation"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/stimulation.svg" language="PD" value="stimulation" title="Stimulation"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/catalysis.svg" language="PD" value="catalysis" title="Catalysis"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/inhibition.svg" language="PD" value="inhibition" title="Inhibition"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/necessary-stimulation.svg" language="PD" value="necessary-stimulation" title="Necessary Stimulation"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/consumption.svg" language="PD" value="logic-arc" title="Logic Arc"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/consumption.svg" language="PD" value="equivalence arc" title="Equivalence Arc"/></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- AF Nodes Panel -->
+                                        <div class="panel">
+                                            <div id="AF-palette-heading" class="panel-heading collapsed" data-toggle="collapse" data-target="#expand-collapse-af-nodes-palette">
+                                                <p class="panel-title accordion-toggle">
+                                                    Activity Flow
+                                                </p>
+                                            </div>
+                                            <!--CWC-->
                                             <!--<div id="expand-collapse-af-nodes-palette" class="panel-collapse collapse">-->
-                                                <!--<div class="panel-body">-->
-                                                    <!--<div id="af-node-palette" class="element-palette node-palette">-->
-                                                        <!--<div class="paletteWrapper">-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/BA-plain.svg" language="AF" value="BA-plain" title="Biological Activity"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/BA-macromolecule.svg" language="AF" value="BA-macromolecule" title="Macromolecule"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/BA-complex.svg" language="AF" value="BA-complex" title="Complex"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/BA-simple-chemical.svg" language="AF" value="BA-simple-chemical" title="Simple Chemical"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/BA-unspecified-entity.svg" language="AF" value="BA-unspecified-entity" title="Unspecified Entity"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/BA-nucleic-acid-feature.svg" language="AF" value="BA-nucleic-acid-feature" title="Nucleic Acid Feature"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/BA-perturbing-agent.svg" language="AF" value="BA-perturbing-agent" title="Perturbing Agent"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/phenotype.svg" language="AF" value="phenotype" title="Phenotype"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/compartment.svg" language="AF" value="compartment" title="Compartment"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/submap.svg" language="AF" value="submap" title="Submap"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/tag.svg" language="AF" value="tag" title="Tag"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/and.svg" language="AF" value="and" title="AND"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/or.svg" language="AF" value="or" title="OR"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/not.svg" language="AF" value="not" title="NOT"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/delay.svg" language="AF" value="delay" title="Delay"/></div>-->
-                                                        <!--</div>-->
-                                                    <!--</div>-->
-                                                <!--</div>-->
-                                                <!--&lt;!&ndash; AF Edges Panel &ndash;&gt;-->
-                                                <!--<div class="panel-body" style="padding-bottom: 0px;">-->
-                                                    <!--<div id="af-edge-palette" class="element-palette edge-palette">-->
-                                                        <!--<div class="paletteWrapper">-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/stimulation.svg" language="AF" value="positive influence" title="Positive Influence"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/inhibition.svg" language="AF" value="negative influence" title="Negative Influence"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/modulation.svg" language="AF" value="unknown influence" title="Unknown Influence"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/necessary-stimulation.svg" language="AF" value="necessary-stimulation" title="Necessary Stimulation"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/consumption.svg" language="AF" value="logic-arc" title="Logic Arc"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/consumption.svg" language="AF" value="equivalence arc" title="Equivalence Arc"/></div>-->
-                                                        <!--</div>-->
-                                                    <!--</div>-->
-                                                <!--</div>-->
-                                            <!--</div>-->
-                                        <!--</div>-->
-                                        <!--&lt;!&ndash; AF Edges End &ndash;&gt;-->
+                                            <div id="expand-collapse-af-nodes-palette" class="panel-collapse">
+                                                <div class="panel-body">
+                                                    <div id="af-node-palette" class="element-palette node-palette">
+                                                        <div class="paletteWrapper">
+                                                            <div class="paletteCol"><img src="app/img/nodes/BA-plain.svg" language="AF" value="BA-plain" title="Biological Activity"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/BA-macromolecule.svg" language="AF" value="BA-macromolecule" title="Macromolecule"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/BA-complex.svg" language="AF" value="BA-complex" title="Complex"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/BA-simple-chemical.svg" language="AF" value="BA-simple-chemical" title="Simple Chemical"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/BA-unspecified-entity.svg" language="AF" value="BA-unspecified-entity" title="Unspecified Entity"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/BA-nucleic-acid-feature.svg" language="AF" value="BA-nucleic-acid-feature" title="Nucleic Acid Feature"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/BA-perturbing-agent.svg" language="AF" value="BA-perturbing-agent" title="Perturbing Agent"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/phenotype.svg" language="AF" value="phenotype" title="Phenotype"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/compartment.svg" language="AF" value="compartment" title="Compartment"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/submap.svg" language="AF" value="submap" title="Submap"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/tag.svg" language="AF" value="tag" title="Tag"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/and.svg" language="AF" value="and" title="AND"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/or.svg" language="AF" value="or" title="OR"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/not.svg" language="AF" value="not" title="NOT"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/delay.svg" language="AF" value="delay" title="Delay"/></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- AF Edges Panel -->
+                                                <div class="panel-body" style="padding-bottom: 0px;">
+                                                    <div id="af-edge-palette" class="element-palette edge-palette">
+                                                        <div class="paletteWrapper">
+                                                            <div class="paletteCol"><img src="app/img/edges/stimulation.svg" language="AF" value="positive influence" title="Positive Influence"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/inhibition.svg" language="AF" value="negative influence" title="Negative Influence"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/modulation.svg" language="AF" value="unknown influence" title="Unknown Influence"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/necessary-stimulation.svg" language="AF" value="necessary-stimulation" title="Necessary Stimulation"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/consumption.svg" language="AF" value="logic-arc" title="Logic Arc"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/consumption.svg" language="AF" value="equivalence arc" title="Equivalence Arc"/></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- AF Edges End -->
 
-                                        <!--&lt;!&ndash; SIF Start &ndash;&gt;-->
-                                        <!--<div class="panel">-->
-                                            <!--<div id="SIF-palette-heading" class="panel-heading" data-toggle="collapse" data-target="#expand-collapse-sif-nodes-palette">-->
-                                                <!--<p class="panel-title accordion-toggle">-->
-                                                    <!--SIF-->
-                                                <!--</p>-->
-                                            <!--</div>-->
+                                        <!-- SIF Start -->
+                                        <div class="panel">
+                                            <div id="SIF-palette-heading" class="panel-heading" data-toggle="collapse" data-target="#expand-collapse-sif-nodes-palette">
+                                                <p class="panel-title accordion-toggle">
+                                                    SIF
+                                                </p>
+                                            </div>
+                                            <!--CWC-->
                                             <!--<div id="expand-collapse-sif-nodes-palette" class="panel-collapse collapse">-->
-                                                <!--<div class="panel-body">-->
-                                                    <!--<div id="sif-node-palette" class="element-palette node-palette">-->
-                                                        <!--<div class="paletteWrapper">-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/macromolecule.svg" language="SIF" value="SIF-macromolecule" title="Macromolecule"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/nodes/simple-chemical.svg" language="SIF" value="SIF-simple-chemical" title="Simple Chemical"/></div>-->
-                                                        <!--</div>-->
-                                                    <!--</div>-->
-                                                <!--</div>-->
-                                                <!--<div class="panel-body" style="padding-bottom: 0px;">-->
-                                                    <!--<div id="sif-edge-palette" class="element-palette edge-palette">-->
-                                                        <!--<div class="paletteWrapper">-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/controls-state-change-of.svg" language="SIF" value="controls-state-change-of" title="Controls State Change of"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/controls-transport-of.svg" language="SIF" value="controls-transport-of" title="Controls Transport of"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/controls-phosphorylation-of.svg" language="SIF" value="controls-phosphorylation-of" title="Controls Phosphorylation of"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/controls-expression-of.svg" language="SIF" value="controls-expression-of" title="Controls Expression of"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/catalysis-precedes.svg" language="SIF" value="catalysis-precedes" title="Catalysis Precedes"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/in-complex-with.svg" language="SIF" value="in-complex-with" title="In Complex With"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/interacts-with.svg" language="SIF" value="interacts-with" title="Interacts With"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/neighbor-of.svg" language="SIF" value="neighbor-of" title="Neighbor of"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/consumption-controled-by.svg" language="SIF" value="consumption-controled-by" title="Consumption Controled By"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/controls-production-of.svg" language="SIF" value="controls-production-of" title="Controls Production of"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/controls-transport-of-chemical.svg" language="SIF" value="controls-transport-of-chemical" title="Controls Transport of Chemical"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/chemical-affects.svg" language="SIF" value="chemical-affects" title="Chemical Affects"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/reacts-with.svg" language="SIF" value="reacts-with" title="Reacts With"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/used-to-produce.svg" language="SIF" value="used-to-produce" title="Used to Produce"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/activates.svg" language="SIF" value="activates" title="Activates"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/inhibits.svg" language="SIF" value="inhibits" title="Inhibits"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/phosphorylates.svg" language="SIF" value="phosphorylates" title="Phosphorylates"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/dephosphorylates.svg" language="SIF" value="dephosphorylates" title="Dephosphorylates"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/upregulates-expression.svg" language="SIF" value="upregulates-expression" title="Upregulates Expression"/></div>-->
-                                                            <!--<div class="paletteCol"><img src="app/img/edges/downregulates-expression.svg" language="SIF" value="downregulates-expression" title="Downregulates Expression"/></div>-->
-                                                        <!--</div>-->
-                                                    <!--</div>-->
-                                                <!--</div>-->
-                                            <!--</div>-->
-                                        <!--</div>-->
-                                        <!--&lt;!&ndash; SIF End &ndash;&gt;-->
+                                            <div id="expand-collapse-sif-nodes-palette" class="panel-collapse">
+                                                <div class="panel-body">
+                                                    <div id="sif-node-palette" class="element-palette node-palette">
+                                                        <div class="paletteWrapper">
+                                                            <div class="paletteCol"><img src="app/img/nodes/macromolecule.svg" language="SIF" value="SIF-macromolecule" title="Macromolecule"/></div>
+                                                            <div class="paletteCol"><img src="app/img/nodes/simple-chemical.svg" language="SIF" value="SIF-simple-chemical" title="Simple Chemical"/></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="panel-body" style="padding-bottom: 0px;">
+                                                    <div id="sif-edge-palette" class="element-palette edge-palette">
+                                                        <div class="paletteWrapper">
+                                                            <div class="paletteCol"><img src="app/img/edges/controls-state-change-of.svg" language="SIF" value="controls-state-change-of" title="Controls State Change of"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/controls-transport-of.svg" language="SIF" value="controls-transport-of" title="Controls Transport of"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/controls-phosphorylation-of.svg" language="SIF" value="controls-phosphorylation-of" title="Controls Phosphorylation of"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/controls-expression-of.svg" language="SIF" value="controls-expression-of" title="Controls Expression of"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/catalysis-precedes.svg" language="SIF" value="catalysis-precedes" title="Catalysis Precedes"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/in-complex-with.svg" language="SIF" value="in-complex-with" title="In Complex With"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/interacts-with.svg" language="SIF" value="interacts-with" title="Interacts With"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/neighbor-of.svg" language="SIF" value="neighbor-of" title="Neighbor of"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/consumption-controled-by.svg" language="SIF" value="consumption-controled-by" title="Consumption Controled By"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/controls-production-of.svg" language="SIF" value="controls-production-of" title="Controls Production of"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/controls-transport-of-chemical.svg" language="SIF" value="controls-transport-of-chemical" title="Controls Transport of Chemical"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/chemical-affects.svg" language="SIF" value="chemical-affects" title="Chemical Affects"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/reacts-with.svg" language="SIF" value="reacts-with" title="Reacts With"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/used-to-produce.svg" language="SIF" value="used-to-produce" title="Used to Produce"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/activates.svg" language="SIF" value="activates" title="Activates"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/inhibits.svg" language="SIF" value="inhibits" title="Inhibits"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/phosphorylates.svg" language="SIF" value="phosphorylates" title="Phosphorylates"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/dephosphorylates.svg" language="SIF" value="dephosphorylates" title="Dephosphorylates"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/upregulates-expression.svg" language="SIF" value="upregulates-expression" title="Upregulates Expression"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/downregulates-expression.svg" language="SIF" value="downregulates-expression" title="Downregulates Expression"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/downregulates-expression.svg" language="SIF" value="custom" title="Custom"/></div>
+                                                                                     <hr> INDRA Edge Types <hr>
+                                                            <div class="paletteCol"><img src="app/img/edges/interacts-with.svg" language="SIF" value="Activation" title="Activation"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/interacts-with.svg" language="SIF" value="Inhibition" title="Inhibition"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/interacts-with.svg" language="SIF" value="Phosphorylation" title="Phosphorylation"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/interacts-with.svg" language="SIF" value="Dephosphorylation" title="Dephosphorylation"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/interacts-with.svg" language="SIF" value="Complex" title="Complex"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/interacts-with.svg" language="SIF" value="Modification" title="Modification"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/interacts-with.svg" language="SIF" value="Modification" title="IncreaseAmount"/></div>
+                                                            <div class="paletteCol"><img src="app/img/edges/interacts-with.svg" language="SIF" value="Modification" title="DecreaseAmount"/></div>
 
-                                    <!--</div>-->
-                                <!--</div>-->
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- SIF End -->
+
+                                    </div>
+                                </div>
 
                             </div>
                         </div>
 
 
-                        <div id = "factoid-area" class = "tab-pane">
 
-                            <div id= "factoid-input-container">
-
-
-                                <table  border="0" cellpadding="2" width="100%" align="top">
-                                    <tbody>
-
-
-                                    <tr>
-                                        <td class='instructions'>Load a manuscript from file </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <label for="factoid-file-input" class="image-file">
-                                                <i class="fa fa-file-text-o"></i> Select File
-                                            </label>
-
-                                            <input type="file" id="factoid-file-input" accept=".txt,.pdf">
-                                        </td>
-
-                                    </tr>
-
-                                    <tr>
-                                        <td align="left" height="8">
-                                            <b><font color=white  face="Verdana" size="2">Or</font></b>
-                                        </td>
-                                    </tr>
-
-                                    <!--<tr>-->
-                                    <!--<td  class = "instructions"  align="left" height="15">-->
-                                    <!--Enter PMC ID: <input id="pmcBox" type = "text" value = <%= pmcID %>></input>-->
-                                    <!--<input type="button" id = "pmc-id-submit-button"  value="Load">-->
-
-
-                                    <tr>
-                                        <td  class = "instructions"  align="left" height="15">
-                                            Write/paste directly into the text box
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td  valign="top" align="left" >
-                                            <textarea rows="30" id="factoidBox"> </textarea>
-                                        </td>
-
-
-                                    </tr>
-
-
-                                    <tr>
-                                        <td><input type="button" class = "factoid-button" id = "factoid-text-clear-button"  value="Clear">
-
-                                            <input type="button" class = "factoid-button" id = "factoid-text-submit-button"  value="Submit"  class='upload'>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-
-                            </div>
-
-                        </div>
 
                         <div id ="visualization-test-area"  class="tab-pane  fade in active">
 
@@ -2931,7 +2886,6 @@
                 <!--<p>Biopax mode <input type="checkbox" unchecked> {{_page.doc.biopaxMode}}<br>-->
                 <!--</p>-->
                 <!--&lt;!&ndash;<button id = "connect-visualization-agent" class = "btn-mini" on-click = "connectVisAgent()">VisA</button>&ndash;&gt;-->
-                <!--<button id = "connect-causality-agent" class = "btn  btn-mini" on-click = "connectCausalityAgent()">CA</button>-->
                 <!--<button id = "test-image-tab" class = "btn  btn-mini" on-click = "testImageTab()">Test image tab</button>-->
 
                 <chat-user:>
@@ -3026,19 +2980,16 @@
                                     var url = el.src;
                                     window.open(url, 'Image', 'width=largeImage.stylewidth,height=largeImage.style.height,resizable=1');
                                 }
-
                             }
 
                             function openPCQueryWindow(){
                                 console.log("opened window");
                             }
 
-
                         </script>
 
                         <script>
                         $( function() {
-
 
                             $('[data-toggle="tooltip"]').tooltip();
                         } );

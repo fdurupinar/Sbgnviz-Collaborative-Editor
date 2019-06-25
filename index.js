@@ -13,6 +13,7 @@ const ONE_MINUTE = 1000 * 60;
 const BobId = "Bob123";
 
 
+
 let docReady = false;
 
 
@@ -49,7 +50,7 @@ app.on('model', function (model) {
 /***
  * Load document and get a new docId if necessary
  */
-app.get('/', function (page, model, params) {
+app.get('/', function (page, model) {
     function getId() {
         return model.id();
     }
@@ -100,6 +101,7 @@ app.get('/:docId', function (page, model, arg, next) {
 
 
             // create a reference to the document
+
             let pysb = model.at((docPath + '.pysb'));
             let cy = model.at((docPath + '.cy'));
             let cellularLocations = model.at((docPath + '.cellularLocations'));
@@ -151,6 +153,8 @@ app.get('/:docId', function (page, model, arg, next) {
             biopaxMode.subscribe(()=>{
             });
 
+            wizardMode.subscribe(()=>{
+            });
 
             noTrips.subscribe(() => {
 
@@ -221,7 +225,7 @@ app.proto.create = function (model) {
 
 
     // Make modelManager instance accessible through window object as testModelManager to use it in Cypress tests
-    let ModelManager = require('./public/collaborative-app/modelManager.js');
+    let ModelManager = require('./public/collaborative-app/js/modelManager.js');
     this.modelManager = window.testModelManager = new ModelManager(model, model.get('_page.room'));
     this.docId = model.get('_page.doc.id');
     window.testApp = this;
@@ -240,16 +244,13 @@ app.proto.create = function (model) {
     //Notify server about the client connection
     this.socket.emit("subscribeHuman", { userName:userNameModel, room:  model.get('_page.room'), userId: id});
 
-    this.agentSocket = require('./public/collaborative-app/clientSideSocketListener')(this);
+    this.agentSocket = require('./public/collaborative-app/js/clientSideSocketListener')(this);
     this.agentSocket.listen();
 
 
-    this.factoidHandler = require('./public/collaborative-app/factoid/factoid-handler')(this) ;
-    this.factoidHandler.initialize();
 
-
-    this.oncoprintHandler = require('./public/collaborative-app/oncoprint/oncoprint-handler')(this) ;
-    this.oncoprintHandler.initialize($('#oncoprint-container').width());
+    let OncoprintHandler = require('./public/collaborative-app/js/oncoprint/oncoprint-handler') ;
+    this.oncoprintHandler = new OncoprintHandler($('#oncoprint-container').width());
 
 
     let oncoprintData = this.modelManager.getOncoprint();
@@ -270,11 +271,11 @@ app.proto.create = function (model) {
         if(parseInt(cyId) !== parseInt(appUtilities.getActiveNetworkId())) //tab 0: initial tab
             appUtilities.createNewNetwork(parseInt(cyId)); //opens a new tab
 
-        this.loadCyFromModel(cyId, function (isModelEmpty) {
-        });
+        this.loadCyFromModel(cyId);
+
 
         //To initialize the editor
-        this.editorListener = require('./public/collaborative-app/editor-listener.js')(this.modelManager,this.socket, id, this);
+        this.editorListener = require('./public/collaborative-app/js/newt-functions/editor-listener.js')(this.modelManager,this.socket, id, this);
 
         //HACK: This is normally called when a new network is created, but the initial network is created before editor-listener
         //Lets editor-listener subscribe to UI operations
@@ -289,7 +290,7 @@ app.proto.create = function (model) {
         this.modelManager.openCy(appUtilities.getActiveNetworkId(), "me");
 
         //To initialize the editor
-        this.editorListener = require('./public/collaborative-app/editor-listener.js')(this.modelManager,this.socket, id, this);
+        this.editorListener = require('./public/collaborative-app/js/newt-functions/editor-listener.js')(this.modelManager,this.socket, id, this);
 
         $(document).trigger('createNewNetwork', [appUtilities.getActiveCy(), appUtilities.getActiveNetworkId()]);
     }
@@ -445,14 +446,6 @@ app.proto.loadCyFromModel = function(cyId, callback){
 
             });
 
-            let container = $('#canvas-tab-area');
-
-            // console.log("Panzoom updated");
-            // appUtilities.getCyInstance(parseInt(cyId)).zoom(1); //was 2 before
-            // appUtilities.getCyInstance(parseInt(cyId)).pan({x:container.width()/2, y:container.height()/2});
-            //
-
-             // appUtilities.getCyInstance(parseInt(cyId)).panzoom().reset();
 
             appUtilities.getCyInstance(parseInt(cyId)).panzoom().fit();
 
@@ -562,7 +555,8 @@ app.proto.listenToNodeOperations = function(model){
             let parent = model.get('_page.doc.cy.'+ cyId +'.nodes.'+ id + '.data.parent');
 
             if(parent === undefined) parent = null;
-            let newNode = appUtilities.getChiseInstance(parseInt(cyId)).elementUtilities.addNode(pos.x, pos.y, sbgnclass, id, parent, visibility);
+            let chiseInstance = appUtilities.getChiseInstance(parseInt(cyId));
+            let newNode = chiseInstance.elementUtilities.addNode(pos.x, pos.y, sbgnclass, id, parent, visibility);
 
             self.modelManager.initModelNode(newNode,cyId, "me", true);
 
@@ -596,8 +590,7 @@ app.proto.listenToNodeOperations = function(model){
     });
 
     model.on('all', '_page.doc.cy.*.nodes.*.highlightColor', function(cyId, id, op, val,prev, passed){
-        //call it here so that everyone can highlight their own textbox
-        self.factoidHandler.highlightSentenceInText(id, val);
+
 
         if(docReady && !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0) {
             if(!val){
@@ -638,7 +631,10 @@ app.proto.listenToNodeOperations = function(model){
             if(att === "parent")
                 appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).move({"parent":val});
 
-
+            let chiseInstance = appUtilities.getChiseInstance(parseInt(cyId));
+            //    get the sif version and send it to INDRA:
+            let sif = chiseInstance.getCurrentSif();
+            console.log(sif);
 
         }
     });
@@ -940,12 +936,6 @@ app.proto.listenToModelOperations = function(model){
         }
     });
 
-    //Listen to other model operations
-    model.on('all', '_page.doc.factoid.*', function(id, op, val, prev, passed){
-        if(docReady &&  !passed.user) {
-            self.factoidHandler.setFactoidModel(val);
-        }
-    });
 
 
     //A new tab is open
@@ -1000,7 +990,7 @@ app.proto.listenToModelOperations = function(model){
         let jsonObj = chiseInst.convertSbgnmlTextToJson(data);
 
             chiseInst.updateGraph(jsonObj, function() {
-                self.modelManager.initModel(chiseInst.getCy().nodes(), chiseInst.getCy().edges(), chiseInst.cyId, appUtilities, "me");
+                self.modelManager.initModel(chiseInst.getCy().nodes(), chiseInst.getCy().edges(), chiseInst.cyId,  "me");
                 // $("#perform-layout").trigger('click');
                 self.callLayout(chiseInst.cyId);
 
@@ -1127,8 +1117,7 @@ app.proto.addCellularLocation = function(genes, compartment, cyId) {
             }
         });
 
-        let nodes = cy.nodes(':selected');
-
+        // let nodes = cy.nodes(':selected');
         // let extendedNodes = chiseInst.elementUtilities.getNeighboursOfNodes(nodes);
         // // let extendedNodes = chiseInst.elementUtilities.extendNodeList(nodes); //processes
         // extendedNodes.forEach((el) => el.select());
@@ -1250,8 +1239,7 @@ app.proto.moveOutOfCellularLocation = function(genes, compartment, cyId){
             }
         });
 
-        let nodes = cy.nodes(':selected');
-
+        // let nodes = cy.nodes(':selected');
         // let extendedNodes = chiseInst.elementUtilities.getNeighboursOfNodes(nodes);
         // // let extendedNodes = chiseInst.elementUtilities.extendNodeList(nodes); //processes
         // extendedNodes.forEach((el) => el.select());
@@ -1314,14 +1302,7 @@ app.proto.removeCellularLocation = function(location) {
  */
 app.proto.updateCellularLocations = function() {
 
-    let cyId = appUtilities.getActiveNetworkId();
-
-    let cy = appUtilities.getCyInstance(cyId);
-    let chiseInst = appUtilities.getChiseInstance(cyId);
-
     let cellularLocations = this.model.get('_page.doc.cellularLocations');
-
-
 
     for(let loc in cellularLocations){
         if(cellularLocations.hasOwnProperty(loc))
@@ -1392,9 +1373,8 @@ app.proto.resetConversationOnTrips = function(){
 };
 
 app.proto.connectVisualizationHandler = function(modelManager){
-    let self = this;
 
-    let VisHandler = require('./public/collaborative-app/visual-manipulation/vis-handler.js');
+    let VisHandler = require('./public/collaborative-app/js/visual-manipulation/vis-handler.js');
     this.visHandler = new VisHandler(modelManager);
 
 };
@@ -1532,7 +1512,7 @@ app.proto.moveCompartment = function(){
 app.proto.connectTripsAgent = function(){
     let self = this;
 
-    let TripsGeneralInterfaceAgent = require("./agent-interaction/TripsGeneralInterfaceAgent.js");
+    let TripsGeneralInterfaceAgent = require("./public/agent-interaction/src/js/TripsGeneralInterfaceAgent.js");
     self.tripsAgent = new TripsGeneralInterfaceAgent("Bob", BobId);
 
     console.log("Bob connected");
@@ -1549,7 +1529,18 @@ app.proto.connectTripsAgent = function(){
     });
 };
 
+app.proto.informTripsAboutModelChange = function(cyId){
+    let chiseInstance = appUtilities.getChiseInstance(cyId);
 
+    // remove pcIDSet and siteLocSet to send indra
+
+    let sif = chiseInstance.getCurrentSif();
+    console.log("sent trips request");
+    console.log(sif);
+    this.tripsAgent.sendTripsRequest({request:"update-sif", data:sif});
+
+
+}
 
 app.proto.enterMessage = function(event){
 
@@ -1800,8 +1791,6 @@ app.proto.dynamicResize = function () {
         let hInspectorTab = $("#inspector-tab-area").height();
 
         $("#sbgn-inspector").height(hInspectorTab);
-        $("#factoid-area").height(hInspectorTab * 0.9);
-        $("#factoidBox").height(hInspectorTab * 0.6);
     }
 
     // TODO it would be better if find a good place to move these resizable calls.
@@ -1852,7 +1841,7 @@ app.proto.testImageTab = function(){
         tabLabel: "test",
         fileName: "modelRXN"
     };
-    var status = this.modelManager.addImage(imgData);
+    this.modelManager.addImage(imgData);
     this.dynamicResize();
 }
 ////////////////////////////////////////////////////////////////////////////

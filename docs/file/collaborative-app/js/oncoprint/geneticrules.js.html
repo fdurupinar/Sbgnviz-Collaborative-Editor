@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../../">
+  <title data-ice="title">collaborative-app/js/oncoprint/geneticrules.js | Sbgnviz-Collaborative-Editor</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  </ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">collaborative-app/js/oncoprint/geneticrules.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">
+// Feed this in as
+
+// Default grey
+var DEFAULT_GREY = &quot;rgba(190, 190, 190, 1)&quot;;
+
+// Mutation colors
+var MUT_COLOR_MISSENSE = &apos;#008000&apos;;
+var MUT_COLOR_MISSENSE_PASSENGER = &apos;#53D400&apos;;
+var MUT_COLOR_INFRAME = &apos;#993404&apos;;
+var MUT_COLOR_INFRAME_PASSENGER = &apos;#fe9929&apos;;
+var MUT_COLOR_TRUNC = &apos;#000000&apos;;
+var MUT_COLOR_TRUNC_PASSENGER = &apos;#708090&apos;;
+var MUT_COLOR_FUSION = &apos;#8B00C9&apos;;
+var MUT_COLOR_PROMOTER = &apos;#FFA942&apos;;
+var MUT_COLOR_GERMLINE = &apos;#FFFFFF&apos;;
+
+var PROT_COLOR_UP = &quot;#9224A6&quot;;
+var PROT_COLOR_DOWN = &quot;#00BCD4&quot;;
+
+// Base mutation rule set parameters
+var baseRuleSetParams = {
+  &apos;type&apos;: &apos;gene&apos;,
+  &apos;legend_label&apos;: &apos;Genetic Alteration&apos;,
+  &apos;legend_base_color&apos;: DEFAULT_GREY,
+
+};
+var non_mutation_rule_params = {
+  // Default: gray rectangle
+  &apos;*&apos;: {
+    shapes: [{
+      &apos;type&apos;: &apos;rectangle&apos;,
+      &apos;fill&apos;: DEFAULT_GREY,
+      &apos;z&apos;: 1
+    }],
+    legend_label: &apos;No alterations&apos;,
+  },
+  // Copy number alteration
+  &apos;disp_cna&apos;: {
+    // Red rectangle for amplification
+    &apos;amp&apos;: {
+      shapes: [{
+        &apos;type&apos;: &apos;rectangle&apos;,
+        &apos;fill&apos;: &apos;rgba(255,0,0,1)&apos;,
+        &apos;x&apos;: &apos;0%&apos;,
+        &apos;y&apos;: &apos;0%&apos;,
+        &apos;width&apos;: &apos;100%&apos;,
+        &apos;height&apos;: &apos;100%&apos;,
+        &apos;z&apos;: 2,
+      }],
+      legend_label: &apos;Amplification&apos;,
+    },
+    // Light red rectangle for gain
+    &apos;gain&apos;: {
+      shapes: [{
+        &apos;type&apos;: &apos;rectangle&apos;,
+        &apos;fill&apos;: &apos;rgba(255,182,193,1)&apos;,
+        &apos;x&apos;: &apos;0%&apos;,
+        &apos;y&apos;: &apos;0%&apos;,
+        &apos;width&apos;: &apos;100%&apos;,
+        &apos;height&apos;: &apos;100%&apos;,
+        &apos;z&apos;: 2,
+      }],
+      legend_label: &apos;Gain&apos;,
+    },
+    // Blue rectangle for deep deletion
+    &apos;homdel&apos;: {
+      shapes: [{
+        &apos;type&apos;: &apos;rectangle&apos;,
+        &apos;fill&apos;: &apos;rgba(0,0,255,1)&apos;,
+        &apos;x&apos;: &apos;0%&apos;,
+        &apos;y&apos;: &apos;0%&apos;,
+        &apos;width&apos;: &apos;100%&apos;,
+        &apos;height&apos;: &apos;100%&apos;,
+        &apos;z&apos;: 2,
+      }],
+      legend_label: &apos;Deep Deletion&apos;,
+    },
+    // Light blue rectangle for shallow deletion
+    &apos;hetloss&apos;: {
+      shapes: [{
+        &apos;type&apos;: &apos;rectangle&apos;,
+        &apos;fill&apos;: &apos;rgba(143, 216, 216,1)&apos;,
+        &apos;x&apos;: &apos;0%&apos;,
+        &apos;y&apos;: &apos;0%&apos;,
+        &apos;width&apos;: &apos;100%&apos;,
+        &apos;height&apos;: &apos;100%&apos;,
+        &apos;z&apos;: 2,
+      }],
+      legend_label: &apos;Shallow Deletion&apos;,
+    }
+  },
+  // mRNA regulation
+  &apos;disp_mrna&apos;: {
+    // Light red outline for upregulation
+    &apos;up&apos;: {
+      shapes: [{
+        &apos;type&apos;: &apos;rectangle&apos;,
+        &apos;fill&apos;: &apos;rgba(0, 0, 0, 0)&apos;,
+        &apos;stroke&apos;: &apos;rgba(255, 153, 153, 1)&apos;,
+        &apos;stroke-width&apos;: &apos;2&apos;,
+        &apos;x&apos;: &apos;0%&apos;,
+        &apos;y&apos;: &apos;0%&apos;,
+        &apos;width&apos;: &apos;100%&apos;,
+        &apos;height&apos;: &apos;100%&apos;,
+        &apos;z&apos;: 3,
+      }],
+      legend_label: &apos;mRNA Upregulation&apos;,
+    },
+    // Light blue outline for downregulation
+    &apos;down&apos;: {
+      shapes: [{
+        &apos;type&apos;: &apos;rectangle&apos;,
+        &apos;fill&apos;: &apos;rgba(0, 0, 0, 0)&apos;,
+        &apos;stroke&apos;: &apos;rgba(102, 153, 204, 1)&apos;,
+        &apos;stroke-width&apos;: &apos;2&apos;,
+        &apos;x&apos;: &apos;0%&apos;,
+        &apos;y&apos;: &apos;0%&apos;,
+        &apos;width&apos;: &apos;100%&apos;,
+        &apos;height&apos;: &apos;100%&apos;,
+        &apos;z&apos;: 3,
+      }],
+      legend_label: &apos;mRNA Downregulation&apos;,
+    },
+  },
+  // protein expression regulation
+  &apos;disp_prot&apos;: {
+    // small top rectangle for upregulated
+    &apos;up&apos;: {
+      shapes: [{
+        &apos;type&apos;: &apos;rectangle&apos;,
+        &apos;fill&apos;: PROT_COLOR_UP,
+        &apos;x&apos;:&quot;0%&quot;,
+        &apos;y&apos;:&quot;0%&quot;,
+        &apos;width&apos;:&quot;100%&quot;,
+        &apos;height&apos;:&quot;20%&quot;,
+        &apos;z&apos;: 4,
+      }],
+      legend_label: &apos;Protein Upregulation&apos;,
+    },
+    // small bottom rectangle for upregulated
+    &apos;down&apos;: {
+      shapes: [{
+        &apos;type&apos;: &apos;rectangle&apos;,
+        &apos;fill&apos;: PROT_COLOR_DOWN,
+        &apos;x&apos;:&quot;0%&quot;,
+        &apos;y&apos;:&quot;80%&quot;,
+        &apos;width&apos;:&quot;100%&quot;,
+        &apos;height&apos;:&quot;20%&quot;,
+        &apos;z&apos;: 4,
+      }],
+      legend_label: &apos;Protein Downregulation&apos;,
+    }
+  },
+  // fusion
+  &apos;disp_fusion&apos;: {
+    // tall inset purple rectangle for fusion
+    &apos;true&apos;: {
+      shapes: [{
+        &apos;type&apos;: &apos;rectangle&apos;,
+        &apos;fill&apos;: MUT_COLOR_FUSION,
+        &apos;x&apos;: &apos;0%&apos;,
+        &apos;y&apos;: &apos;20%&apos;,
+        &apos;width&apos;: &apos;100%&apos;,
+        &apos;height&apos;: &apos;60%&apos;,
+        &apos;z&apos;: 5
+      }],
+      legend_label: &apos;Fusion&apos;
+    }
+  },
+  // germline
+  &apos;disp_germ&apos;: {
+    // white stripe in the middle
+    &apos;true&apos;: {
+      shapes: [{
+        &apos;type&apos;: &apos;rectangle&apos;,
+        &apos;fill&apos;: MUT_COLOR_GERMLINE,
+        &apos;x&apos;: &apos;0%&apos;,
+        &apos;y&apos;: &apos;46%&apos;,
+        &apos;width&apos;: &apos;100%&apos;,
+        &apos;height&apos;: &apos;8%&apos;,
+        &apos;z&apos;: 7
+      }],
+      legend_label: &apos;Germline Mutation&apos;
+    }
+  }
+};
+
+module.exports.geneticrules = {};
+module.exports.geneticrules.genetic_rule_set_same_color_for_all_no_recurrence = $.extend({}, baseRuleSetParams, {
+  &apos;rule_params&apos;: $.extend({}, non_mutation_rule_params, {
+    &apos;disp_mut&apos;: {
+      &apos;trunc,inframe,missense,promoter,trunc_rec,inframe_rec,missense_rec,promoter_rec&apos;: {
+        shapes: [{
+          &apos;type&apos;: &apos;rectangle&apos;,
+          &apos;fill&apos;: MUT_COLOR_MISSENSE,
+          &apos;x&apos;: &apos;0%&apos;,
+          &apos;y&apos;: &apos;33.33%&apos;,
+          &apos;width&apos;: &apos;100%&apos;,
+          &apos;height&apos;: &apos;33.33%&apos;,
+          &apos;z&apos;: 6
+        }],
+        legend_label: &apos;Mutation&apos;,
+
+      }
+    }
+  })
+});
+module.exports.geneticrules.genetic_rule_set_same_color_for_all_recurrence = $.extend({}, baseRuleSetParams, {
+  &apos;rule_params&apos;: $.extend({}, non_mutation_rule_params, {
+    &apos;disp_mut&apos;: {
+      &apos;missense_rec,inframe_rec,trunc_rec&apos;: {
+        shapes: [{
+          &apos;type&apos;: &apos;rectangle&apos;,
+          &apos;fill&apos;: MUT_COLOR_MISSENSE,
+          &apos;x&apos;: &apos;0%&apos;,
+          &apos;y&apos;: &apos;33.33%&apos;,
+          &apos;width&apos;: &apos;100%&apos;,
+          &apos;height&apos;: &apos;33.33%&apos;,
+          &apos;z&apos;: 6
+        }],
+        legend_label: &apos;Mutation (putative driver)&apos;
+      },
+      &apos;missense,inframe,trunc,promoter,promoter_rec&apos;: {
+        shapes: [{
+          &apos;type&apos;: &apos;rectangle&apos;,
+          &apos;fill&apos;: MUT_COLOR_MISSENSE_PASSENGER,
+          &apos;x&apos;: &apos;0%&apos;,
+          &apos;y&apos;: &apos;33.33%&apos;,
+          &apos;width&apos;: &apos;100%&apos;,
+          &apos;height&apos;: &apos;33.33%&apos;,
+          &apos;z&apos;: 6
+        }],
+        legend_label: &apos;Mutation (putative passenger)&apos;
+      },
+    },
+  })
+});
+module.exports.geneticrules.genetic_rule_set_different_colors_no_recurrence = $.extend({}, baseRuleSetParams, {
+  &apos;rule_params&apos;: $.extend({}, non_mutation_rule_params, {
+    &apos;disp_mut&apos;: {
+      &apos;promoter,promoter_rec&apos;: {
+        shapes: [{
+          &apos;type&apos;: &apos;rectangle&apos;,
+          &apos;fill&apos;: MUT_COLOR_PROMOTER,
+          &apos;x&apos;: &apos;0%&apos;,
+          &apos;y&apos;: &apos;33.33%&apos;,
+          &apos;width&apos;: &apos;100%&apos;,
+          &apos;height&apos;: &apos;33.33%&apos;,
+          &apos;z&apos;: 6,
+        }],
+        legend_label: &apos;Promoter Mutation&apos;
+      },
+      &apos;trunc,trunc_rec&apos;: {
+        shapes: [{
+          &apos;type&apos;: &apos;rectangle&apos;,
+          &apos;fill&apos;: MUT_COLOR_TRUNC,
+          &apos;x&apos;: &apos;0%&apos;,
+          &apos;y&apos;: &apos;33.33%&apos;,
+          &apos;width&apos;: &apos;100%&apos;,
+          &apos;height&apos;: &apos;33.33%&apos;,
+          &apos;z&apos;: 6,
+        }],
+        legend_label: &apos;Truncating Mutation&apos;,
+      },
+      &apos;inframe,inframe_rec&apos;: {
+        shapes: [{
+          &apos;type&apos;: &apos;rectangle&apos;,
+          &apos;fill&apos;: MUT_COLOR_INFRAME,
+          &apos;x&apos;: &apos;0%&apos;,
+          &apos;y&apos;: &apos;33.33%&apos;,
+          &apos;width&apos;: &apos;100%&apos;,
+          &apos;height&apos;: &apos;33.33%&apos;,
+          &apos;z&apos;: 6,
+        }],
+        legend_label: &apos;Inframe Mutation&apos;,
+      },
+      &apos;missense,missense_rec&apos;: {
+        shapes: [{
+          &apos;type&apos;: &apos;rectangle&apos;,
+          &apos;fill&apos;: MUT_COLOR_MISSENSE,
+          &apos;x&apos;: &apos;0%&apos;,
+          &apos;y&apos;: &apos;33.33%&apos;,
+          &apos;width&apos;: &apos;100%&apos;,
+          &apos;height&apos;: &apos;33.33%&apos;,
+          &apos;z&apos;: 6,
+        }],
+        legend_label: &apos;Missense Mutation&apos;,
+      },
+    }
+  })
+});
+module.exports.geneticrules.genetic_rule_set_different_colors_recurrence = $.extend({}, baseRuleSetParams, {
+  &apos;rule_params&apos;: $.extend({}, non_mutation_rule_params, {
+    &apos;disp_mut&apos;: {
+      &apos;promoter,promoter_rec&apos;: {
+        shapes: [{
+          &apos;type&apos;: &apos;rectangle&apos;,
+          &apos;fill&apos;: MUT_COLOR_PROMOTER,
+          &apos;x&apos;: &apos;0%&apos;,
+          &apos;y&apos;: &apos;33.33%&apos;,
+          &apos;width&apos;: &apos;100%&apos;,
+          &apos;height&apos;: &apos;33.33%&apos;,
+          &apos;z&apos;: 6,
+        }],
+        legend_label: &apos;Promoter Mutation&apos;
+      },
+      &apos;trunc_rec&apos;: {
+        shapes: [{
+          &apos;type&apos;: &apos;rectangle&apos;,
+          &apos;fill&apos;: MUT_COLOR_TRUNC,
+          &apos;x&apos;: &apos;0%&apos;,
+          &apos;y&apos;: &apos;33.33%&apos;,
+          &apos;width&apos;: &apos;100%&apos;,
+          &apos;height&apos;: &apos;33.33%&apos;,
+          &apos;z&apos;: 6,
+        }],
+        legend_label: &apos;Truncating Mutation (putative driver)&apos;,
+      },
+      &apos;trunc&apos;: {
+        shapes: [{
+          &apos;type&apos;: &apos;rectangle&apos;,
+          &apos;fill&apos;: MUT_COLOR_TRUNC_PASSENGER,
+          &apos;x&apos;: &apos;0%&apos;,
+          &apos;y&apos;: &apos;33.33%&apos;,
+          &apos;width&apos;: &apos;100%&apos;,
+          &apos;height&apos;: &apos;33.33%&apos;,
+          &apos;z&apos;: 6,
+        }],
+        legend_label: &apos;Truncating Mutation (putative passenger)&apos;,
+      },
+      &apos;inframe_rec&apos;: {
+        shapes: [{
+          &apos;type&apos;: &apos;rectangle&apos;,
+          &apos;fill&apos;: MUT_COLOR_INFRAME,
+          &apos;x&apos;: &apos;0%&apos;,
+          &apos;y&apos;: &apos;33.33%&apos;,
+          &apos;width&apos;: &apos;100%&apos;,
+          &apos;height&apos;: &apos;33.33%&apos;,
+          &apos;z&apos;: 6,
+        }],
+        legend_label: &apos;Inframe Mutation (putative driver)&apos;,
+      },
+      &apos;inframe&apos;: {
+        shapes: [{
+          &apos;type&apos;: &apos;rectangle&apos;,
+          &apos;fill&apos;: MUT_COLOR_INFRAME_PASSENGER,
+          &apos;x&apos;: &apos;0%&apos;,
+          &apos;y&apos;: &apos;33.33%&apos;,
+          &apos;width&apos;: &apos;100%&apos;,
+          &apos;height&apos;: &apos;33.33%&apos;,
+          &apos;z&apos;: 6,
+        }],
+        legend_label: &apos;Inframe Mutation (putative passenger)&apos;,
+      },
+      &apos;missense_rec&apos;: {
+        shapes: [{
+          &apos;type&apos;: &apos;rectangle&apos;,
+          &apos;fill&apos;: MUT_COLOR_MISSENSE,
+          &apos;x&apos;: &apos;0%&apos;,
+          &apos;y&apos;: &apos;33.33%&apos;,
+          &apos;width&apos;: &apos;100%&apos;,
+          &apos;height&apos;: &apos;33.33%&apos;,
+          &apos;z&apos;: 6,
+        }],
+        legend_label: &apos;Missense Mutation (putative driver)&apos;,
+      },
+      &apos;missense&apos;: {
+        shapes: [{
+          &apos;type&apos;: &apos;rectangle&apos;,
+          &apos;fill&apos;: MUT_COLOR_MISSENSE_PASSENGER,
+          &apos;x&apos;: &apos;0%&apos;,
+          &apos;y&apos;: &apos;33.33%&apos;,
+          &apos;width&apos;: &apos;100%&apos;,
+          &apos;height&apos;: &apos;33.33%&apos;,
+          &apos;z&apos;: 6,
+        }],
+        legend_label: &apos;Missense Mutation (putative passenger)&apos;,
+      },
+    }
+  })
+});
+
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

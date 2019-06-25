@@ -6,17 +6,10 @@
  */
 
 var request = require('request');
-var fs = require('fs');
-
-
 
 module.exports = function(){
 
     var cancerStudies = [];
-    var profileIds = [];
-
-
-
     return{
 
 
@@ -51,7 +44,6 @@ module.exports = function(){
         },
 
         getSequencedCaseCounts: function(study) {
-            var self = this;
             var url = "http://www.cbioportal.org/webservice.do?cmd=getCaseLists&cancer_study_id=" + study.id;
 
 

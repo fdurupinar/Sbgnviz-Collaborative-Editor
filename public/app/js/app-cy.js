@@ -47,28 +47,29 @@ module.exports = function (chiseInstance) {
 
         cy.autopanOnDrag();
 
-        cy.edgeEditing({
-            // this function specifies the positions of bend points
-            bendPositionsFunction: function (ele) {
-                return ele.data('bendPointPositions');
-            },
-            // whether the bend editing operations are undoable (requires cytoscape-undo-redo.js)
-            undoable: appUtilities.undoable,
-            // title of remove bend point menu item
-            removeBendMenuItemTitle: "Delete Bend Point",
-            // whether to initilize bend points on creation of this extension automatically
-            initBendPointsAutomatically: false,
-            // function to validate edge source and target on reconnection
-            validateEdge: chiseInstance.elementUtilities.validateArrowEnds,
-            // function to be called on invalid edge reconnection
-            actOnUnsuccessfulReconnection: function () {
-                if(appUtilities.promptInvalidEdgeWarning){
-                    appUtilities.promptInvalidEdgeWarning.render();
-                }
-            },
-            // function that handles edge reconnection
-            handleReconnectEdge: chiseInstance.elementUtilities.addEdge,
-        });
+        //FUNDA
+        // cy.edgeEditing({
+        //     // this function specifies the positions of bend points
+        //     bendPositionsFunction: function (ele) {
+        //         return ele.data('bendPointPositions');
+        //     },
+        //     // whether the bend editing operations are undoable (requires cytoscape-undo-redo.js)
+        //     undoable: appUtilities.undoable,
+        //     // title of remove bend point menu item
+        //     removeBendMenuItemTitle: "Delete Bend Point",
+        //     // whether to initilize bend points on creation of this extension automatically
+        //     initBendPointsAutomatically: false,
+        //     // function to validate edge source and target on reconnection
+        //     validateEdge: chiseInstance.elementUtilities.validateArrowEnds,
+        //     // function to be called on invalid edge reconnection
+        //     actOnUnsuccessfulReconnection: function () {
+        //         if(appUtilities.promptInvalidEdgeWarning){
+        //             appUtilities.promptInvalidEdgeWarning.render();
+        //         }
+        //     },
+        //     // function that handles edge reconnection
+        //     handleReconnectEdge: chiseInstance.elementUtilities.addEdge,
+        // });
 
         contextMenus.appendMenuItems([
             {
@@ -228,22 +229,23 @@ module.exports = function (chiseInstance) {
                     appUtilities.navigateToOtherEnd(cyTarget, event.renderedPosition, event.position);
                 }
             },
-            {
-                id: 'ctx-menu-convert-into-reversible',
-                content: 'Convert into Reversible Reaction',
-                selector: 'node[class="process"]',
-                onClickFunction: function (event) {
-                    var cyTarget = event.target || event.cyTarget;
-                    var consumptionEdges = cyTarget._private.edges.filter(edge => edge._private.data.class === "consumption");
-
-                    if (consumptionEdges.length > 0) {
-                        var ur = cy.undoRedo();
-                        ur.do("convertIntoReversibleReaction", {processId: cyTarget.id(), collection: consumptionEdges, mapType: "Unknown"});
-                    }
-                    var currentArrowScale = Number($('#arrow-scale').val());
-                    cyTarget.connectedEdges().style('arrow-scale', currentArrowScale);
-                }
-            },
+            //FUNDA
+            // {
+            //     id: 'ctx-menu-convert-into-reversible',
+            //     content: 'Convert into Reversible Reaction',
+            //     selector: 'node[class="process"]',
+            //     onClickFunction: function (event) {
+            //         var cyTarget = event.target || event.cyTarget;
+            //         var consumptionEdges = cyTarget._private.edges.filter(edge => edge._private.data.class === "consumption");
+            //
+            //         if (consumptionEdges.length > 0) {
+            //             var ur = cy.undoRedo();
+            //             ur.do("convertIntoReversibleReaction", {processId: cyTarget.id(), collection: consumptionEdges, mapType: "Unknown"});
+            //         }
+            //         var currentArrowScale = Number($('#arrow-scale').val());
+            //         cyTarget.connectedEdges().style('arrow-scale', currentArrowScale);
+            //     }
+            // },
             {
                 id: 'ctx-menu-relocate-info-boxes',
                 content: 'Relocate Information Boxes',
@@ -276,39 +278,41 @@ module.exports = function (chiseInstance) {
                     appUtilities.resizeNodesToContent(collection);
                 }
             },
-            {
-                id: 'ctx-menu-query-pcids',
-                content: 'Query PC IDs',
-                selector: 'edge',
-                onClickFunction: function (event) {
-                    var edge = event.target || event.cyTarget;
-                    var qUrl = 'http://www.pathwaycommons.org/pc2/get?';
-                    var pcIDSet = edge.data( 'pcIDSet' );
 
-                    for ( var pcID in pcIDSet ) {
-                        qUrl += ( 'uri=' + pcID + '&' );
-                    }
-
-                    qUrl += 'format=sbgn';
-
-                    $.ajax({
-                        type: 'get',
-                        url: "/utilities/testURL",
-                        data: { url: qUrl },
-                        success: function( data ) {
-                            if (!data.error && data.response.statusCode == 200 && data.response.body) {
-                                var xml = $.parseXML(data.response.body);
-                                appUtilities.createNewNetwork();
-                                var activeChise = appUtilities.getActiveChiseInstance();
-                                activeChise.updateGraph(chiseInstance.convertSbgnmlToJson(xml), undefined, true);
-                            }
-                        },
-                        error: function(xhr, options, err){
-                            console.log( err );
-                        }
-                    });
-                }
-            },
+            //FUNDA : this makes sense only when the model is launched with this information at hand
+            // {
+            //     id: 'ctx-menu-query-pcids',
+            //     content: 'Query PC IDs',
+            //     selector: 'edge',
+            //     onClickFunction: function (event) {
+            //         var edge = event.target || event.cyTarget;
+            //         var qUrl = 'http://www.pathwaycommons.org/pc2/get?';
+            //         var pcIDSet = edge.data( 'pcIDSet' );
+            //
+            //         for ( var pcID in pcIDSet ) {
+            //             qUrl += ( 'uri=' + pcID + '&' );
+            //         }
+            //
+            //         qUrl += 'format=sbgn';
+            //
+            //         $.ajax({
+            //             type: 'get',
+            //             url: "/utilities/testURL",
+            //             data: { url: qUrl },
+            //             success: function( data ) {
+            //                 if (!data.error && data.response.statusCode == 200 && data.response.body) {
+            //                     var xml = $.parseXML(data.response.body);
+            //                     appUtilities.createNewNetwork();
+            //                     var activeChise = appUtilities.getActiveChiseInstance();
+            //                     activeChise.updateGraph(chiseInstance.convertSbgnmlToJson(xml), undefined, true);
+            //                 }
+            //             },
+            //             error: function(xhr, options, err){
+            //                 console.log( err );
+            //             }
+            //         });
+            //     }
+            // },
         ]);
 
         cy.clipboard({

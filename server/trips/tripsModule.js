@@ -6,13 +6,8 @@ module.exports = (function() {
     var DefaultHost = '127.0.0.1';
     // var DefaultHost = 'causalpath.org';
     var DefaultPort = 6200;
-    var MaxPortTries = 100;
-
 
     var socket;
-
-    var globalPat = "";
-
 
 
     function TripsModule(argv) {
@@ -77,7 +72,6 @@ module.exports = (function() {
             var that = this;
             try { //funda
                 if (this.autoConnect) {
-                    var tries = this.scanForPort ? MaxPortTries : 1;
                     // TODO detect failure to connect somehow?
                     try {
                         socket = new net.connect(this.port, this.host, function () {
@@ -177,7 +171,7 @@ module.exports = (function() {
             } while (replyId in this.continuations);
             this.continuations[replyId] = cont;
             var msgWithReplyId = { replyWith: replyId };
-            for (var p in msg) { msgWithReplyId[p] = msg[p] };
+            for (var p in msg) { msgWithReplyId[p] = msg[p] }
             this.sendMsg(msgWithReplyId);
         },
 
@@ -196,7 +190,7 @@ module.exports = (function() {
 
         replyToMsg: function(msg, reply) {
             var modReply = { receiver: msg.sender };
-            for (var p in reply) { modReply[p] = reply[p] };
+            for (var p in reply) { modReply[p] = reply[p] }
             if ('replyWith' in msg) {
                 modReply.inReplyTo = msg.replyWith;
             }
@@ -227,7 +221,6 @@ module.exports = (function() {
                     }
                 }
                 if (pat === undefined) {
-                    ;
                     //FUNDA process.stderr.write("No handler for message: " + KQML.toKQML(message) + " in "  + this.name + "\n");
                 } else {
                     var handler = this.handlers[pat].handler;

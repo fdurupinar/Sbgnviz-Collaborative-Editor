@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../../">
+  <title data-ice="title">collaborative-app/js/newt-functions/collaborative-backbone-views.js | Sbgnviz-Collaborative-Editor</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js">js</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/modelManager.js~ModelManager.html">ModelManager</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-clientSideSocketListener">clientSideSocketListener</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-merger">js/merger</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/merger/json-merger.js~JsonMerger.html">JsonMerger</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/merger/rephrase-handler.js~RephraseHandler.html">RephraseHandler</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-modelmergefunctions">modelmergefunctions</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-newt-functions">js/newt-functions</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-editorlistener">editorlistener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-PathsBetweenQueryView">PathsBetweenQueryView</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-PathsByURIQueryView">PathsByURIQueryView</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-oncoprint">js/oncoprint</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/oncoprint/oncoprint-handler.js~OncoprintHandler.html">OncoprintHandler</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-reach-functions">js/reach-functions</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-idxCardinfo">idxCardinfo</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-idxCardToJson">idxCardToJson</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-visual-manipulation">js/visual-manipulation</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/visual-manipulation/vis-handler.js~VisHandler.html">VisHandler</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">collaborative-app/js/newt-functions/collaborative-backbone-views.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">
+var _ = require(&apos;underscore&apos;);
+var Backbone = require(&apos;backbone&apos;);
+let appUtilities = window.appUtilities;
+
+var PathsBetweenQueryView = Backbone.View.extend({
+    defaultQueryParameters: {
+        geneSymbols: &quot;mdm2\ntp53&quot;, //TODO: for easy debugging only
+        lengthLimit: 1
+    },
+    currentQueryParameters: null,
+    initialize: function () {
+        var self = this;
+        self.copyProperties();
+        self.template = _.template($(&quot;#query-pathsbetween-template&quot;).html());
+        self.template = self.template(self.currentQueryParameters);
+    },
+    copyProperties: function () {
+        this.currentQueryParameters = _.clone(this.defaultQueryParameters);
+    },
+    render: function () {
+        var self = this;
+        self.template = _.template($(&quot;#query-pathsbetween-template&quot;).html());
+        self.template = self.template(self.currentQueryParameters);
+        $(self.el).html(self.template);
+
+        $(self.el).modal(&apos;show&apos;);
+
+        $(&quot;#query-pathsbetween-enable-shortest-k-alteration&quot;).change(function () {
+            if (document.getElementById(&quot;query-pathsbetween-enable-shortest-k-alteration&quot;).checked) {
+                $(&quot;#query-pathsbetween-shortest-k&quot;).prop(&quot;disabled&quot;, false);
+            } else {
+                $(&quot;#query-pathsbetween-shortest-k&quot;).prop(&quot;disabled&quot;, true);
+            }
+        });
+
+        $(document).off(&quot;click&quot;, &quot;#save-query-pathsbetween&quot;).on(&quot;click&quot;, &quot;#save-query-pathsbetween&quot;, function () {
+
+            self.currentQueryParameters.geneSymbols = document.getElementById(&quot;query-pathsbetween-gene-symbols&quot;).value;
+            self.currentQueryParameters.lengthLimit = Number(document.getElementById(&quot;query-pathsbetween-length-limit&quot;).value);
+
+            if (self.currentQueryParameters.geneSymbols.length === 0) {
+                document.getElementById(&quot;query-pathsbetween-gene-symbols&quot;).focus();
+                return;
+            }
+
+            var queryURL = &quot;http://www.pathwaycommons.org/pc2/graph?format=SBGN&amp;kind=PATHSBETWEEN&amp;limit=&quot;
+                + self.currentQueryParameters.lengthLimit;
+
+            var sources = &quot;&quot;;
+            var geneSymbolsArray = self.currentQueryParameters.geneSymbols.replace(&quot;\n&quot;, &quot; &quot;).replace(&quot;\t&quot;, &quot; &quot;).split(&quot; &quot;);
+
+            for (var i = 0; i &lt; geneSymbolsArray.length; i++) {
+                var currentGeneSymbol = geneSymbolsArray[i];
+                if (currentGeneSymbol.length == 0 || currentGeneSymbol == &apos; &apos;
+                    || currentGeneSymbol == &apos;\n&apos; || currentGeneSymbol == &apos;\t&apos;) {
+                    continue;
+                }
+                sources = sources + &quot;&amp;source=&quot; + currentGeneSymbol;
+
+            }
+
+            appUtilities.getActiveChiseInstance().startSpinner(&apos;paths-between-spinner&apos;);
+
+            queryURL = queryURL + sources;
+
+
+            $.ajax({
+                url: queryURL,
+                type: &apos;GET&apos;,
+                dataType: &apos;text&apos;,
+                success: function (data) {
+
+                    let chiseInst = appUtilities.createNewNetwork(); //opens a new tab
+
+
+                    let jsonObj = chiseInst.convertSbgnmlTextToJson(data);
+
+                    chiseInst.updateGraph(jsonObj, function() {
+
+                    }, true);
+
+                    // appUtilities.getChiseInstance(data.cyId).updateGraph(jsonObj, function(){
+                    //     app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(),  &quot;me&quot;);
+                    //
+                    //     appUtilities.setActiveNetwork(data.cyId);
+                    //
+                    //     $(&quot;#perform-layout&quot;).trigger(&apos;click&apos;);
+                    //
+                    //     if (callback) callback(&quot;success&quot;);
+                    // });
+                    //
+                    //
+                    // // //because window opening takes a while
+                    // setTimeout(function () {
+                    //     var json = appUtilities.getActiveChiseInstance().convertSbgnmlTextToJson(data);
+                    //     w.postMessage(JSON.stringify(json), &quot;*&quot;);
+                    // }, 2000);
+
+                    appUtilities.getActiveChiseInstance().endSpinner(&apos;paths-between-spinner&apos;);
+                },
+                error: function (request) {
+                    console.log(request.responseText);
+                    appUtilities.getActiveChiseInstance().endSpinner(&apos;paths-between-spinner&apos;);
+                }
+
+
+
+            });
+
+            $(self.el).modal(&apos;toggle&apos;);
+
+
+        });
+
+        $(document).off(&quot;click&quot;, &quot;#cancel-query-pathsbetween&quot;).on(&quot;click&quot;, &quot;#cancel-query-pathsbetween&quot;, function () {
+            $(self.el).modal(&apos;toggle&apos;);
+        });
+
+        return this;
+    }
+});
+
+/**
+ * Paths By URI Query view for the Sample Application.
+ */
+var PathsByURIQueryView = Backbone.View.extend({
+    defaultQueryParameters: {
+        URI: &quot;&quot;
+    },
+    currentQueryParameters: null,
+    initialize: function () {
+        var self = this;
+        self.copyProperties();
+        self.template = _.template($(&quot;#query-pathsbyURI-template&quot;).html());
+        self.template = self.template(self.currentQueryParameters);
+    },
+    copyProperties: function () {
+        this.currentQueryParameters = _.clone(this.defaultQueryParameters);
+    },
+    render: function () {
+        var self = this;
+        self.template = _.template($(&quot;#query-pathsbyURI-template&quot;).html());
+        self.template = self.template(self.currentQueryParameters);
+        $(self.el).html(self.template);
+
+        $(self.el).modal(&apos;show&apos;);
+
+        $(document).off(&quot;click&quot;, &quot;#save-query-pathsbyURI&quot;).on(&quot;click&quot;, &quot;#save-query-pathsbyURI&quot;, function () {
+
+            self.currentQueryParameters.URI = document.getElementById(&quot;query-pathsbyURI-URI&quot;).value;
+
+            if (self.currentQueryParameters.URI.length === 0) {
+                document.getElementById(&quot;query-pathsbyURI-gene-symbols&quot;).focus();
+                return;
+            }
+
+            var queryURL = &quot;http://www.pathwaycommons.org/pc2/get?uri=&quot;
+                + self.currentQueryParameters.URI + &quot;&amp;format=SBGN&quot;;
+            /*var queryURL = &quot;http://www.pathwaycommons.org/pc2/get?uri=http://identifiers.org/uniprot/&quot;
+             + self.currentQueryParameters.URI + &quot;&amp;format=SBGN&quot;;*/
+
+            appUtilities.getActiveChiseInstance().startSpinner(&apos;paths-between-spinner&apos;);
+
+            $.ajax({
+                url: queryURL,
+                type: &apos;GET&apos;,
+                dataType: &apos;text&apos;,
+                success: function (data) {
+                    let chiseInst = appUtilities.createNewNetwork(); //opens a new tab
+
+
+                    let jsonObj = chiseInst.convertSbgnmlTextToJson(data);
+
+                    chiseInst.updateGraph(jsonObj, function() {
+
+                    }, true);
+
+                    appUtilities.getActiveChiseInstance().endSpinner(&apos;paths-between-spinner&apos;);
+
+
+                }
+            });
+
+            $(self.el).modal(&apos;toggle&apos;);
+        });
+
+        $(document).off(&quot;click&quot;, &quot;#cancel-query-pathsbyURI&quot;).on(&quot;click&quot;, &quot;#cancel-query-pathsbyURI&quot;, function () {
+            $(self.el).modal(&apos;toggle&apos;);
+        });
+
+        return this;
+    }
+});
+
+
+module.exports = {
+    PathsBetweenQueryView: PathsBetweenQueryView,
+    PathsByURIQueryView: PathsByURIQueryView,
+
+};
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

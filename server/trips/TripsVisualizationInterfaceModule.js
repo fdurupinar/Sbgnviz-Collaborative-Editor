@@ -140,7 +140,7 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
                 let state = trimDoubleQuotes(contentObj.state);
                 let location = trimDoubleQuotes(contentObj.location);
 
-                this.askHuman(this.agentId, this.room, "moveGene", {name: geneName, state: state, location: location, cyId: "0"},  (val) => {
+                this.askHuman(this.agentId, this.room, "moveGene", {name: geneName, state: state, location: location, cyId: "0"},  () => {
 
                     // this.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
                 });
@@ -156,7 +156,7 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
 
 
 
-            this.askHuman(this.agentId, this.room, "moveGene", {name: compartmentName, state: "", location: location, cyId: "0"},  (val)  => {
+            this.askHuman(this.agentId, this.room, "moveGene", {name: compartmentName, state: "", location: location, cyId: "0"},  ()  => {
 
             });
         }
@@ -173,7 +173,7 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
                     direction = "up";
                 else if(direction.toLowerCase().indexOf("downstream")> -1)
                     direction = "down";
-                this.askHuman(this.agentId, this.room, "moveGeneStream", {name: geneName, state: state, location:location, cyId: "0", direction: direction},  (val) => {
+                this.askHuman(this.agentId, this.room, "moveGeneStream", {name: geneName, state: state, location:location, cyId: "0", direction: direction},  () => {
                 });
             });
         }
@@ -193,7 +193,7 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
                     direction = "down";
 
 
-                this.askHuman(this.agentId, this.room, "highlightGeneStream", {name: geneName, state: state, cyId: "0", direction: direction},  (val) => {
+                this.askHuman(this.agentId, this.room, "highlightGeneStream", {name: geneName, state: state, cyId: "0", direction: direction},  () => {
 
 
                 });

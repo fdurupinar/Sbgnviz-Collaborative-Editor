@@ -1,0 +1,670 @@
+/**
+ * Functions for the browser client to perform on the editor as requested by an agent through the agent socket
+ * @param  {Object} app Derby.js application
+ * @return {Object} {{listenToVisAgentRequests: listenToVisAgentRequests, listen: listen, cleanModel: cleanModel}}
+ */
+
+
+const modelMergeFunctions = require('./merger/model-merge-functions.js')();
+const appUtilities = window.appUtilities;
+const $ = require('jquery');
+
+module.exports =  function(app) {
+
+    return {
+
+        /**
+         * Listens to Trips agent and menu function requests via the server
+         *
+         */
+        listen: function () {
+            let self = this;
+
+            self.listenToVisAgentRequests();
+
+            app.socket.on('loadFile', function (data, callback) {
+                try {
+                    appUtilities.getChiseInstance(data.cyId).getSbgnvizInstance().loadSBGNMLText(data.content);
+
+                    if (callback) callback("success");
+                }
+                catch (e) {
+                    console.log(e);
+                    if(callback) callback();
+
+                }
+            });
+
+
+            app.socket.on('cleanModel', function ( data, callback) {
+                try {
+                    self.cleanModel(data.shouldCleanProvenance, callback);
+                }
+                catch (e) {
+                    console.log(e);
+                    if(callback) callback();
+                }
+            });
+
+
+            app.socket.on('runLayout', function (data, callback) {
+                try {
+                    appUtilities.setActiveNetwork(data.cyId);
+                    $("#perform-layout")[0].click();
+                    if (callback) callback("success");
+                }
+                catch (e) {
+                    console.log(e);
+                    if(callback) callback();
+                }
+            });
+
+
+            app.socket.on('addNode', function (param, callback) {
+                try {
+                    //does not trigger cy events
+                    let newNode = appUtilities.getChiseInstance(param.cyId).elementUtilities.addNode(param.position.x, param.position.y, param.data.class);
+
+                    //notifies other clients
+                    app.modelManager.addModelNode(newNode.id(), param.cyId, param, "me");
+                    app.modelManager.initModelNode(newNode, param.cyId, "me");
+
+                    if (callback) callback(newNode.id());
+                }
+                catch (e) {
+                    console.log(e);
+                    if(callback) callback();
+                }
+            });
+
+
+            app.socket.on('deleteEles', function (data, callback) {
+                try {
+                    //unselect all others
+                    appUtilities.getCyInstance(data.cyId).elements().unselect();
+
+                    //first delete edges
+                    data.elementIds.forEach(function (id) {
+                        appUtilities.getCyInstance(data.cyId).getElementById(id).select();
+                    });
+
+                    //then delete modes
+                    if (data.type === "simple")
+                        appUtilities.getChiseInstance(data.cyId).deleteElesSimple(appUtilities.getCyInstance(data.cyId).elements(':selected'));
+                    else
+                        appUtilities.getChiseInstance(data.cyId).deleteNodesSmart(appUtilities.getCyInstance(data.cyId).nodes(':selected'));
+
+                    if(callback) callback("success");
+                }
+                catch (e) {
+                    console.log(e);
+                    if(callback) callback();
+                }
+            });
+
+            app.socket.on('addImage', function (data, callback) {
+                try {
+                    let status = app.modelManager.addImage(data);
+                    app.dynamicResize();
+
+                    if (callback) callback(status);
+
+                }
+                catch (e) {
+                    console.log(e);
+                    if(callback) callback();
+                }
+            });
+
+
+            app.socket.on('align', function (data, callback) {
+                try {
+                    let nodes = appUtilities.getCyInstance(data.cyId).collection();
+                    if (data.nodeIds === '*' || data.nodeIds === 'all')
+                        nodes = appUtilities.getCyInstance(data.cyId).nodes();
+                    else
+                        data.nodeIds.forEach(function (nodeId) {
+                            nodes.add(appUtilities.getCyInstance(data.cyId).getElementById(nodeId));
+                        });
+
+                    appUtilities.getChiseInstance(data.cyId).align(nodes, data.horizontal, data.vertical, appUtilities.getCyInstance(data.cyId).getElementById(data.alignTo));
+
+                    if (callback) callback("success");
+                }
+                catch (e) {
+                    console.log(e);
+                    if (callback) callback();
+                }
+
+            });
+            app.socket.on('updateVisibility', function (data, callback) {
+                try {
+                    //unselect all others
+                    appUtilities.setActiveNetwork(data.cyId);
+                    appUtilities.getCyInstance(data.cyId).elements().unselect();
+
+                    if (data.val === "showAll")
+                        $("#show-all")[0].click();
+                    else {
+                        data.elementIds.forEach(function (id) {
+                            appUtilities.getCyInstance(data.cyId).getElementById(id).select();
+                        });
+
+                        if (data.val == "show")
+                            $("#show-selected")[0].click();
+                        else
+                            $("#hide-selected")[0].click();
+                    }
+
+                    if (callback) callback("success");
+                }
+                catch (e) {
+                    console.log(e);
+                    if (callback) callback();
+                }
+            });
+
+            app.socket.on('searchByLabel', function (data, callback) {
+                try {
+                    //unselect all others
+                    appUtilities.getCyInstance(data.cyId).elements().unselect();
+                    appUtilities.getChiseInstance(data.cyId).searchByLabel(data.label);
+
+                    if (callback) callback("success");
+                }
+                catch (e) {
+                    console.log(e);
+                    if (callback) callback();
+                }
+            });
+            app.socket.on('updateHighlight', function (data, callback) {
+                try {
+                    //unselect all others
+                    appUtilities.getCyInstance(data.cyId).elements().unselect();
+                    appUtilities.setActiveNetwork(data.cyId);
+
+                    if (data.val === "remove") {
+                        $("#remove-highlights")[0].click();
+                    }
+                    else {
+                        data.elementIds.forEach(function (id) {
+                            appUtilities.getCyInstance(data.cyId).getElementById(id).select();
+                        });
+
+                        if (data.val === "neighbors")
+                            $("#highlight-neighbors-of-selected")[0].click();
+                        else if (data.val === "processes")
+                            $("#highlight-processes-of-selected")[0].click();
+                    }
+
+                    if (callback) callback("success");
+                }
+                catch (e) {
+                    console.log(e);
+                    if (callback) callback();
+                }
+            });
+
+            app.socket.on('updateExpandCollapse', function (data, callback) {
+                try {
+                    //unselect all others
+                    appUtilities.getCyInstance(data.cyId).elements().unselect();
+                    appUtilities.setActiveNetwork(data.cyId);
+
+                    data.elementIds.forEach(function (id) {
+                        appUtilities.getCyInstance(data.cyId).getElementById(id).select();
+                    });
+
+                    if (data.val === "collapse")
+                        $("#collapse-selected")[0].click();
+                    else
+                        $("#expand-selected")[0].click();
+
+                    if (callback) callback("success");
+                }
+                catch (e) {
+                    console.log(e);
+                    if (callback) callback();
+                }
+            });
+
+
+            app.socket.on('addCompound', function (data, callback) {
+                try {
+                    //unselect all others
+                    appUtilities.getCyInstance(data.cyId).elements().unselect();
+
+                    data.elementIds.forEach(function (elId) {
+                        let el = appUtilities.getCyInstance(data.cyId).getElementById(elId);
+                        if(el.isNode())
+                            el.select();
+                    });
+
+                    appUtilities.getChiseInstance(data.cyId).createCompoundForGivenNodes(appUtilities.getCyInstance(data.cyId).nodes(':selected'), data.val);
+
+                    if (callback) callback("success");
+                }
+                catch (e) {
+                    console.log(e);
+                    if (callback) callback();
+                }
+            });
+
+
+            app.socket.on('clone', function (data, callback) {
+                try {
+                    appUtilities.getCyInstance(data.cyId).elements().unselect();
+                    appUtilities.setActiveNetwork(data.cyId);
+
+                    data.elementIds.forEach(function (nodeId) {
+                        appUtilities.getCyInstance(data.cyId).getElementById(nodeId).select();
+                    });
+
+                    $("#clone-selected")[0].click();
+
+
+                    if (callback) callback("success");
+                }
+                catch (e) {
+                    console.log(e);
+                    if (callback) callback();
+                }
+            });
+
+            //Open in another tab
+            app.socket.on('openPCQueryWindow', function(data, callback){
+                try {
+                    let chiseInst = appUtilities.createNewNetwork(); //opens a new tab
+
+                    let jsonObj;
+                    if (data.type && data.type == 'sif')
+                        jsonObj = chiseInst.convertSifTextToJson(data.graph);
+                    else
+                        jsonObj = chiseInst.convertSbgnmlTextToJson(data.graph);
+
+                    chiseInst.updateGraph(jsonObj, function () {
+                        app.modelManager.initModel(appUtilities.getCyInstance(chiseInst.cyId).nodes(), appUtilities.getCyInstance(chiseInst.cyId).edges(), chiseInst.cyId,  "me");
+
+                        appUtilities.setActiveNetwork(chiseInst.cyId);
+
+                        $("#perform-layout")[0].click();
+
+                        if (callback) callback("success");
+
+                    }, true);
+                }
+                catch (e) {
+                    console.log(e);
+                    if (callback) callback();
+                }
+
+                });
+
+            app.socket.on('displayOncoprint', function(data, callback){
+
+                try {
+                    let timeOut = 0;
+                    if (document.getElementById('oncoprint-tab').style.visibility == 'hidden') {
+
+                        timeOut = 4000;
+                        document.getElementById('oncoprint-tab').style.visibility = 'visible';
+                    }
+
+                    setTimeout(() => {
+
+                            app.modelManager.setOncoprint(data);
+                            app.oncoprintHandler.updateData(data);
+
+                        }, timeOut
+                    );
+
+                    if (callback) callback("success");
+                }
+                catch (e) {
+                    console.log(e);
+                    if (callback) callback();
+                }
+            });
+
+
+            app.socket.on("displaySif", function(data, callback) {
+                try {
+                    let chiseInst;
+                    if (!data.cyId) {
+                        data.cyId = appUtilities.getActiveNetworkId();
+                        chiseInst = appUtilities.getActiveChiseInstance();
+                    } else {
+
+                        data.cyId = parseInt(data.cyId);
+
+
+                        if (!appUtilities.doesNetworkExist(data.cyId))
+                            chiseInst = appUtilities.createNewNetwork(data.cyId); //opens a new tab
+                        else
+                            chiseInst = appUtilities.getChiseInstance(data.cyId);
+
+                    }
+
+                    appUtilities.getCyInstance(data.cyId).remove(appUtilities.getCyInstance(data.cyId).elements());
+
+
+                    let jsonObj = chiseInst.convertSifTextToJson(data.sif);
+
+
+                    chiseInst.updateGraph(jsonObj, () => {
+
+                        app.modelManager.newModel(appUtilities.getActiveNetworkId(), "me"); //delete the existing model first so that ids don't get mixed up
+
+
+                        app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(), data.cyId,  "me");
+
+
+                        appUtilities.setActiveNetwork(data.cyId);
+
+                        setTimeout(() => {
+
+                            // $("#perform-layout")[0].click();
+
+                            // app.callLayout(data.cyId);
+                            //open the network view and rerender it otherwise the graph becomes invisible
+                            $("#defaultOpen")[0].click();
+
+                            app.dynamicResize();
+                            appUtilities.getCyInstance(data.cyId).panzoom().fit();
+
+
+                            if (callback) callback("success");
+                        }, 1000);
+
+
+                    }, true);
+                }
+                catch (e) {
+                    console.log(e);
+                    if (callback) callback();
+                }
+            });
+
+             app.socket.on("displaySbgn", function(data, callback){
+                 try {
+                     let chiseInst;
+
+                     if (!data.cyId) {
+                         data.cyId = appUtilities.getActiveNetworkId();
+                         chiseInst = appUtilities.getActiveChiseInstance();
+                     } else {
+
+                         data.cyId = parseInt(data.cyId);
+                         if (!appUtilities.doesNetworkExist(data.cyId))
+                             chiseInst = appUtilities.createNewNetwork(data.cyId); //opens a new tab
+                         else
+                             chiseInst = appUtilities.getChiseInstance(data.cyId);
+
+                     }
+
+
+                     appUtilities.getCyInstance(data.cyId).remove(appUtilities.getCyInstance(data.cyId).elements());
+
+
+                     let jsonObj = chiseInst.convertSbgnmlTextToJson(data.sbgn);
+
+
+                     chiseInst.updateGraph(jsonObj, () => {
+
+                         app.modelManager.newModel(appUtilities.getActiveNetworkId(), "me"); //delete the existing model first so that ids don't get mixed up
+
+
+                         app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(), data.cyId,  "me");
+
+
+                         appUtilities.setActiveNetwork(data.cyId);
+
+                         setTimeout(() => {
+
+                             // $("#perform-layout")[0].click();
+
+                             // app.callLayout(data.cyId);
+                             //open the network view and rerender it otherwise the graph becomes invisible
+                             $("#defaultOpen")[0].click();
+
+                             app.dynamicResize();
+                             appUtilities.getCyInstance(data.cyId).panzoom().fit();
+
+
+                             if (callback) callback("success");
+                         }, 1000);
+
+
+                     }, true);
+
+                     //update cellular locations
+                     app.updateCellularLocations();
+
+                 }
+                 catch (e) {
+                     console.log(e);
+                     if (callback) callback();
+                 }
+            });
+
+            app.socket.on("mergeSbgn", function (data, callback) {
+                try {
+
+                    if (!data.cyId)
+                        data.cyId = appUtilities.getActiveNetworkId();
+
+                    let newJson = appUtilities.getChiseInstance(data.cyId).convertSbgnmlTextToJson(data.graph);
+
+                    modelMergeFunctions.mergeJsonWithCurrent(newJson, data.cyId, app.modelManager, callback);
+                }
+                catch (e) {
+                    console.log(e);
+                    if (callback) callback();
+                }
+            });
+
+            app.socket.on("mergeJsonWithCurrent", function (data, callback) {
+                try {
+                    if (!data.cyId)
+                        data.cyId = appUtilities.getActiveNetworkId();
+                    modelMergeFunctions.mergeJsonWithCurrent(data.graph, data.cyId, app.modelManager, callback);
+                }
+                catch (e) {
+                    console.log(e);
+                    if (callback) callback();
+                }
+            });
+
+
+            app.socket.on("addProvenance", function (data, callback) {
+                try {
+                    if (!data.cyId)
+                        data.cyId = appUtilities.getActiveNetworkId();
+
+
+                    if (data.pc)
+                        app.model.push('_page.doc.provenance', {
+                            html: data.html,
+                            pc: data.pc,
+                            title: data.title,
+                            userName: self.agentName
+                        });
+                    else if (data.title)
+                        app.model.push('_page.doc.provenance', {
+                            html: data.html,
+                            title: data.title,
+                            userName: self.agentName
+                        });
+                    else
+                        app.model.push('_page.doc.provenance', {html: data.html, userName: self.agentName});
+
+                    if (callback)
+                        callback("success");
+                }
+                catch (e) {
+                    console.log(e);
+                    if (callback) callback();
+                }
+            });
+
+            //This is for Claire -- to make sure Bob is not connected at the same time
+            app.socket.on("removeBob", function(data, callback){
+                try {
+                    if (app.tripsAgent) {
+
+                        app.tripsAgent.disconnect();
+                        if (callback) {
+
+                            callback();
+                        }
+                    }
+                }
+                catch (e) {
+                    console.log(e);
+                    if (callback) callback();
+                }
+            });
+        },
+
+
+        /**
+         *
+         * Listens to VisualizationAgent requests sent via the server
+         */
+        listenToVisAgentRequests: function () {
+
+            app.socket.on('moveGene', function ( data, callback) {
+                try {
+                    app.visHandler.moveNode(data);
+                    if (callback) callback("success");
+                }
+                catch (e) {
+                    console.log(e);
+                    if (callback) callback();
+                }
+            });
+
+            app.socket.on('moveGeneStream', function ( data, callback) {
+                try {
+                    app.visHandler.moveNodeStream(data);
+                    if (callback) callback("success");
+                }
+                catch (e) {
+                    console.log(e);
+                    if (callback) callback();
+                }
+            });
+
+            app.socket.on('highlightGeneStream', function ( data, callback) {
+                try {
+                    app.visHandler.highlightNodeStream(data);
+                    if (callback) callback("success");
+                }
+                catch (e) {
+                    console.log(e);
+                    if (callback) callback();
+                }
+            });
+
+
+            app.socket.on("changeLockState", function(data, callback){
+                try {
+                    if (!data.cyId)
+                        data.cyId = appUtilities.getActiveNetworkId();
+
+                    if (data.lock)
+                        appUtilities.getCyInstance(data.cyId).getElementById(data.id).lock();
+                    else
+                        appUtilities.getCyInstance(data.cyId).getElementById(data.id).unlock();
+
+                    if (callback) callback("success");
+                }
+                catch (e) {
+                    console.log(e);
+                    if (callback) callback();
+                }
+            });
+
+
+            app.socket.on('addCellularLocation', function (data, callback) {
+                try {
+                    app.addCellularLocation(data.genes, data.compartment, data.cyId);
+
+                    app.modelManager.addModelCellularLocation(data.genes, data.compartment, "me");
+
+                    //unselect back
+                    // cy.elements().unselect();
+
+                    //remove highlights
+                    // chiseInst.removeHighlights();
+
+
+                    if (callback) callback("success");
+                }
+                catch (e) {
+                    console.log(e);
+                    if (callback) callback();
+                }
+
+            });
+
+            app.socket.on('moveOutOfCellularLocation', function (data, callback) {
+                try {
+
+                    app.moveOutOfCellularLocation(data.genes, data.compartment, data.cyId);
+                    app.modelManager.removeNodesFromCellularLocation(data.genes, data.compartment,  "me");
+
+                    // app.modelManager.addModelCellularLocation(data.genes, data.compartment, "me");
+
+
+                    //unselect back
+                    // cy.elements().unselect();
+
+                    //remove highlights
+                    // chiseInst.removeHighlights();
+
+                    if (callback) callback("success");
+                }
+                catch (e) {
+                    console.log(e);
+                    if (callback) callback();
+                }
+
+            });
+
+        },
+
+
+        /***
+         * Cleans Trips model
+         * @param {Boolean} shouldCleanProvenance  check if provenance content should be deleted
+         * @param {Function} callback
+         */
+        cleanModel: function(shouldCleanProvenance, callback){
+            try {
+                let cyIds = app.modelManager.getCyIds();
+
+                cyIds.forEach(function(cyId) {
+                    console.log(cyId);
+                    appUtilities.getCyInstance(cyId).remove(appUtilities.getCyInstance(cyId).elements());
+                    app.modelManager.newModel(cyId, "me"); //do not delete cytoscape, only the model
+
+                });
+
+                appUtilities.closeOtherNetworks(0);
+                app.model.set('_page.doc.images', null);
+                app.dynamicResize(); //to clean the canvas
+
+                if(shouldCleanProvenance)
+                    app.model.set('_page.doc.provenance', null);
+
+                if (callback) callback("success");
+            }
+            catch (e) {
+                console.log(e);
+                if(callback) callback();
+            }
+        },
+
+    }
+}

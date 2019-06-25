@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../../">
+  <title data-ice="title">collaborative-app/js/reach-functions/idxcardjson-to-json-converter.js | Sbgnviz-Collaborative-Editor</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js">js</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/modelManager.js~ModelManager.html">ModelManager</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-clientSideSocketListener">clientSideSocketListener</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-merger">js/merger</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/merger/json-merger.js~JsonMerger.html">JsonMerger</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/merger/rephrase-handler.js~RephraseHandler.html">RephraseHandler</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-modelmergefunctions">modelmergefunctions</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-newt-functions">js/newt-functions</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-editorlistener">editorlistener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-PathsBetweenQueryView">PathsBetweenQueryView</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-PathsByURIQueryView">PathsByURIQueryView</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-oncoprint">js/oncoprint</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/oncoprint/oncoprint-handler.js~OncoprintHandler.html">OncoprintHandler</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-reach-functions">js/reach-functions</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-idxCardinfo">idxCardinfo</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-idxCardToJson">idxCardToJson</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-visual-manipulation">js/visual-manipulation</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/visual-manipulation/vis-handler.js~VisHandler.html">VisHandler</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">collaborative-app/js/reach-functions/idxcardjson-to-json-converter.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/** The idxcardjson-to-json-converter module translates an indexcard JSON from the Reach API into a JSON valid for SBGNviz. Its implementation is below.
+ **/
+
+// Author: David Servillo.
+
+//Date of the last change: 09/20/2017
+
+var idxCardToJson = {
+
+    //Create the SBGNviz-compatible JSON
+    createJson: function(idxcardjsonObj) {
+        var jsonObj = {};
+        jsonObj.nodes = [];
+        jsonObj.edges = [];
+
+        var entityBbox = {
+            &quot;compartment&quot;: {x:0, y:0, w:60, h:60},
+            &quot;complex&quot;: {x:0, y:0, w:60, h:60},
+            &quot;macromolecule&quot;: {x:0, y:0, w:120, h:60},
+            &quot;process&quot;: {x:0, y:0, w:20, h:20},
+            &quot;sourceandsink&quot;: {x:0, y:0, w:60, h:60}
+        };
+
+        var statesandinfosbbox = {x:0, y:-50, w:40, h:12};
+        var addmodifstatesandinfosbbox = {x:0, y:50, w:40, h:12};
+
+        var stateInfos = {
+            &quot;acetylation&quot;: &quot;Ac&quot;,
+            &quot;glycosylation&quot;: &quot;G&quot;,
+            &quot;hydroxylation&quot;: &quot;OH&quot;,
+            &quot;methylation&quot;: &quot;Me&quot;,
+            &quot;myristoylation&quot;: &quot;My&quot;,
+            &quot;palmytoylation&quot;: &quot;Pa&quot;,
+            &quot;phosphorylation&quot;: &quot;P&quot;,
+            &quot;prenylation&quot;: &quot;Pr&quot;,
+            &quot;protonation&quot;: &quot;H&quot;,
+            &quot;sulfation&quot;: &quot;S&quot;,
+            &quot;sumoylation&quot;: &quot;Su&quot;,
+            &quot;ubiquitination&quot;: &quot;Ub&quot;
+        }
+
+        var i;
+        for(i=0; i&lt;idxcardjsonObj.cards.length; i++) {
+
+            //Create the first glyph
+            var newNode0 = {
+                data: {
+                    id:&quot;ele&quot;+i+1,
+                    class: &quot;macromolecule&quot;,
+                    bbox: entityBbox.macromolecule,
+                    statesandinfos: [{bbox: statesandinfosbbox,
+                        id: &quot;ele&quot;+i+2,
+                        clazz: &quot;unit of information&quot;,
+                        label: {text:&quot;mt:prot&quot;},
+                        coordType:  &quot;relativeToCenter&quot;,
+                        anchorSide: &quot;top&quot;,
+                        isDisplayed: false}],
+                    parent: &quot;&quot;,
+                    ports: []
+                }
+            };
+
+            if(&apos;participant_a&apos; in idxcardjsonObj.cards[i].extracted_information)
+                newNode0.data.label = idxcardjsonObj.cards[i].extracted_information.participant_a.entity_text;
+            else
+                newNode0.data.label = &quot;&quot;;
+
+            jsonObj.nodes.push(newNode0);
+
+            //Create the second glyph
+            var newNode1 = {
+                data: {
+                    id: &quot;ele&quot;+i+3,
+                    class: &quot;macromolecule&quot;,
+                    bbox: entityBbox.macromolecule,
+                    label: idxcardjsonObj.cards[i].extracted_information.participant_b.entity_text,
+                    statesandinfos: [{bbox: statesandinfosbbox,
+                        id:&quot;ele&quot;+i+6,
+                        clazz:&quot;unit of information&quot;,
+                        label:{text:&quot;mt:prot&quot;},
+                        coordType:  &quot;relativeToCenter&quot;,
+                        anchorSide: &quot;top&quot;,
+                        isDisplayed: false}],
+                    parent: &quot;&quot;,
+                    ports: []
+                }
+            };
+
+            jsonObj.nodes.push(newNode1);
+
+            //Create the third glyph
+            var newNode2 = {
+                data: {
+                    id: &quot;ele&quot;+i+5,
+                    class: &quot;process&quot;,
+                    label: &quot;null&quot;,
+                    statesandinfos: [],
+                    bbox: entityBbox.process,
+                    parent: &quot;&quot;,
+                    ports: []
+                }
+            };
+
+            jsonObj.nodes.push(newNode2);
+
+            var newNode3 = {
+                data: {
+                    id: &quot;ele&quot;+i+6,
+                    class: &quot;&quot;,
+                    label: &quot;&quot;,
+                    statesandinfos: [],
+                    bbox: {x:0, y:0, w:0, h:0},
+                    parent: &quot;&quot;,
+                    ports: []
+                }
+            };
+
+            jsonObj.nodes.push(newNode3);
+
+            var newNode4;
+            //Create the first arc
+            var newEdge0 = {
+                data: {
+                    id: newNode3.data.id + &quot;-&quot; + newNode2.data.id,
+                    class: &quot;consumption&quot;,
+                    bendPointPositions: [],
+                    cardinality: 0,
+                    source: newNode3.data.id,
+                    target: newNode2.data.id,
+                    portsource: newNode3.data.id,
+                    porttarget: newNode2.data.id
+                }
+            };
+
+            jsonObj.edges.push(newEdge0);
+
+            //Create the second arc
+            var newEdge1 = {
+                data: {
+                    id: newNode2.data.id + &quot;-&quot; + newNode1.data.id,
+                    class: &quot;production&quot;,
+                    bendPointPositions: [],
+                    cardinality: 0,
+                    source: newNode2.data.id,
+                    target: newNode1.data.id,
+                    portsource: newNode2.data.id,
+                    porttarget: newNode1.data.id
+                }
+            };
+
+            jsonObj.edges.push(newEdge1);
+
+            //Create the third arc
+            var newEdge2 = {
+                data: {
+                    id: newNode0.data.id + &quot;-&quot; + newNode2.data.id,
+                    class: &quot;consumption&quot;,
+                    bendPointPositions: [],
+                    cardinality: 0,
+                    source: newNode0.data.id,
+                    target: newNode2.data.id,
+                    portsource: newNode0.data.id,
+                    porttarget: newNode2.data.id
+                }
+            };
+
+            jsonObj.edges.push(newEdge2);
+
+            if(idxcardjsonObj.cards[i].extracted_information.interaction_type == &quot;increases_activity&quot;)  //The interaction is a type of stimulation.
+                newEdge2.data.class = &quot;stimulation&quot;;
+
+            else if(idxcardjsonObj.cards[i].extracted_information.interaction_type == &quot;decreases_activity&quot;)  //The interaction is a type of inhibition.
+                newEdge2.data.class = &quot;inhibition&quot;;
+
+            else if(idxcardjsonObj.cards[i].extracted_information.interaction_type == &quot;binds&quot;) {  //The interaction is a binding.
+
+                //The &quot;source and sink&quot; glyph is transformed into a macromolecular glyph
+                newNode3.data.class = &quot;macromolecule&quot;;
+                newNode3.data.label = idxcardjsonObj.cards[i].extracted_information.participant_b.entity_text;
+                newNode3.data.bbox = entityBbox.macromolecule;
+                newNode3.data.statesandinfos[0] = {};
+                newNode3.data.statesandinfos[0].bbox = statesandinfosbbox;
+                newNode3.data.statesandinfos[0].id = &quot;ele&quot;+i+9;
+                newNode3.data.statesandinfos[0].clazz = &quot;unit of information&quot;;
+                newNode3.data.statesandinfos[0].label = {};
+                newNode3.data.statesandinfos[0].label.text = &quot;mt:prot&quot;;
+                newNode3.data.statesandinfos[0].coordType = &quot;relativeToCenter&quot;;
+                newNode3.data.statesandinfos[0].anchorSide = &quot;top&quot;;
+                newNode3.data.statesandinfos[0].isDisplayed = false;
+
+                //The result of the reaction is a complex
+                newNode1.data.class = &quot;complex&quot;;
+                newNode1.data.bbox = entityBbox.complex;
+                delete newNode1.data.label;
+                newNode1.data.statesandinfos = [];
+
+                //First glyph in the complex
+                newNode4 = {
+                    data: {
+                        id:&quot;ele&quot;+i+10,
+                        class: &quot;macromolecule&quot;,
+                        bbox: entityBbox.macromolecule,
+                        label: idxcardjsonObj.cards[i].extracted_information.participant_b.entity_text,
+                        statesandinfos: [{bbox: statesandinfosbbox,
+                            id:&quot;ele&quot;+i+4,
+                            clazz: &quot;unit of information&quot;,
+                            label: {text:&quot;mt:prot&quot;},
+                            coordType:  &quot;relativeToCenter&quot;,
+                            anchorSide: &quot;top&quot;,
+                            isDisplayed: false}],
+                        parent: &quot;ele&quot;+i+3,
+                        ports: []
+                    }
+                };
+
+                jsonObj.nodes.push(newNode4);
+
+                //Second glyph in the complex
+                var newNode5 = {
+                    data: {
+                        id: &quot;ele&quot;+i+11,
+                        class: &quot;macromolecule&quot;,
+                        bbox: entityBbox.macromolecule,
+                        statesandinfos: [{bbox: statesandinfosbbox,
+                            id: &quot;ele&quot;+i+12,
+                            clazz: &quot;unit of information&quot;,
+                            label:{text:&quot;mt:prot&quot;},
+                            coordType:  &quot;relativeToCenter&quot;,
+                            anchorSide: &quot;top&quot;,
+                            isDisplayed: false}],
+                        label: newNode0.data.label,
+                        parent: &quot;ele&quot;+i+3,
+                        ports: []
+                    }
+                };
+
+                jsonObj.nodes.push(newNode5);
+
+                newNode2.data.class = &quot;association&quot;;
+
+                newEdge2.data.class = &quot;consumption&quot;;
+            }
+
+            else if(idxcardjsonObj.cards[i].extracted_information.interaction_type == &quot;adds_modification&quot;) { //The interaction is a chemical modification
+                newEdge2.data.class = &quot;stimulation&quot;;
+
+                //That glyph is not a &quot;source and sink&quot; glyph anymore, but a macromolecule
+                newNode3.data.class = &quot;macromolecule&quot;;
+                newNode3.data.label = idxcardjsonObj.cards[i].extracted_information.participant_b.entity_text;
+                newNode3.data.bbox = entityBbox.macromolecule;
+                newNode3.data.statesandinfos[0] = {};
+                newNode3.data.statesandinfos[0].id = &quot;ele&quot;+i+8;
+                newNode3.data.statesandinfos[0].clazz = &quot;unit of information&quot;;
+                newNode3.data.statesandinfos[0].label = {};
+                newNode3.data.statesandinfos[0].label.text = &quot;mt:prot&quot;;
+                newNode3.data.statesandinfos[0].bbox = statesandinfosbbox;
+                newNode3.data.statesandinfos[0].coordType = &quot;relativeToCenter&quot;;
+                newNode3.data.statesandinfos[0].anchorSide = &quot;top&quot;;
+                newNode3.data.statesandinfos[0].isDisplayed = false;
+                newNode3.data.parent = &quot;&quot;;
+                newNode3.data.ports = [];
+
+                var j;
+                for(j=0; j&lt;idxcardjsonObj.cards[i].extracted_information.modifications.length; j++) {
+                    var newStateInfos = {
+                        id: &quot;ele&quot;+i+7,
+                        clazz: &quot;state variable&quot;,
+                        bbox: addmodifstatesandinfosbbox,
+                        state: {value: stateInfos[idxcardjsonObj.cards[i].extracted_information.modifications[j].modification_type]},
+                        coordType:  &quot;relativeToCenter&quot;,
+                        anchorSide: &quot;top&quot;,
+                        isDisplayed: false
+                    };
+
+                    newNode1.data.statesandinfos.push(newStateInfos);
+                }
+            }
+            else if(idxcardjsonObj.cards[i].extracted_information.interaction_type == &quot;translocates&quot;) {  //The interaction is a translocation
+
+                //jsonObj.edges[3*i+2].data.class = &quot;consumption&quot;;
+
+                //A second compartment
+                if(idxcardjsonObj.cards[i].extracted_information.to_location_text !== undefined) {
+                    newNode4 = {
+                        data: {
+                            id:&quot;ele&quot;+i+10,
+                            class: &quot;compartment&quot;,
+                            bbox: entityBbox.compartment,
+                            label: idxcardjsonObj.cards[i].extracted_information.to_location_text,
+                            statesandinfos: [],
+                            parent: &quot;&quot;,
+                            ports: []
+                        }
+                    };
+
+                    jsonObj.nodes.push(newNode4);
+
+                    newNode1.data.parent = &quot;ele&quot;+i+10;
+                }
+
+                //The &quot;source and sink&quot; glyph is transformed into a macromolecule
+                newNode3.data.class = &quot;macromolecule&quot;;
+                newNode3.data.label = idxcardjsonObj.cards[i].extracted_information.participant_b.entity_text;
+                newNode3.data.bbox = entityBbox.macromolecule;
+                newNode3.data.statesandinfos[0] = {};
+                newNode3.data.statesandinfos[0].bbox = statesandinfosbbox;
+                newNode3.data.statesandinfos[0].id = &quot;ele&quot;+i+9;
+                newNode3.data.statesandinfos[0].clazz = &quot;unit of information&quot;;
+                newNode3.data.statesandinfos[0].label = {};
+                newNode3.data.statesandinfos[0].coordType = &quot;relativeToCenter&quot;;
+                newNode3.data.statesandinfos[0].anchorSide = &quot;top&quot;;
+                newNode3.data.statesandinfos[0].isDisplayed = false;
+                newNode3.data.statesandinfos[0].label.text = &quot;mt:prot&quot;;
+
+                //The first glyph is transformed into a compartment
+                if(idxcardjsonObj.cards[i].extracted_information.from_location_text !== undefined) {
+                    newNode0.class = &quot;compartment&quot;;
+                    newNode0.statesandinfos = [];
+                    newNode0.label = idxcardjsonObj.cards[i].extracted_information.from_location_text;
+                    newNode0.bbox = entityBbox.compartment.bbox;
+
+                    newNode3.data.parent = &quot;ele&quot;+i+1;
+                } else {
+                    newNode0.label = idxcardjsonObj.cards[i].extracted_information.participant_b.entity_text;
+                    newNode3 = {};
+                    newEdge0 = {};
+                }
+            }
+        }
+        return jsonObj;
+    }
+};
+
+// if( typeof module !== &apos;undefined&apos; &amp;&amp; module.exports) // expose as a nodejs module
+module.exports = idxCardToJson;</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>
