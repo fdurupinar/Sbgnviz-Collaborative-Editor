@@ -2,8 +2,6 @@
  * Tests for non-cy-related modelManager methods
  */
 
-const testData = require('../testData/globalTestData.js');
-
 
 describe('modelManager Cytoscape Operations Test', function () {
 
@@ -30,7 +28,7 @@ describe('modelManager Cytoscape Operations Test', function () {
 
     }
 
-    function addModelNode(cyId, id, delay) {
+    function addModelNode(cyId, id) {
 
         let testName = extendTestNameWithNetworkId('modelManager.addModelNode', cyId);
 

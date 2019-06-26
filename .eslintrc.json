@@ -10,7 +10,11 @@
         "SharedArrayBuffer": "readonly",
         "$": false,
         "io" : false,
-        "appUtilities": false
+        "appUtilities": false,
+        "expect": false,
+        "describe": false,
+        "it": false,
+        "cy": false
 
     },
     "parserOptions": {

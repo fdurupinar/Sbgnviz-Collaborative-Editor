@@ -244,8 +244,14 @@ app.proto.create = function (model) {
     //Notify server about the client connection
     this.socket.emit("subscribeHuman", { userName:userNameModel, room:  model.get('_page.room'), userId: id});
 
-    this.agentSocket = require('./public/collaborative-app/js/clientSideSocketListener')(this);
-    this.agentSocket.listen();
+
+
+    let ClientSideSocketListener = require('./public/collaborative-app/js/clientSideSocketListener');
+    this.clientSideSocketListener = new ClientSideSocketListener(this);
+    this.clientSideSocketListener.listen();
+
+    // this.agentSocket = require('./public/collaborative-app/js/clientSideSocketListener')(this);
+    // this.agentSocket.listen();
 
 
 
@@ -1643,11 +1649,6 @@ app.proto.add = function (event, model) {
 app.proto.clearHistory = function () {
     this.model.set('_page.clickTime', new Date);
 
-    //TODO: silllll
-    // appUtilities.getCyInstance(parseInt(cyId)).panzoom().fit();
-    // var $reset = $('<div class="cy-panzoom-reset cy-panzoom-zoom-button"></div>');
-    // $('#cy-panzoom-zoom-button').trigger('mousedown');
-    // appUtilities.getCyInstance(parseInt(cyId)).panzoom.reset();
     return this.model.filter('_page.doc.messages', 'biggerThanCurrentTime').ref('_page.list');
 };
 
@@ -1793,7 +1794,7 @@ app.proto.dynamicResize = function () {
         $("#sbgn-inspector").height(hInspectorTab);
     }
 
-    // TODO it would be better if find a good place to move these resizable calls.
+    // TODO find a better place to move these resizable calls.
     
     // make canvas tab area resizable and resize some other components as it is resized
     $("#canvas-tab-area").resizable({
