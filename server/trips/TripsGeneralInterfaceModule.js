@@ -235,7 +235,8 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
 
                     //The socket connection is between the interface and the agent, so we cannot directly emit messages
                     //we must ask the client with the browser to do it for us
-                    self.askHuman(self.agentId, self.room, "addImage", imgData, function () {
+                    self.askHuman(self.agentId, self.room, "addImage", imgData, function (val) {
+                        console.log(val);
                       // self.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
                     });
 
@@ -325,7 +326,8 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
                     if(body.length == 0)
                         callback("");
                     else {
-                        self.askHuman(self.agentId, self.room, "openPCQueryWindow", {graph: body, type: 'sif'}, () => {
+                        self.askHuman(self.agentId, self.room, "openPCQueryWindow", {graph: body, type: 'sif'}, (val) => {
+                            console.log(val);
                             callback("success");
                         });
                     }
@@ -349,8 +351,8 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
 
             //The socket connection is between the interface and the agent, so we cannot directly emit messages
             //we must ask the client with the browser to do it for us
-            self.askHuman(self.agentId, self.room, "openPCQueryWindow", {graph: sbgnModel}, function () {
-
+            self.askHuman(self.agentId, self.room, "openPCQueryWindow", {graph: sbgnModel},  (val) => {
+                console.log(val);
                 // self.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
             });
         }
@@ -378,8 +380,8 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
             //The socket connection is between the interface and the agent, so we cannot directly emit messages
             //we must ask the client with the browser to do it for us
             //TODO: get the cyId from TRIPS
-            this.askHuman(this.agentId, this.room, "displaySif", {sif: sifModel, cyId: cyId || "0"},  () => {
-
+            this.askHuman(this.agentId, this.room, "displaySif", {sif: sifModel, cyId: cyId || "0"},  (val) => {
+                console.log(val);
             });
         }
     }
@@ -407,7 +409,8 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
             //The socket connection is between the interface and the agent, so we cannot directly emit messages
             //we must ask the client with the browser to do it for us
             //TODO: get the cyId from TRIPS
-            this.askHuman(this.agentId, this.room, "displaySbgn", {sbgn: sbgnModel, cyId: cyId || "0"},  () => {
+            this.askHuman(this.agentId, this.room, "displaySbgn", {sbgn: sbgnModel, cyId: cyId || "0"},  (val) => {
+                console.log(val);
             // this.askHuman(this.agentId, this.room, "mergeSbgn", {graph: sbgnModel,  type:'sbgn', cyId: contentObj.cyId || "0"},  () => {
 
             // this.tm.replyToMsg(text, {0: 'reply', content: {das: 'success'}});
@@ -458,7 +461,8 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
             try {
 
                 let json = JSON.parse(data);
-                this.askHuman(this.agentId, this.room, "displayOncoprint", json, () => {
+                this.askHuman(this.agentId, this.room, "displayOncoprint", json, (val) => {
+                    console.log(val);
                 });
             }
             catch(e) {
@@ -493,7 +497,8 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
         });
 
         //this will clean the image tabs and sbgn model
-        this.askHuman(this.agentId, this.room, "cleanModel", shouldCleanProvenance,  function () {
+        this.askHuman(this.agentId, this.room, "cleanModel", shouldCleanProvenance,  function (val) {
+            console.log(val);
         });
 
 
@@ -521,7 +526,7 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
             contentObj.pc = trimDoubleQuotes(contentObj.pc);
 
 
-        this.askHuman(this.agendId, this.room, "addProvenance", contentObj);
+        this.askHuman(this.agentId, this.room, "addProvenance", contentObj);
         //we can directly update the model
         // if(contentObj.pc)
         //     self.model.push('documents.' + this.room + '.provenance', {html:contentObj.html, pc: contentObj.pc, title: contentObj.title, userName: self.agentName});

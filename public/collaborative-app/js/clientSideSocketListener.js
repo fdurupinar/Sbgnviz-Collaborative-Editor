@@ -5,7 +5,9 @@
  */
 
 
-const modelMergeFunctions = require('./merger/model-merge-functions.js')();
+
+let ModelMergeFunctions = require('./merger/model-merge-functions.js');
+let modelMergeFunctions = new ModelMergeFunctions();
 const appUtilities = window.appUtilities;
 const $ = require('jquery');
 
@@ -138,6 +140,12 @@ class ClientSideSocketListener{
         }
     }
 
+    /**
+     *
+     * @param {Object} data
+     * @param {function} callback
+     * @private
+     */
     _deleteEles(data, callback){
         try {
             //unselect all others
@@ -162,6 +170,12 @@ class ClientSideSocketListener{
         }
     }
 
+    /**
+     *
+     * @param {Object} data
+     * @param {function} callback
+     * @private
+     */
     _addImage(data, callback){
         try {
             let status = this.app.modelManager.addImage(data);
@@ -175,6 +189,13 @@ class ClientSideSocketListener{
             if(callback) callback();
         }
     }
+
+    /**
+     *
+     * @param {Object} data
+     * @param {function} callback
+     * @private
+     */
     _align(data, callback) {
         try {
             let nodes = appUtilities.getCyInstance(data.cyId).collection();
@@ -194,6 +215,12 @@ class ClientSideSocketListener{
         }
     }
 
+    /**
+     *
+     * @param {Object} data
+     * @param {function} callback
+     * @private
+     */
     _updateVisibility(data, callback){
         try {
             //unselect all others
@@ -221,6 +248,12 @@ class ClientSideSocketListener{
         }
     }
 
+    /**
+     *
+     * @param {Object} data
+     * @param {function} callback
+     * @private
+     */
     _searchByLabel(data, callback){
         try {
             //unselect all others
@@ -235,6 +268,12 @@ class ClientSideSocketListener{
         }
     }
 
+    /**
+     *
+     * @param {Object} data
+     * @param {function} callback
+     * @private
+     */
     _updateHighlight(data, callback){
         try {
             //unselect all others
@@ -263,6 +302,12 @@ class ClientSideSocketListener{
         }
     }
 
+    /**
+     *
+     * @param {Object} data
+     * @param {function} callback
+     * @private
+     */
     _updateExpandCollapse(data, callback){
         try {
             //unselect all others
@@ -286,6 +331,12 @@ class ClientSideSocketListener{
         }
     }
 
+    /**
+     *
+     * @param {Object} data
+     * @param {function} callback
+     * @private
+     */
     _addCompound(data, callback){
         try {
             //unselect all others
@@ -307,6 +358,12 @@ class ClientSideSocketListener{
         }
     }
 
+    /**
+     *
+     * @param {Object} data
+     * @param {function} callback
+     * @private
+     */
     _clone(data, callback){
         try {
             appUtilities.getCyInstance(data.cyId).elements().unselect();
@@ -327,6 +384,12 @@ class ClientSideSocketListener{
         }
     }
 
+    /**
+     * Open the graph in another tab
+     * @param {{Object}} data Format is {type:<sif or sbgn>, graph:<>}
+     * @param {function} callback
+     * @private
+     */
     _openPCQueryWindow(data, callback){
         try {
             let chiseInst = appUtilities.createNewNetwork(); //opens a new tab
@@ -341,7 +404,7 @@ class ClientSideSocketListener{
                 this.app.modelManager.initModel(appUtilities.getCyInstance(chiseInst.cyId).nodes(), appUtilities.getCyInstance(chiseInst.cyId).edges(), chiseInst.cyId,  "me");
 
                 appUtilities.setActiveNetwork(chiseInst.cyId);
-
+                //
                 $("#perform-layout")[0].click();
 
                 if (callback) callback("success");
@@ -355,6 +418,12 @@ class ClientSideSocketListener{
 
     }
 
+    /**
+     * Display oncoprint data on the oncoprint tab
+     * @param {Object} data
+     * @param {function} callback
+     * @private
+     */
     _displayOncoprint(data, callback){
         try{
             let timeOut = 0;
@@ -375,11 +444,17 @@ class ClientSideSocketListener{
             if (callback) callback("success");
         }
         catch (e) {
-        console.log(e);
-        if (callback) callback();
+            console.log(e);
+            if (callback) callback();
         }
     }
 
+    /*
+     * Display a sif graph on the current tab
+     * @param {Object} data Format is {sif:<sif>, cyId:<number>}
+     * @param {function} callback
+     * @private
+     */
     _displaySif(data, callback){
         try {
             let chiseInst;
@@ -439,7 +514,12 @@ class ClientSideSocketListener{
 
     }
 
-
+    /*
+     * Display an sbgn graph on the current tab
+     * @param {Object} data Format is {sbgn:<sbgn>, cyId:<number>}
+     * @param {function} callback
+     * @private
+     */
     _displaySbgn(data, callback){
         try {
             let chiseInst;
@@ -502,6 +582,12 @@ class ClientSideSocketListener{
         }
     }
 
+    /**
+     *
+     * @param {Object} data
+     * @param {function} callback
+     * @private
+     */
     _mergeSbgn(data, callback){
         try {
 
@@ -511,6 +597,7 @@ class ClientSideSocketListener{
             let newJson = appUtilities.getChiseInstance(data.cyId).convertSbgnmlTextToJson(data.graph);
 
             modelMergeFunctions.mergeJsonWithCurrent(newJson, data.cyId, this.app.modelManager, callback);
+
         }
         catch (e) {
             console.log(e);
@@ -518,6 +605,12 @@ class ClientSideSocketListener{
         }
     }
 
+    /**
+     * Merge data.graph with the current model in the active tab or a given tab
+     * @param {Object} data
+     * @param {function} callback
+     * @private
+     */
     _mergeJsonWithCurrent(data, callback){
         try {
             if (!data.cyId)
@@ -529,6 +622,13 @@ class ClientSideSocketListener{
             if (callback) callback();
         }
     }
+
+    /**
+     * Adds links and other info to the provenance tab
+     * @param {Object} data
+     * @param {function} callback
+     * @private
+     */
     _addProvenance(data, callback){
         try {
             if (!data.cyId)
@@ -539,17 +639,15 @@ class ClientSideSocketListener{
                 this.app.model.push('_page.doc.provenance', {
                     html: data.html,
                     pc: data.pc,
-                    title: data.title,
-                    userName: this.agentName
+                    title: data.title
                 });
             else if (data.title)
                 this.app.model.push('_page.doc.provenance', {
                     html: data.html,
-                    title: data.title,
-                    userName: this.agentName
+                    title: data.title
                 });
             else
-                this.app.model.push('_page.doc.provenance', {html: data.html, userName: this.agentName});
+                this.app.model.push('_page.doc.provenance', {html: data.html});
 
             if (callback)
                 callback("success");
@@ -583,6 +681,12 @@ class ClientSideSocketListener{
         }
     }
 
+    /**
+     *
+     * @param {Object} data Node info {name:<string>, state:<string> , location:<string>}
+     * @param {function} callback
+     * @private
+     */
     _moveGene(data, callback){
         try {
             this.app.visHandler.moveNode(data);
@@ -594,6 +698,12 @@ class ClientSideSocketListener{
         }
     }
 
+    /**
+     *
+     * @param {Object} data {name:<string>, direction: <"up", "down">, state:, cyId:<Number>, location: <"top", "bottom", "left", "right">}
+     * @param {function} callback
+     * @private
+     */
     _moveGeneStream(data, callback){
         try {
             this.app.visHandler.moveNodeStream(data);
@@ -605,6 +715,12 @@ class ClientSideSocketListener{
         }
     }
 
+    /**
+     *
+     * @param {Object} data
+     * @param {function} callback
+     * @private
+     */
     _highlightGeneStream(data, callback){
         try {
             this.app.visHandler.highlightNodeStream(data);
@@ -616,6 +732,12 @@ class ClientSideSocketListener{
         }
     }
 
+    /**
+     *
+     * @param {Object} data
+     * @param {function} callback
+     * @private
+     */
     _changeLockState(data, callback){
         try {
             if (!data.cyId)
@@ -634,6 +756,12 @@ class ClientSideSocketListener{
         }
     }
 
+    /**
+     *
+     * @param {Object} data
+     * @param {function} callback
+     * @private
+     */
     _addCellularLocation(data, callback){
         try {
             this.app.addCellularLocation(data.genes, data.compartment, data.cyId);
@@ -655,6 +783,12 @@ class ClientSideSocketListener{
         }
     }
 
+    /**
+     *
+     * @param {Object} data
+     * @param {function} callback
+     * @private
+     */
     _moveOutOfCellularLocation(data, callback){
         try {
 

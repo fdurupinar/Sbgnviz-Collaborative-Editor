@@ -29,11 +29,11 @@
 <nav class="navigation" data-ice="nav"><div>
   <ul>
     
-  <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js">js</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/modelManager.js~ModelManager.html">ModelManager</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-clientSideSocketListener">clientSideSocketListener</a></span></span></li>
+  <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js">js</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html">ClientSideSocketListener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/modelManager.js~ModelManager.html">ModelManager</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-merger">js/merger</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/merger/json-merger.js~JsonMerger.html">JsonMerger</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/merger/model-merge-functions.js~ModelMergeFunctions.html">ModelMergeFunctions</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/merger/rephrase-handler.js~RephraseHandler.html">RephraseHandler</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-modelmergefunctions">modelmergefunctions</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-newt-functions">js/newt-functions</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-editorlistener">editorlistener</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-PathsBetweenQueryView">PathsBetweenQueryView</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-PathsByURIQueryView">PathsByURIQueryView</a></span></span></li>
@@ -50,92 +50,109 @@
 let jsonMerger = new JsonMerger();
 let appUtilities = window.appUtilities;
 
-
-module.exports = function(){
-
-    return {
-        //Merge an array of json objects with the json of the current sbgn network
-        //on display to output a single json object.
-        mergeJsonWithCurrent: function (jsonGraph, cyId, modelManager, callback) {
-
-            let chiseInstance = appUtilities.getChiseInstance(cyId);
-            let currJson;
-            if(chiseInstance.getMapType()!=&apos;PD&apos; &amp;&amp; chiseInstance.getMapType()!=&apos;AF&apos; )
-                currJson = chiseInstance.createJsonFromSif();
-            else
-                currJson = chiseInstance.createJsonFromSBGN();
-
-
-            console.log(jsonGraph);
-
-            modelManager.setRollbackPoint(cyId); //before merging.. for undo
-
-            let jsonObj = jsonMerger.mergeJsonWithCurrent(jsonGraph, currJson);
-
-            //get another sbgncontainer and display the new SBGN model.
-            modelManager.newModel(cyId, &quot;me&quot;, true);
-
-            //this takes a while so wait before initiating the model
-            appUtilities.getChiseInstance(cyId).updateGraph(jsonObj, function () {
-
-                modelManager.initModel(appUtilities.getCyInstance(cyId).nodes(), appUtilities.getCyInstance(cyId).edges(), cyId,  &quot;me&quot;);
-
-                //select the new graph
-                jsonGraph.nodes.forEach(function (node) {
-                    appUtilities.getCyInstance(cyId).getElementById(node.data.id).select();
-                });
-
-                $(&quot;#perform-layout&quot;).trigger(&apos;click&apos;);
-
-                appUtilities.getCyInstance(cyId).elements().unselect();
-
-                // Call merge notification after the layout
-                setTimeout(function () {
-                    modelManager.mergeJsons(cyId, &quot;me&quot;);
-                    if (callback) callback(&quot;success&quot;);
-                }, 1000);
-
-            }, true);
-        },
-
-        //Merge an array of json objects to output a single json object.
-        mergeJsons: function (jsonGraph, cyId, modelManager, callback) {
-            let idxCardNodeMap = {};
-            let sentenceNodeMap = {};
-
-            modelManager.setRollbackPoint(cyId); //before merging.. for undo
-
-            let jsonObj = jsonMerger.mergeJsons(jsonGraph, sentenceNodeMap, idxCardNodeMap);
-
-            modelManager.newModel(cyId, &quot;me&quot;, true);
-
-
-            console.log(jsonObj);
-
-            appUtilities.getChiseInstance(cyId).updateGraph(jsonObj, function(){
-
-                modelManager.initModel( appUtilities.getCyInstance(cyId).nodes(), appUtilities.getCyInstance(cyId).edges(), cyId,  &quot;me&quot;);
-
-                //Call layout after init
-                $(&quot;#perform-layout&quot;).trigger(&apos;click&apos;);
-
-
-                //Call merge notification after the layout
-                setTimeout(function () {
-                    modelManager.mergeJsons(cyId, &quot;me&quot;, true);
-
-                    if (callback) callback();
-                }, 1000);
-
-            }, true);
-
-            return {sentences: sentenceNodeMap, idxCards: idxCardNodeMap};
-        },
-
-
-
+/**
+ * Merge functions through the editor and the model
+ */
+class ModelMergeFunctions{
+    constructor() {
     }
-}</code></pre>
+
+
+    /**
+     * Merge a json object with the json of the current sbgn network
+     * @param {Object} jsonGraph
+     * @param {Number} cyId
+     * @param {Object} modelManager
+     * @param {function} callback
+     * @returns {Object}
+     */
+    mergeJsonWithCurrent (jsonGraph, cyId, modelManager, callback) {
+
+        let chiseInstance = appUtilities.getChiseInstance(cyId);
+        let currJson;
+        if(chiseInstance.getMapType()== &apos;SIF&apos; )
+            currJson = chiseInstance.createJsonFromSif();
+        else
+            currJson = chiseInstance.createJsonFromSBGN();
+
+
+        modelManager.setRollbackPoint(cyId); //before merging.. for undo
+
+        let jsonObj = jsonMerger.mergeJsonWithCurrent(jsonGraph, currJson);
+
+
+        //get another sbgncontainer and display the new SBGN model.
+        modelManager.newModel(cyId, &quot;me&quot;, true);
+
+        //this takes a while so wait before initiating the model
+        appUtilities.getChiseInstance(cyId).updateGraph(jsonObj, function () {
+
+            modelManager.initModel(appUtilities.getCyInstance(cyId).nodes(), appUtilities.getCyInstance(cyId).edges(), cyId,  &quot;me&quot;);
+
+            //select the new graph
+            jsonGraph.nodes.forEach(function (node) {
+                appUtilities.getCyInstance(cyId).getElementById(node.data.id).select();
+            });
+
+            $(&quot;#perform-layout&quot;).trigger(&apos;click&apos;);
+
+            appUtilities.getCyInstance(cyId).elements().unselect();
+
+            // Call merge notification after the layout
+            setTimeout(function () {
+                modelManager.mergeJsons(cyId, &quot;me&quot;);
+                if (callback) callback(&quot;success&quot;);
+            }, 1000);
+
+        }, true);
+    }
+
+
+    /**
+     * Merge an array of json objects to output a single json object.
+     * @param {Array} jsonGraph
+     * @param {Number} cyId
+     * @param {Object} modelManager
+     * @param {function} callback
+     * @returns {Object}
+     */
+    mergeJsons(jsonGraph, cyId, modelManager, callback) {
+        let idxCardNodeMap = {};
+        let sentenceNodeMap = {};
+
+        modelManager.setRollbackPoint(cyId); //before merging.. for undo
+
+        let jsonObj = jsonMerger.mergeJsons(jsonGraph, sentenceNodeMap, idxCardNodeMap);
+
+        modelManager.newModel(cyId, &quot;me&quot;, true);
+
+
+
+        appUtilities.getChiseInstance(cyId).updateGraph(jsonObj, function(){
+
+            modelManager.initModel( appUtilities.getCyInstance(cyId).nodes(), appUtilities.getCyInstance(cyId).edges(), cyId,  &quot;me&quot;);
+
+            //Call layout after init
+            $(&quot;#perform-layout&quot;).trigger(&apos;click&apos;);
+
+
+            //Call merge notification after the layout
+            setTimeout(function () {
+                modelManager.mergeJsons(cyId, &quot;me&quot;, true);
+
+                if (callback) callback();
+            }, 1000);
+
+        }, true);
+
+        return {sentences: sentenceNodeMap, idxCards: idxCardNodeMap};
+    }
+
+
+
+}
+
+module.exports = ModelMergeFunctions;</code></pre>
 
 </div>
 

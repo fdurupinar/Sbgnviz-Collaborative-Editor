@@ -59,7 +59,7 @@ describe('Client side socket listener', () => {
                 let clientSideSocketListener = window.testApp.clientSideSocketListener;
                 let modelManager = window.testApp.modelManager;
 
-                let data = {content: globalTestData.sbgnData, cyId:0 };
+                let data = {cyId:0 };
                 clientSideSocketListener._cleanModel(data, (val) => {
                     expect(modelManager.getModelCy(0).nodes).to.be.not.ok;
                     expect(modelManager.getModelCy(0).edges).to.be.not.ok;
@@ -72,6 +72,7 @@ describe('Client side socket listener', () => {
             });
         });
     }
+
 
     function addOperations(){
 
@@ -153,8 +154,6 @@ describe('Client side socket listener', () => {
 
             cy.window().should( (window) => {
                 let modelManager = window.testApp.modelManager;
-                // expect(document.getElementById('oncoprint-tab').style.visibility).to.be.equal('hidden');
-
 
                 let clientSideSocketListener = window.testApp.clientSideSocketListener;
                 clientSideSocketListener._displayOncoprint(globalTestData.gaData, ()=>{
@@ -163,6 +162,7 @@ describe('Client side socket listener', () => {
 
                         expect(modelManager.getOncoprint()).to.be.ok;
                         expect(window.testApp.oncoprintHandler.oncoprint.getTracks().length > 0).to.be.ok;
+
                         done();
                     }, 5000);
 
@@ -173,16 +173,254 @@ describe('Client side socket listener', () => {
         });
     }
 
+    function addImage() {
+        it('Add image',  () => {
+            cy.fixture('modelRXN.png').then((content) => {
+
+                cy.window().should( (window)  => {
+                    let modelManager = window.testApp.modelManager;
+                    let $ = window.$;
+                    let imageTabList = ['RXN', 'CM', 'IM', 'SIM'];
+
+                    // because file reading is not possible on the client side, store img in mwmory
+
+                    for (let i = 0; i < imageTabList.length; i++) {
+
+                        let imgData = {
+                            img: ("data:image/png;base64," + content),
+                            tabIndex: i,
+                            tabLabel: imageTabList[i],
+                            fileName: "modelRXN"
+                        };
 
 
+                        let clientSideSocketListener = window.testApp.clientSideSocketListener;
+                        clientSideSocketListener._addImage(imgData, () => {
+
+                            let images = modelManager.getImages();
+                            let lastImage = images[i];
+
+                            expect(images).to.be.ok;
+                            expect(lastImage.tabIndex).to.equal(imgData.tabIndex);
+                            expect(lastImage.tabLabel).to.equal(imgData.tabLabel);
+                            setTimeout(() => {
+                                expect($("#static-image-container-" + lastImage.tabIndex)).to.be.ok;
+                            }, 100);
+
+                        });
+                    }
+
+
+                });
+
+            });
+
+        });
+    }
+
+    function openPCQuery(){
+        it('PC Query SBGN',  (done) => {
+            cy.window().should( (window) => {
+                let clientSideSocketListener = window.testApp.clientSideSocketListener;
+                let data = {graph: globalTestData.sbgnData, cyId:0, type:'sbgn' };
+                clientSideSocketListener._openPCQueryWindow(data, (val) => {
+                    expect(val).to.eq("success");
+
+                    done();
+
+                });
+
+            });
+        });
+
+        it('PC Query SIF',  (done) => {
+            cy.window().should( (window) => {
+                let clientSideSocketListener = window.testApp.clientSideSocketListener;
+                let data = {graph: globalTestData.sifData, cyId:0, type:'sif' };
+                clientSideSocketListener._openPCQueryWindow(data, (val) => {
+                    expect(val).to.eq("success");
+
+                    done();
+
+                });
+
+            });
+        });
+    }
+
+
+    function displayGraphs(){
+
+        it('Display SIF',  (done) => {
+            cy.window().should( (window) => {
+                let clientSideSocketListener = window.testApp.clientSideSocketListener;
+                let data = {sif: globalTestData.sifData, cyId:0};
+                clientSideSocketListener._displaySif(data, (val) => {
+                    expect(val).to.eq("success");
+                    done();
+
+                });
+
+            });
+
+        });
+
+        it('Display SBGN',  (done) => {
+            cy.window().should( (window) => {
+                let clientSideSocketListener = window.testApp.clientSideSocketListener;
+                let data = {sbgn: globalTestData.sbgnData, cyId:0 };
+                clientSideSocketListener._displaySbgn(data, (val) => {
+                    expect(val).to.eq("success");
+                    done();
+
+                });
+
+            });
+
+        });
+
+
+        it('Merge SBGN',  (done) => {
+            cy.window().should( (window) => {
+                let clientSideSocketListener = window.testApp.clientSideSocketListener;
+                let data = {graph: globalTestData.sbgnData2, cyId:0 };
+                setTimeout(()=>{
+                    clientSideSocketListener._mergeSbgn(data, (val) => {
+                        expect(val).to.eq("success");
+                        done();
+
+                    });
+                }, 1000);
+
+            });
+
+        });
+
+
+
+
+
+
+    }
+
+
+    function displayAndCleanProvenance(){
+
+        it('Display provenance',  (done) => {
+            cy.window().should( (window) => {
+                let clientSideSocketListener = window.testApp.clientSideSocketListener;
+
+
+                let data = {title: "Test", html:"<p>Hello</p>"}
+                clientSideSocketListener._addProvenance(data, (val) => {
+
+                    let model = window.testApp.model;
+                    expect(model.get('_page.doc.provenance').length).to.eq(1);
+                    expect(val).to.eq("success");
+
+                    done();
+
+                });
+
+
+            });
+
+        });
+
+        it("Clean model and provenance", (done)=> {
+            cy.window().should((window) => {
+                let clientSideSocketListener = window.testApp.clientSideSocketListener;
+                let modelManager = window.testApp.modelManager;
+
+                let data = { cyId:0 , shouldCleanProvenance:true};
+                setTimeout(()=>{ //let the provenance to be loaded first
+                    clientSideSocketListener._cleanModel(data, (val) => {
+
+
+                        expect(modelManager.getModelCy(0).nodes).to.be.not.ok;
+                        expect(modelManager.getModelCy(0).edges).to.be.not.ok;
+                        expect(modelManager.getImages(0)).to.be.not.ok;
+                        expect(val).to.eq("success");
+                        let model = window.testApp.model;
+                        expect(model.get('_page.doc.provenance')).to.be.not.ok;
+
+                        done();
+                    });
+                }, 1000);
+
+            });
+        });
+
+    }
+
+
+    // Visualization Agent Tests
+    function visAgentOperations(){
+
+        it("Move gene", (done)=> {
+            cy.window().should((window) => {
+                let clientSideSocketListener = window.testApp.clientSideSocketListener;
+
+                let data = {sbgn: globalTestData.sbgnData2, cyId:0 };
+
+                clientSideSocketListener._displaySbgn(data, () => {
+                });
+
+                setTimeout(()=> { //wait for the file to load
+                    let data2  = {name:"ERK", location:"top", cyId : 0};
+                    clientSideSocketListener._moveGene(data2, (val)=>{
+                        expect(val).to.eq("success");
+                        done();
+                    });
+
+                }, 1000);
+
+
+                });
+
+        });
+
+
+        it("Move gene stream", (done)=> {
+            cy.window().should((window) => {
+                let clientSideSocketListener = window.testApp.clientSideSocketListener;
+
+                setTimeout(()=> { //wait for the file to load
+                    let data  = {name:"ERK", location:"top", direction:"up", cyId : 0};
+                    clientSideSocketListener._moveGeneStream(data, (val)=>{
+                        expect(val).to.eq("success");
+                        done();
+                    });
+
+                }, 1000);
+
+
+            });
+
+        });
+
+    }
+
+
+    //
     connect();
-    loadFile();
-    runLayout();
-    cleanModel();
+    // loadFile();
+    // runLayout();
+    // cleanModel();
+    //
+    // addOperations();
+    //
+    //
+    // addImage();
+    //
+    //
+    // openPCQuery();
+    // displayGraphs();
+    // displayOncoprint();
+    //
+    // displayAndCleanProvenance();
 
-    addOperations();
-
-    displayOncoprint();
+    visAgentOperations();
 
 
 });

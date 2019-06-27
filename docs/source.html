@@ -29,11 +29,11 @@
 <nav class="navigation" data-ice="nav"><div>
   <ul>
     
-  <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js">js</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/modelManager.js~ModelManager.html">ModelManager</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-clientSideSocketListener">clientSideSocketListener</a></span></span></li>
+  <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js">js</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html">ClientSideSocketListener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/modelManager.js~ModelManager.html">ModelManager</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-merger">js/merger</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/merger/json-merger.js~JsonMerger.html">JsonMerger</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/merger/model-merge-functions.js~ModelMergeFunctions.html">ModelMergeFunctions</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/merger/rephrase-handler.js~RephraseHandler.html">RephraseHandler</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-modelmergefunctions">modelmergefunctions</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-newt-functions">js/newt-functions</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-editorlistener">editorlistener</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-PathsBetweenQueryView">PathsBetweenQueryView</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-PathsByURIQueryView">PathsByURIQueryView</a></span></span></li>
@@ -45,7 +45,7 @@
 </div>
 </nav>
 
-<div class="content" data-ice="content"><h1>Source <img data-ice="coverageBadge" src="./badge.svg"><span data-ice="totalCoverageCount" class="total-coverage-count">94/138</span></h1>
+<div class="content" data-ice="content"><h1>Source <img data-ice="coverageBadge" src="./badge.svg"><span data-ice="totalCoverageCount" class="total-coverage-count">104/173</span></h1>
 
 <table class="files-summary" data-ice="files" data-use-coverage="true">
   <thead>
@@ -61,12 +61,12 @@
   <tbody>
     
   <tr data-ice="file">
-      <td data-ice="filePath"><span><a href="file/collaborative-app/js/clientSideSocketListener.js.html#errorLines=10,12,9">collaborative-app/js/clientSideSocketListener.js</a></span></td>
-      <td data-ice="identifier" class="identifiers"><span><a href="function/index.html#static-function-clientSideSocketListener">clientSideSocketListener</a></span></td>
-      <td class="coverage"><span data-ice="coverage">0 %</span><span data-ice="coverageCount" class="coverage-count">0/3</span></td>
-      <td style="display: none;" data-ice="size">23789 byte</td>
-      <td style="display: none;" data-ice="lines">670</td>
-      <td style="display: none;" data-ice="updated">2019-06-03 17:58:47 (UTC)</td>
+      <td data-ice="filePath"><span><a href="file/collaborative-app/js/clientSideSocketListener.js.html#errorLines=10,109,11,12,143,15,167,180,199,22,226,240,268,291,312,403,468,530,547,558,612,623,634,64,645,663,684">collaborative-app/js/clientSideSocketListener.js</a></span></td>
+      <td data-ice="identifier" class="identifiers"><span><a href="class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html">ClientSideSocketListener</a></span></td>
+      <td class="coverage"><span data-ice="coverage">20 %</span><span data-ice="coverageCount" class="coverage-count">7/34</span></td>
+      <td style="display: none;" data-ice="size">22676 byte</td>
+      <td style="display: none;" data-ice="lines">709</td>
+      <td style="display: none;" data-ice="updated">2019-06-04 23:54:00 (UTC)</td>
     </tr>
 <tr data-ice="file">
       <td data-ice="filePath"><span><a href="file/collaborative-app/js/merger/json-merger.js.html#errorLines=101,17,20,22,232,27,69,85">collaborative-app/js/merger/json-merger.js</a></span></td>
@@ -77,12 +77,12 @@
       <td style="display: none;" data-ice="updated">2019-06-03 18:31:34 (UTC)</td>
     </tr>
 <tr data-ice="file">
-      <td data-ice="filePath"><span><a href="file/collaborative-app/js/merger/model-merge-functions.js.html#errorLines=2,3,6">collaborative-app/js/merger/model-merge-functions.js</a></span></td>
-      <td data-ice="identifier" class="identifiers"><span><a href="function/index.html#static-function-modelmergefunctions">modelmergefunctions</a></span></td>
-      <td class="coverage"><span data-ice="coverage">0 %</span><span data-ice="coverageCount" class="coverage-count">0/3</span></td>
-      <td style="display: none;" data-ice="size">3096 byte</td>
-      <td style="display: none;" data-ice="lines">89</td>
-      <td style="display: none;" data-ice="updated">2019-06-03 18:26:07 (UTC)</td>
+      <td data-ice="filePath"><span><a href="file/collaborative-app/js/merger/model-merge-functions.js.html#errorLines=2,3,9">collaborative-app/js/merger/model-merge-functions.js</a></span></td>
+      <td data-ice="identifier" class="identifiers"><span><a href="class/collaborative-app/js/merger/model-merge-functions.js~ModelMergeFunctions.html">ModelMergeFunctions</a></span></td>
+      <td class="coverage"><span data-ice="coverage">50 %</span><span data-ice="coverageCount" class="coverage-count">3/6</span></td>
+      <td style="display: none;" data-ice="size">3167 byte</td>
+      <td style="display: none;" data-ice="lines">106</td>
+      <td style="display: none;" data-ice="updated">2019-06-04 23:57:04 (UTC)</td>
     </tr>
 <tr data-ice="file">
       <td data-ice="filePath"><span><a href="file/collaborative-app/js/merger/rephrase-handler.js.html#errorLines=139,16,170,19,198,21,239,25,260,279,362,403,61,94">collaborative-app/js/merger/rephrase-handler.js</a></span></td>
@@ -96,9 +96,9 @@
       <td data-ice="filePath"><span><a href="file/collaborative-app/js/modelManager.js.html#errorLines=22">collaborative-app/js/modelManager.js</a></span></td>
       <td data-ice="identifier" class="identifiers"><span><a href="class/collaborative-app/js/modelManager.js~ModelManager.html">ModelManager</a></span></td>
       <td class="coverage"><span data-ice="coverage">98 %</span><span data-ice="coverageCount" class="coverage-count">73/74</span></td>
-      <td style="display: none;" data-ice="size">55370 byte</td>
-      <td style="display: none;" data-ice="lines">1669</td>
-      <td style="display: none;" data-ice="updated">2019-06-03 18:17:54 (UTC)</td>
+      <td style="display: none;" data-ice="size">55415 byte</td>
+      <td style="display: none;" data-ice="lines">1671</td>
+      <td style="display: none;" data-ice="updated">2019-06-04 23:23:43 (UTC)</td>
     </tr>
 <tr data-ice="file">
       <td data-ice="filePath"><span><a href="file/collaborative-app/js/newt-functions/collaborative-backbone-views.js.html#errorLines=4,6">collaborative-app/js/newt-functions/collaborative-backbone-views.js</a></span></td>
@@ -110,20 +110,20 @@
       <td style="display: none;" data-ice="updated">2019-06-03 17:58:47 (UTC)</td>
     </tr>
 <tr data-ice="file">
-      <td data-ice="filePath"><span><a href="file/collaborative-app/js/newt-functions/editor-listener.js.html#errorLines=11">collaborative-app/js/newt-functions/editor-listener.js</a></span></td>
+      <td data-ice="filePath"><span><a href="file/collaborative-app/js/newt-functions/editor-listener.js.html#errorLines=11,13">collaborative-app/js/newt-functions/editor-listener.js</a></span></td>
       <td data-ice="identifier" class="identifiers"><span><a href="function/index.html#static-function-editorlistener">editorlistener</a></span></td>
-      <td class="coverage"><span data-ice="coverage">50 %</span><span data-ice="coverageCount" class="coverage-count">1/2</span></td>
-      <td style="display: none;" data-ice="size">22280 byte</td>
-      <td style="display: none;" data-ice="lines">652</td>
-      <td style="display: none;" data-ice="updated">2019-06-03 17:59:16 (UTC)</td>
+      <td class="coverage"><span data-ice="coverage">33 %</span><span data-ice="coverageCount" class="coverage-count">1/3</span></td>
+      <td style="display: none;" data-ice="size">22388 byte</td>
+      <td style="display: none;" data-ice="lines">656</td>
+      <td style="display: none;" data-ice="updated">2019-06-04 23:59:22 (UTC)</td>
     </tr>
 <tr data-ice="file">
-      <td data-ice="filePath"><span><a href="file/collaborative-app/js/oncoprint/oncoprint-handler.js.html#errorLines=10,11,12,13,15,197,303,8,9">collaborative-app/js/oncoprint/oncoprint-handler.js</a></span></td>
+      <td data-ice="filePath"><span><a href="file/collaborative-app/js/oncoprint/oncoprint-handler.js.html#errorLines=10,11,12,13,15,197,317,8,9">collaborative-app/js/oncoprint/oncoprint-handler.js</a></span></td>
       <td data-ice="identifier" class="identifiers"><span><a href="class/collaborative-app/js/oncoprint/oncoprint-handler.js~OncoprintHandler.html">OncoprintHandler</a></span></td>
       <td class="coverage"><span data-ice="coverage">30 %</span><span data-ice="coverageCount" class="coverage-count">4/13</span></td>
-      <td style="display: none;" data-ice="size">32156 byte</td>
-      <td style="display: none;" data-ice="lines">1375</td>
-      <td style="display: none;" data-ice="updated">2019-06-03 21:15:18 (UTC)</td>
+      <td style="display: none;" data-ice="size">10337 byte</td>
+      <td style="display: none;" data-ice="lines">343</td>
+      <td style="display: none;" data-ice="updated">2019-06-03 22:38:09 (UTC)</td>
     </tr>
 <tr data-ice="file">
       <td data-ice="filePath"><span><a href="file/collaborative-app/js/reach-functions/idxCard-info.js.html#errorLines=23">collaborative-app/js/reach-functions/idxCard-info.js</a></span></td>

@@ -143,7 +143,7 @@ const appUtilities = window.appUtilities;
 
     /***
      * Moves node to the given location in data
-     * @param {Object} data Has {name:, state: , location:}
+     * @param {Object} data Node info {name:<string>, state:<string> , location:<string>}
      */
     moveNode(data) {
 
@@ -298,18 +298,29 @@ const appUtilities = window.appUtilities;
 
     /***
      * Moves the upstream or downsteam of nodes given in data to a location
-     * @param {Object} data {name:, direction: <"up", "dow">, state:, cyId:, location: <"top", "bottom", "left", "right">}
+     * @param {Object} data {name: <string>, direction: <"up", "down">, state:, cyId:<Number>, location: <"top", "bottom", "left", "right">}
      */
     moveNodeStream (data) {
 
         let cy = appUtilities.getCyInstance(data.cyId);
-        let nodeId = this.findNodeFromLabel(data.name, data.state, cy.nodes()).data("id");
 
-        let nodeIds = this.findStream(nodeId, data.direction, cy);
+        let nodes = this.findNodeFromLabel(data.name, data.state, cy.nodes());
+
+        let ids = [];
+        if(!nodes)
+            return;
+        nodes.forEach(function (node) {
+            ids.push(node.data("id"));
+        });
 
 
+        let nodeIds = this.findStream(ids, data.direction, cy);
+
+        if(!nodeIds)
+            return;
         //unselect all first
         cy.elements().unselect();
+
 
 
         //select elements
@@ -383,13 +394,18 @@ const appUtilities = window.appUtilities;
 
         let directionMap = {down: {node: "source", neighbor: "target"}, up: {node: "target", neighbor: "source"}};
 
+
         ids.forEach(function (nodeId) {
 
             let edgeStr = "[" + directionMap[direction].node + "='" + nodeId + "']";
 
+            console.log(edgeStr);
             let edges = cy.edges(edgeStr);
 
+            if(!edges)
+                return [];
 
+            //TODO: handle cyclic edges
             edges.forEach(function (edge) {
                 let neighborId = edge.data(directionMap[direction].neighbor);
 

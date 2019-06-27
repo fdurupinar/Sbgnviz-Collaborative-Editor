@@ -5,13 +5,15 @@
  */
 
 
-let modelMergeFunctions = require('../merger/model-merge-functions.js')();
+
 let Mousetrap = require('mousetrap'); //used to listen to keyboard events
 let Tippy = require('tippy.js');
 let appUtilities = window.appUtilities;
+let ModelMergeFunctions = require('../merger/model-merge-functions.js');
+let modelMergeFunctions = new ModelMergeFunctions();
 
 /**
- *
+ * Listens to editor events and updates the shared model
  * @param {Object} modelManager Model operations handler
  * @param {Object} socket
  * @param {string} userId

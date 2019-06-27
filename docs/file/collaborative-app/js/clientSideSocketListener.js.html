@@ -29,11 +29,11 @@
 <nav class="navigation" data-ice="nav"><div>
   <ul>
     
-  <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js">js</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/modelManager.js~ModelManager.html">ModelManager</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-clientSideSocketListener">clientSideSocketListener</a></span></span></li>
+  <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js">js</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html">ClientSideSocketListener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/modelManager.js~ModelManager.html">ModelManager</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-merger">js/merger</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/merger/json-merger.js~JsonMerger.html">JsonMerger</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/merger/model-merge-functions.js~ModelMergeFunctions.html">ModelMergeFunctions</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/merger/rephrase-handler.js~RephraseHandler.html">RephraseHandler</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-modelmergefunctions">modelmergefunctions</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-newt-functions">js/newt-functions</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-editorlistener">editorlistener</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-PathsBetweenQueryView">PathsBetweenQueryView</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-PathsByURIQueryView">PathsByURIQueryView</a></span></span></li>
@@ -53,670 +53,709 @@
  */
 
 
-const modelMergeFunctions = require(&apos;./merger/model-merge-functions.js&apos;)();
+
+let ModelMergeFunctions = require(&apos;./merger/model-merge-functions.js&apos;);
+let modelMergeFunctions = new ModelMergeFunctions();
 const appUtilities = window.appUtilities;
 const $ = require(&apos;jquery&apos;);
 
-module.exports =  function(app) {
 
-    return {
-
-        /**
-         * Listens to Trips agent and menu function requests via the server
-         *
-         */
-        listen: function () {
-            let self = this;
-
-            self.listenToVisAgentRequests();
-
-            app.socket.on(&apos;loadFile&apos;, function (data, callback) {
-                try {
-                    appUtilities.getChiseInstance(data.cyId).getSbgnvizInstance().loadSBGNMLText(data.content);
-
-                    if (callback) callback(&quot;success&quot;);
-                }
-                catch (e) {
-                    console.log(e);
-                    if(callback) callback();
-
-                }
-            });
-
-
-            app.socket.on(&apos;cleanModel&apos;, function ( data, callback) {
-                try {
-                    self.cleanModel(data.shouldCleanProvenance, callback);
-                }
-                catch (e) {
-                    console.log(e);
-                    if(callback) callback();
-                }
-            });
-
-
-            app.socket.on(&apos;runLayout&apos;, function (data, callback) {
-                try {
-                    appUtilities.setActiveNetwork(data.cyId);
-                    $(&quot;#perform-layout&quot;)[0].click();
-                    if (callback) callback(&quot;success&quot;);
-                }
-                catch (e) {
-                    console.log(e);
-                    if(callback) callback();
-                }
-            });
-
-
-            app.socket.on(&apos;addNode&apos;, function (param, callback) {
-                try {
-                    //does not trigger cy events
-                    let newNode = appUtilities.getChiseInstance(param.cyId).elementUtilities.addNode(param.position.x, param.position.y, param.data.class);
-
-                    //notifies other clients
-                    app.modelManager.addModelNode(newNode.id(), param.cyId, param, &quot;me&quot;);
-                    app.modelManager.initModelNode(newNode, param.cyId, &quot;me&quot;);
-
-                    if (callback) callback(newNode.id());
-                }
-                catch (e) {
-                    console.log(e);
-                    if(callback) callback();
-                }
-            });
-
-
-            app.socket.on(&apos;deleteEles&apos;, function (data, callback) {
-                try {
-                    //unselect all others
-                    appUtilities.getCyInstance(data.cyId).elements().unselect();
-
-                    //first delete edges
-                    data.elementIds.forEach(function (id) {
-                        appUtilities.getCyInstance(data.cyId).getElementById(id).select();
-                    });
-
-                    //then delete modes
-                    if (data.type === &quot;simple&quot;)
-                        appUtilities.getChiseInstance(data.cyId).deleteElesSimple(appUtilities.getCyInstance(data.cyId).elements(&apos;:selected&apos;));
-                    else
-                        appUtilities.getChiseInstance(data.cyId).deleteNodesSmart(appUtilities.getCyInstance(data.cyId).nodes(&apos;:selected&apos;));
-
-                    if(callback) callback(&quot;success&quot;);
-                }
-                catch (e) {
-                    console.log(e);
-                    if(callback) callback();
-                }
-            });
-
-            app.socket.on(&apos;addImage&apos;, function (data, callback) {
-                try {
-                    let status = app.modelManager.addImage(data);
-                    app.dynamicResize();
-
-                    if (callback) callback(status);
-
-                }
-                catch (e) {
-                    console.log(e);
-                    if(callback) callback();
-                }
-            });
-
-
-            app.socket.on(&apos;align&apos;, function (data, callback) {
-                try {
-                    let nodes = appUtilities.getCyInstance(data.cyId).collection();
-                    if (data.nodeIds === &apos;*&apos; || data.nodeIds === &apos;all&apos;)
-                        nodes = appUtilities.getCyInstance(data.cyId).nodes();
-                    else
-                        data.nodeIds.forEach(function (nodeId) {
-                            nodes.add(appUtilities.getCyInstance(data.cyId).getElementById(nodeId));
-                        });
-
-                    appUtilities.getChiseInstance(data.cyId).align(nodes, data.horizontal, data.vertical, appUtilities.getCyInstance(data.cyId).getElementById(data.alignTo));
-
-                    if (callback) callback(&quot;success&quot;);
-                }
-                catch (e) {
-                    console.log(e);
-                    if (callback) callback();
-                }
-
-            });
-            app.socket.on(&apos;updateVisibility&apos;, function (data, callback) {
-                try {
-                    //unselect all others
-                    appUtilities.setActiveNetwork(data.cyId);
-                    appUtilities.getCyInstance(data.cyId).elements().unselect();
-
-                    if (data.val === &quot;showAll&quot;)
-                        $(&quot;#show-all&quot;)[0].click();
-                    else {
-                        data.elementIds.forEach(function (id) {
-                            appUtilities.getCyInstance(data.cyId).getElementById(id).select();
-                        });
-
-                        if (data.val == &quot;show&quot;)
-                            $(&quot;#show-selected&quot;)[0].click();
-                        else
-                            $(&quot;#hide-selected&quot;)[0].click();
-                    }
-
-                    if (callback) callback(&quot;success&quot;);
-                }
-                catch (e) {
-                    console.log(e);
-                    if (callback) callback();
-                }
-            });
-
-            app.socket.on(&apos;searchByLabel&apos;, function (data, callback) {
-                try {
-                    //unselect all others
-                    appUtilities.getCyInstance(data.cyId).elements().unselect();
-                    appUtilities.getChiseInstance(data.cyId).searchByLabel(data.label);
-
-                    if (callback) callback(&quot;success&quot;);
-                }
-                catch (e) {
-                    console.log(e);
-                    if (callback) callback();
-                }
-            });
-            app.socket.on(&apos;updateHighlight&apos;, function (data, callback) {
-                try {
-                    //unselect all others
-                    appUtilities.getCyInstance(data.cyId).elements().unselect();
-                    appUtilities.setActiveNetwork(data.cyId);
-
-                    if (data.val === &quot;remove&quot;) {
-                        $(&quot;#remove-highlights&quot;)[0].click();
-                    }
-                    else {
-                        data.elementIds.forEach(function (id) {
-                            appUtilities.getCyInstance(data.cyId).getElementById(id).select();
-                        });
-
-                        if (data.val === &quot;neighbors&quot;)
-                            $(&quot;#highlight-neighbors-of-selected&quot;)[0].click();
-                        else if (data.val === &quot;processes&quot;)
-                            $(&quot;#highlight-processes-of-selected&quot;)[0].click();
-                    }
-
-                    if (callback) callback(&quot;success&quot;);
-                }
-                catch (e) {
-                    console.log(e);
-                    if (callback) callback();
-                }
-            });
-
-            app.socket.on(&apos;updateExpandCollapse&apos;, function (data, callback) {
-                try {
-                    //unselect all others
-                    appUtilities.getCyInstance(data.cyId).elements().unselect();
-                    appUtilities.setActiveNetwork(data.cyId);
-
-                    data.elementIds.forEach(function (id) {
-                        appUtilities.getCyInstance(data.cyId).getElementById(id).select();
-                    });
-
-                    if (data.val === &quot;collapse&quot;)
-                        $(&quot;#collapse-selected&quot;)[0].click();
-                    else
-                        $(&quot;#expand-selected&quot;)[0].click();
-
-                    if (callback) callback(&quot;success&quot;);
-                }
-                catch (e) {
-                    console.log(e);
-                    if (callback) callback();
-                }
-            });
-
-
-            app.socket.on(&apos;addCompound&apos;, function (data, callback) {
-                try {
-                    //unselect all others
-                    appUtilities.getCyInstance(data.cyId).elements().unselect();
-
-                    data.elementIds.forEach(function (elId) {
-                        let el = appUtilities.getCyInstance(data.cyId).getElementById(elId);
-                        if(el.isNode())
-                            el.select();
-                    });
-
-                    appUtilities.getChiseInstance(data.cyId).createCompoundForGivenNodes(appUtilities.getCyInstance(data.cyId).nodes(&apos;:selected&apos;), data.val);
-
-                    if (callback) callback(&quot;success&quot;);
-                }
-                catch (e) {
-                    console.log(e);
-                    if (callback) callback();
-                }
-            });
-
-
-            app.socket.on(&apos;clone&apos;, function (data, callback) {
-                try {
-                    appUtilities.getCyInstance(data.cyId).elements().unselect();
-                    appUtilities.setActiveNetwork(data.cyId);
-
-                    data.elementIds.forEach(function (nodeId) {
-                        appUtilities.getCyInstance(data.cyId).getElementById(nodeId).select();
-                    });
-
-                    $(&quot;#clone-selected&quot;)[0].click();
-
-
-                    if (callback) callback(&quot;success&quot;);
-                }
-                catch (e) {
-                    console.log(e);
-                    if (callback) callback();
-                }
-            });
-
-            //Open in another tab
-            app.socket.on(&apos;openPCQueryWindow&apos;, function(data, callback){
-                try {
-                    let chiseInst = appUtilities.createNewNetwork(); //opens a new tab
-
-                    let jsonObj;
-                    if (data.type &amp;&amp; data.type == &apos;sif&apos;)
-                        jsonObj = chiseInst.convertSifTextToJson(data.graph);
-                    else
-                        jsonObj = chiseInst.convertSbgnmlTextToJson(data.graph);
-
-                    chiseInst.updateGraph(jsonObj, function () {
-                        app.modelManager.initModel(appUtilities.getCyInstance(chiseInst.cyId).nodes(), appUtilities.getCyInstance(chiseInst.cyId).edges(), chiseInst.cyId,  &quot;me&quot;);
-
-                        appUtilities.setActiveNetwork(chiseInst.cyId);
-
-                        $(&quot;#perform-layout&quot;)[0].click();
-
-                        if (callback) callback(&quot;success&quot;);
-
-                    }, true);
-                }
-                catch (e) {
-                    console.log(e);
-                    if (callback) callback();
-                }
-
-                });
-
-            app.socket.on(&apos;displayOncoprint&apos;, function(data, callback){
-
-                try {
-                    let timeOut = 0;
-                    if (document.getElementById(&apos;oncoprint-tab&apos;).style.visibility == &apos;hidden&apos;) {
-
-                        timeOut = 4000;
-                        document.getElementById(&apos;oncoprint-tab&apos;).style.visibility = &apos;visible&apos;;
-                    }
-
-                    setTimeout(() =&gt; {
-
-                            app.modelManager.setOncoprint(data);
-                            app.oncoprintHandler.updateData(data);
-
-                        }, timeOut
-                    );
-
-                    if (callback) callback(&quot;success&quot;);
-                }
-                catch (e) {
-                    console.log(e);
-                    if (callback) callback();
-                }
-            });
-
-
-            app.socket.on(&quot;displaySif&quot;, function(data, callback) {
-                try {
-                    let chiseInst;
-                    if (!data.cyId) {
-                        data.cyId = appUtilities.getActiveNetworkId();
-                        chiseInst = appUtilities.getActiveChiseInstance();
-                    } else {
-
-                        data.cyId = parseInt(data.cyId);
-
-
-                        if (!appUtilities.doesNetworkExist(data.cyId))
-                            chiseInst = appUtilities.createNewNetwork(data.cyId); //opens a new tab
-                        else
-                            chiseInst = appUtilities.getChiseInstance(data.cyId);
-
-                    }
-
-                    appUtilities.getCyInstance(data.cyId).remove(appUtilities.getCyInstance(data.cyId).elements());
-
-
-                    let jsonObj = chiseInst.convertSifTextToJson(data.sif);
-
-
-                    chiseInst.updateGraph(jsonObj, () =&gt; {
-
-                        app.modelManager.newModel(appUtilities.getActiveNetworkId(), &quot;me&quot;); //delete the existing model first so that ids don&apos;t get mixed up
-
-
-                        app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(), data.cyId,  &quot;me&quot;);
-
-
-                        appUtilities.setActiveNetwork(data.cyId);
-
-                        setTimeout(() =&gt; {
-
-                            // $(&quot;#perform-layout&quot;)[0].click();
-
-                            // app.callLayout(data.cyId);
-                            //open the network view and rerender it otherwise the graph becomes invisible
-                            $(&quot;#defaultOpen&quot;)[0].click();
-
-                            app.dynamicResize();
-                            appUtilities.getCyInstance(data.cyId).panzoom().fit();
-
-
-                            if (callback) callback(&quot;success&quot;);
-                        }, 1000);
-
-
-                    }, true);
-                }
-                catch (e) {
-                    console.log(e);
-                    if (callback) callback();
-                }
-            });
-
-             app.socket.on(&quot;displaySbgn&quot;, function(data, callback){
-                 try {
-                     let chiseInst;
-
-                     if (!data.cyId) {
-                         data.cyId = appUtilities.getActiveNetworkId();
-                         chiseInst = appUtilities.getActiveChiseInstance();
-                     } else {
-
-                         data.cyId = parseInt(data.cyId);
-                         if (!appUtilities.doesNetworkExist(data.cyId))
-                             chiseInst = appUtilities.createNewNetwork(data.cyId); //opens a new tab
-                         else
-                             chiseInst = appUtilities.getChiseInstance(data.cyId);
-
-                     }
-
-
-                     appUtilities.getCyInstance(data.cyId).remove(appUtilities.getCyInstance(data.cyId).elements());
-
-
-                     let jsonObj = chiseInst.convertSbgnmlTextToJson(data.sbgn);
-
-
-                     chiseInst.updateGraph(jsonObj, () =&gt; {
-
-                         app.modelManager.newModel(appUtilities.getActiveNetworkId(), &quot;me&quot;); //delete the existing model first so that ids don&apos;t get mixed up
-
-
-                         app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(), data.cyId,  &quot;me&quot;);
-
-
-                         appUtilities.setActiveNetwork(data.cyId);
-
-                         setTimeout(() =&gt; {
-
-                             // $(&quot;#perform-layout&quot;)[0].click();
-
-                             // app.callLayout(data.cyId);
-                             //open the network view and rerender it otherwise the graph becomes invisible
-                             $(&quot;#defaultOpen&quot;)[0].click();
-
-                             app.dynamicResize();
-                             appUtilities.getCyInstance(data.cyId).panzoom().fit();
-
-
-                             if (callback) callback(&quot;success&quot;);
-                         }, 1000);
-
-
-                     }, true);
-
-                     //update cellular locations
-                     app.updateCellularLocations();
-
-                 }
-                 catch (e) {
-                     console.log(e);
-                     if (callback) callback();
-                 }
-            });
-
-            app.socket.on(&quot;mergeSbgn&quot;, function (data, callback) {
-                try {
-
-                    if (!data.cyId)
-                        data.cyId = appUtilities.getActiveNetworkId();
-
-                    let newJson = appUtilities.getChiseInstance(data.cyId).convertSbgnmlTextToJson(data.graph);
-
-                    modelMergeFunctions.mergeJsonWithCurrent(newJson, data.cyId, app.modelManager, callback);
-                }
-                catch (e) {
-                    console.log(e);
-                    if (callback) callback();
-                }
-            });
-
-            app.socket.on(&quot;mergeJsonWithCurrent&quot;, function (data, callback) {
-                try {
-                    if (!data.cyId)
-                        data.cyId = appUtilities.getActiveNetworkId();
-                    modelMergeFunctions.mergeJsonWithCurrent(data.graph, data.cyId, app.modelManager, callback);
-                }
-                catch (e) {
-                    console.log(e);
-                    if (callback) callback();
-                }
-            });
-
-
-            app.socket.on(&quot;addProvenance&quot;, function (data, callback) {
-                try {
-                    if (!data.cyId)
-                        data.cyId = appUtilities.getActiveNetworkId();
-
-
-                    if (data.pc)
-                        app.model.push(&apos;_page.doc.provenance&apos;, {
-                            html: data.html,
-                            pc: data.pc,
-                            title: data.title,
-                            userName: self.agentName
-                        });
-                    else if (data.title)
-                        app.model.push(&apos;_page.doc.provenance&apos;, {
-                            html: data.html,
-                            title: data.title,
-                            userName: self.agentName
-                        });
-                    else
-                        app.model.push(&apos;_page.doc.provenance&apos;, {html: data.html, userName: self.agentName});
-
-                    if (callback)
-                        callback(&quot;success&quot;);
-                }
-                catch (e) {
-                    console.log(e);
-                    if (callback) callback();
-                }
-            });
-
-            //This is for Claire -- to make sure Bob is not connected at the same time
-            app.socket.on(&quot;removeBob&quot;, function(data, callback){
-                try {
-                    if (app.tripsAgent) {
-
-                        app.tripsAgent.disconnect();
-                        if (callback) {
-
-                            callback();
-                        }
-                    }
-                }
-                catch (e) {
-                    console.log(e);
-                    if (callback) callback();
-                }
-            });
-        },
-
-
-        /**
-         *
-         * Listens to VisualizationAgent requests sent via the server
-         */
-        listenToVisAgentRequests: function () {
-
-            app.socket.on(&apos;moveGene&apos;, function ( data, callback) {
-                try {
-                    app.visHandler.moveNode(data);
-                    if (callback) callback(&quot;success&quot;);
-                }
-                catch (e) {
-                    console.log(e);
-                    if (callback) callback();
-                }
-            });
-
-            app.socket.on(&apos;moveGeneStream&apos;, function ( data, callback) {
-                try {
-                    app.visHandler.moveNodeStream(data);
-                    if (callback) callback(&quot;success&quot;);
-                }
-                catch (e) {
-                    console.log(e);
-                    if (callback) callback();
-                }
-            });
-
-            app.socket.on(&apos;highlightGeneStream&apos;, function ( data, callback) {
-                try {
-                    app.visHandler.highlightNodeStream(data);
-                    if (callback) callback(&quot;success&quot;);
-                }
-                catch (e) {
-                    console.log(e);
-                    if (callback) callback();
-                }
-            });
-
-
-            app.socket.on(&quot;changeLockState&quot;, function(data, callback){
-                try {
-                    if (!data.cyId)
-                        data.cyId = appUtilities.getActiveNetworkId();
-
-                    if (data.lock)
-                        appUtilities.getCyInstance(data.cyId).getElementById(data.id).lock();
-                    else
-                        appUtilities.getCyInstance(data.cyId).getElementById(data.id).unlock();
-
-                    if (callback) callback(&quot;success&quot;);
-                }
-                catch (e) {
-                    console.log(e);
-                    if (callback) callback();
-                }
-            });
-
-
-            app.socket.on(&apos;addCellularLocation&apos;, function (data, callback) {
-                try {
-                    app.addCellularLocation(data.genes, data.compartment, data.cyId);
-
-                    app.modelManager.addModelCellularLocation(data.genes, data.compartment, &quot;me&quot;);
-
-                    //unselect back
-                    // cy.elements().unselect();
-
-                    //remove highlights
-                    // chiseInst.removeHighlights();
-
-
-                    if (callback) callback(&quot;success&quot;);
-                }
-                catch (e) {
-                    console.log(e);
-                    if (callback) callback();
-                }
-
-            });
-
-            app.socket.on(&apos;moveOutOfCellularLocation&apos;, function (data, callback) {
-                try {
-
-                    app.moveOutOfCellularLocation(data.genes, data.compartment, data.cyId);
-                    app.modelManager.removeNodesFromCellularLocation(data.genes, data.compartment,  &quot;me&quot;);
-
-                    // app.modelManager.addModelCellularLocation(data.genes, data.compartment, &quot;me&quot;);
-
-
-                    //unselect back
-                    // cy.elements().unselect();
-
-                    //remove highlights
-                    // chiseInst.removeHighlights();
-
-                    if (callback) callback(&quot;success&quot;);
-                }
-                catch (e) {
-                    console.log(e);
-                    if (callback) callback();
-                }
-
-            });
-
-        },
-
-
-        /***
-         * Cleans Trips model
-         * @param {Boolean} shouldCleanProvenance  check if provenance content should be deleted
-         * @param {Function} callback
-         */
-        cleanModel: function(shouldCleanProvenance, callback){
-            try {
-                let cyIds = app.modelManager.getCyIds();
-
-                cyIds.forEach(function(cyId) {
-                    console.log(cyId);
-                    appUtilities.getCyInstance(cyId).remove(appUtilities.getCyInstance(cyId).elements());
-                    app.modelManager.newModel(cyId, &quot;me&quot;); //do not delete cytoscape, only the model
-
-                });
-
-                appUtilities.closeOtherNetworks(0);
-                app.model.set(&apos;_page.doc.images&apos;, null);
-                app.dynamicResize(); //to clean the canvas
-
-                if(shouldCleanProvenance)
-                    app.model.set(&apos;_page.doc.provenance&apos;, null);
-
-                if (callback) callback(&quot;success&quot;);
-            }
-            catch (e) {
-                console.log(e);
-                if(callback) callback();
-            }
-        },
+class ClientSideSocketListener{
+
+    /**
+     *
+     * @param {Object} app Derby,js application
+     */
+    constructor(app) {
+        this.app = app;
+    }
+
+    /**
+     * Listens to Trips agent, visAgent and menu function requests via the server
+     *
+     */
+    listen () {
+        this.app.socket.on(&apos;loadFile&apos;,  (data, callback) =&gt; this._loadFile(data, callback));
+        this.app.socket.on(&apos;cleanModel&apos;,(data, callback) =&gt; this._cleanModel(data, callback));
+        this.app.socket.on(&apos;runLayout&apos;,(data, callback) =&gt; this._runLayout(data, callback));
+        this.app.socket.on(&apos;addNode&apos;,(data, callback) =&gt; this._addNode(data, callback));
+        this.app.socket.on(&apos;deleteEles&apos;,(data, callback) =&gt; this._deleteEles(data, callback));
+        this.app.socket.on(&apos;addImage&apos;,(data, callback) =&gt; this._addImage(data, callback));
+        this.app.socket.on(&apos;align&apos;,(data, callback) =&gt; this._align(data, callback));
+        this.app.socket.on(&apos;updateVisibility&apos;,(data, callback) =&gt; this._updateVisibility(data, callback));
+        this.app.socket.on(&apos;searchByLabel&apos;,(data, callback) =&gt; this._searchByLabel(data, callback));
+        this.app.socket.on(&apos;updateHighlight&apos;,(data, callback) =&gt; this._updateHighlight(data, callback));
+        this.app.socket.on(&apos;updateExpandCollapse&apos;,(data, callback) =&gt; this._updateExpandCollapse(data, callback));
+        this.app.socket.on(&apos;addCompound&apos;,(data, callback) =&gt; this._addCompound(data, callback));
+        this.app.socket.on(&apos;clone&apos;,(data, callback) =&gt; this._clone(data, callback));
+        this.app.socket.on(&apos;openPCQueryWindow&apos;,(data, callback) =&gt; this._openPCQueryWindow(data, callback));
+        this.app.socket.on(&apos;displayOncoprint&apos;,(data, callback) =&gt; this._displayOncoprint(data, callback));
+        this.app.socket.on(&apos;displaySif&apos;,(data, callback) =&gt; this._displaySif(data, callback));
+        this.app.socket.on(&apos;displaySbgn&apos;,(data, callback) =&gt; this._displaySbgn(data, callback));
+        this.app.socket.on(&apos;mergeSbgn&apos;,(data, callback) =&gt; this._mergeSbgn(data, callback));
+        this.app.socket.on(&apos;mergeJsonWithCurrent&apos;,(data, callback) =&gt; this._mergeJsonWithCurrent(data, callback));
+        this.app.socket.on(&apos;addProvenance&apos;,(data, callback) =&gt; this._addProvenance(data, callback));
+        this.app.socket.on(&apos;removeBob&apos;,(data, callback) =&gt; this._removeBob(data, callback));
+
+
+        //VisAgent requests
+        this.app.socket.on(&apos;moveGene&apos;,  (data, callback) =&gt; this._moveGene(data, callback));
+        this.app.socket.on(&apos;moveGeneStream&apos;,  (data, callback) =&gt; this._moveGeneStream(data, callback));
+        this.app.socket.on(&apos;highlightGeneStream&apos;,  (data, callback) =&gt; this._highlightGeneStream(data, callback));
+        this.app.socket.on(&apos;changeLockState&apos;,  (data, callback) =&gt; this._changeLockState(data, callback));
+        this.app.socket.on(&apos;addCellularLocation&apos;,  (data, callback) =&gt; this._addCellularLocation(data, callback));
+        this.app.socket.on(&apos;moveOutOfCellularLocation&apos;,  (data, callback) =&gt; this._moveOutOfCellularLocation(data, callback));
 
     }
+
+
+    _loadFile(data, callback){
+        try {
+            appUtilities.getChiseInstance(data.cyId).getSbgnvizInstance().loadSBGNMLText(data.content);
+
+            if (callback) callback(&quot;success&quot;);
+        }
+        catch (e) {
+            console.log(e);
+            if(callback) callback();
+
+        }
+    }
+
+    /***
+     * Cleans Trips model
+     * @param {Object} data
+     * @property{Boolean} data.shouldCleanProvenance  check if provenance content should be deleted
+     * @param {Function} callback
+     */
+    _cleanModel(data, callback) {
+        try {
+            let cyIds = this.app.modelManager.getCyIds();
+
+            cyIds.forEach((cyId) =&gt; {
+                appUtilities.getCyInstance(cyId).remove(appUtilities.getCyInstance(cyId).elements());
+                this.app.modelManager.newModel(cyId, &quot;me&quot;); //do not delete cytoscape, only the model
+
+            });
+
+            appUtilities.closeOtherNetworks(0);
+            this.app.model.set(&apos;_page.doc.images&apos;, null);
+            this.app.dynamicResize(); //to clean the canvas
+
+            if(data.shouldCleanProvenance)
+                this.app.model.set(&apos;_page.doc.provenance&apos;, null);
+
+            if (callback) callback(&quot;success&quot;);
+
+
+        } catch (e) {
+            console.log(e);
+            if (callback) callback();
+        }
+    }
+
+    _runLayout(data, callback) {
+        try {
+            appUtilities.setActiveNetwork(data.cyId);
+            $(&quot;#perform-layout&quot;)[0].click();
+            if (callback) callback(&quot;success&quot;);
+        } catch (e) {
+            console.log(e);
+            if (callback) callback();
+        }
+    }
+
+    /**
+     * Adds node to the system and modelManager and returns the node id in the callback
+     * @param {Object} data Node info
+     * @param {Function} callback
+     * @private
+     */
+    _addNode(data, callback) {
+        try {
+            //does not trigger cy events
+            let newNode = appUtilities.getChiseInstance(data.cyId).elementUtilities.addNode(data.position.x, data.position.y, data.data.class);
+
+            //notifies other clients
+            this.app.modelManager.addModelNode(newNode.id(), data.cyId, data, &quot;me&quot;);
+            this.app.modelManager.initModelNode(newNode, data.cyId, &quot;me&quot;);
+
+            if (callback) callback(newNode.id());
+        }
+        catch (e) {
+            console.log(e);
+            if(callback) callback();
+        }
+    }
+
+    _deleteEles(data, callback){
+        try {
+            //unselect all others
+            appUtilities.getCyInstance(data.cyId).elements().unselect();
+
+            //first delete edges
+            data.elementIds.forEach( (id) =&gt; {
+                appUtilities.getCyInstance(data.cyId).getElementById(id).select();
+            });
+
+            //then delete modes
+            if (data.type === &quot;simple&quot;)
+                appUtilities.getChiseInstance(data.cyId).deleteElesSimple(appUtilities.getCyInstance(data.cyId).elements(&apos;:selected&apos;));
+            else
+                appUtilities.getChiseInstance(data.cyId).deleteNodesSmart(appUtilities.getCyInstance(data.cyId).nodes(&apos;:selected&apos;));
+
+            if(callback) callback(&quot;success&quot;);
+        }
+        catch (e) {
+            console.log(e);
+            if(callback) callback();
+        }
+    }
+
+    _addImage(data, callback){
+        try {
+            let status = this.app.modelManager.addImage(data);
+            this.app.dynamicResize();
+
+            if (callback) callback(status);
+
+        }
+        catch (e) {
+            console.log(e);
+            if(callback) callback();
+        }
+    }
+    _align(data, callback) {
+        try {
+            let nodes = appUtilities.getCyInstance(data.cyId).collection();
+            if (data.nodeIds === &apos;*&apos; || data.nodeIds === &apos;all&apos;)
+                nodes = appUtilities.getCyInstance(data.cyId).nodes();
+            else
+                data.nodeIds.forEach((nodeId) =&gt; {
+                    nodes.add(appUtilities.getCyInstance(data.cyId).getElementById(nodeId));
+                });
+
+            appUtilities.getChiseInstance(data.cyId).align(nodes, data.horizontal, data.vertical, appUtilities.getCyInstance(data.cyId).getElementById(data.alignTo));
+
+            if (callback) callback(&quot;success&quot;);
+        } catch (e) {
+            console.log(e);
+            if (callback) callback();
+        }
+    }
+
+    _updateVisibility(data, callback){
+        try {
+            //unselect all others
+            appUtilities.setActiveNetwork(data.cyId);
+            appUtilities.getCyInstance(data.cyId).elements().unselect();
+
+            if (data.val === &quot;showAll&quot;)
+                $(&quot;#show-all&quot;)[0].click();
+            else {
+                data.elementIds.forEach((id) =&gt; {
+                    appUtilities.getCyInstance(data.cyId).getElementById(id).select();
+                });
+
+                if (data.val == &quot;show&quot;)
+                    $(&quot;#show-selected&quot;)[0].click();
+                else
+                    $(&quot;#hide-selected&quot;)[0].click();
+            }
+
+            if (callback) callback(&quot;success&quot;);
+        }
+        catch (e) {
+            console.log(e);
+            if (callback) callback();
+        }
+    }
+
+    _searchByLabel(data, callback){
+        try {
+            //unselect all others
+            appUtilities.getCyInstance(data.cyId).elements().unselect();
+            appUtilities.getChiseInstance(data.cyId).searchByLabel(data.label);
+
+            if (callback) callback(&quot;success&quot;);
+        }
+        catch (e) {
+            console.log(e);
+            if (callback) callback();
+        }
+    }
+
+    _updateHighlight(data, callback){
+        try {
+            //unselect all others
+            appUtilities.getCyInstance(data.cyId).elements().unselect();
+            appUtilities.setActiveNetwork(data.cyId);
+
+            if (data.val === &quot;remove&quot;) {
+                $(&quot;#remove-highlights&quot;)[0].click();
+            }
+            else {
+                data.elementIds.forEach( (id) =&gt; {
+                    appUtilities.getCyInstance(data.cyId).getElementById(id).select();
+                });
+
+                if (data.val === &quot;neighbors&quot;)
+                    $(&quot;#highlight-neighbors-of-selected&quot;)[0].click();
+                else if (data.val === &quot;processes&quot;)
+                    $(&quot;#highlight-processes-of-selected&quot;)[0].click();
+            }
+
+            if (callback) callback(&quot;success&quot;);
+        }
+        catch (e) {
+            console.log(e);
+            if (callback) callback();
+        }
+    }
+
+    _updateExpandCollapse(data, callback){
+        try {
+            //unselect all others
+            appUtilities.getCyInstance(data.cyId).elements().unselect();
+            appUtilities.setActiveNetwork(data.cyId);
+
+            data.elementIds.forEach( (id) =&gt; {
+                appUtilities.getCyInstance(data.cyId).getElementById(id).select();
+            });
+
+            if (data.val === &quot;collapse&quot;)
+                $(&quot;#collapse-selected&quot;)[0].click();
+            else
+                $(&quot;#expand-selected&quot;)[0].click();
+
+            if (callback) callback(&quot;success&quot;);
+        }
+        catch (e) {
+            console.log(e);
+            if (callback) callback();
+        }
+    }
+
+    _addCompound(data, callback){
+        try {
+            //unselect all others
+            appUtilities.getCyInstance(data.cyId).elements().unselect();
+
+            data.elementIds.forEach( (elId) =&gt; {
+                let el = appUtilities.getCyInstance(data.cyId).getElementById(elId);
+                if(el.isNode())
+                    el.select();
+            });
+
+            appUtilities.getChiseInstance(data.cyId).createCompoundForGivenNodes(appUtilities.getCyInstance(data.cyId).nodes(&apos;:selected&apos;), data.val);
+
+            if (callback) callback(&quot;success&quot;);
+        }
+        catch (e) {
+            console.log(e);
+            if (callback) callback();
+        }
+    }
+
+    _clone(data, callback){
+        try {
+            appUtilities.getCyInstance(data.cyId).elements().unselect();
+            appUtilities.setActiveNetwork(data.cyId);
+
+            data.elementIds.forEach( (nodeId) =&gt; {
+                appUtilities.getCyInstance(data.cyId).getElementById(nodeId).select();
+            });
+
+            $(&quot;#clone-selected&quot;)[0].click();
+
+
+            if (callback) callback(&quot;success&quot;);
+        }
+        catch (e) {
+            console.log(e);
+            if (callback) callback();
+        }
+    }
+
+    /**
+     * Open the graph in another tab
+     * @param {{Object}} data Format is {type:&lt;sif or sbgn&gt;, graph:&lt;&gt;}
+     * @param {function} callback
+     * @private
+     */
+    _openPCQueryWindow(data, callback){
+        try {
+            let chiseInst = appUtilities.createNewNetwork(); //opens a new tab
+
+            let jsonObj;
+            if (data.type &amp;&amp; data.type == &apos;sif&apos;)
+                jsonObj = chiseInst.convertSifTextToJson(data.graph);
+            else
+                jsonObj = chiseInst.convertSbgnmlTextToJson(data.graph);
+
+            chiseInst.updateGraph(jsonObj,  () =&gt; {
+                this.app.modelManager.initModel(appUtilities.getCyInstance(chiseInst.cyId).nodes(), appUtilities.getCyInstance(chiseInst.cyId).edges(), chiseInst.cyId,  &quot;me&quot;);
+
+                appUtilities.setActiveNetwork(chiseInst.cyId);
+                //
+                $(&quot;#perform-layout&quot;)[0].click();
+
+                if (callback) callback(&quot;success&quot;);
+
+            }, true);
+        }
+        catch (e) {
+            console.log(e);
+            if (callback) callback();
+        }
+
+    }
+
+    /**
+     * Display oncoprint data on the oncoprint tab
+     * @param {Object} data
+     * @param {function} callback
+     * @private
+     */
+    _displayOncoprint(data, callback){
+        try{
+            let timeOut = 0;
+            if (document.getElementById(&apos;oncoprint-tab&apos;).style.visibility == &apos;hidden&apos;) {
+
+                timeOut = 4000;
+                document.getElementById(&apos;oncoprint-tab&apos;).style.visibility = &apos;visible&apos;;
+            }
+
+            setTimeout(() =&gt; {
+
+                    this.app.modelManager.setOncoprint(data);
+                    this.app.oncoprintHandler.updateData(data);
+
+                }, timeOut
+            );
+
+            if (callback) callback(&quot;success&quot;);
+        }
+        catch (e) {
+            console.log(e);
+            if (callback) callback();
+        }
+    }
+
+    /*
+     * Display a sif graph on the current tab
+     * @param {Object} data Format is {sif:&lt;sif&gt;, cyId:&lt;number&gt;}
+     * @param {function} callback
+     * @private
+     */
+    _displaySif(data, callback){
+        try {
+            let chiseInst;
+            if (!data.cyId) {
+                data.cyId = appUtilities.getActiveNetworkId();
+                chiseInst = appUtilities.getActiveChiseInstance();
+            } else {
+
+                data.cyId = parseInt(data.cyId);
+
+
+                if (!appUtilities.doesNetworkExist(data.cyId))
+                    chiseInst = appUtilities.createNewNetwork(data.cyId); //opens a new tab
+                else
+                    chiseInst = appUtilities.getChiseInstance(data.cyId);
+
+            }
+
+            appUtilities.getCyInstance(data.cyId).remove(appUtilities.getCyInstance(data.cyId).elements());
+
+
+            let jsonObj = chiseInst.convertSifTextToJson(data.sif);
+
+
+            chiseInst.updateGraph(jsonObj, () =&gt; {
+
+                this.app.modelManager.newModel(appUtilities.getActiveNetworkId(), &quot;me&quot;); //delete the existing model first so that ids don&apos;t get mixed up
+
+
+                this.app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(), data.cyId,  &quot;me&quot;);
+
+
+                appUtilities.setActiveNetwork(data.cyId);
+
+                setTimeout(() =&gt; {
+
+                    // $(&quot;#perform-layout&quot;)[0].click();
+
+                    // this.app.callLayout(data.cyId);
+                    //open the network view and rerender it otherwise the graph becomes invisible
+                    $(&quot;#defaultOpen&quot;)[0].click();
+
+                    this.app.dynamicResize();
+                    appUtilities.getCyInstance(data.cyId).panzoom().fit();
+
+
+                    if (callback) callback(&quot;success&quot;);
+                }, 1000);
+
+
+            }, true);
+        }
+        catch (e) {
+            console.log(e);
+            if (callback) callback();
+        }
+
+    }
+
+    /*
+     * Display an sbgn graph on the current tab
+     * @param {Object} data Format is {sbgn:&lt;sbgn&gt;, cyId:&lt;number&gt;}
+     * @param {function} callback
+     * @private
+     */
+    _displaySbgn(data, callback){
+        try {
+            let chiseInst;
+
+            if (!data.cyId) {
+                data.cyId = appUtilities.getActiveNetworkId();
+                chiseInst = appUtilities.getActiveChiseInstance();
+            } else {
+
+                data.cyId = parseInt(data.cyId);
+                if (!appUtilities.doesNetworkExist(data.cyId))
+                    chiseInst = appUtilities.createNewNetwork(data.cyId); //opens a new tab
+                else
+                    chiseInst = appUtilities.getChiseInstance(data.cyId);
+
+            }
+
+
+            appUtilities.getCyInstance(data.cyId).remove(appUtilities.getCyInstance(data.cyId).elements());
+
+
+            let jsonObj = chiseInst.convertSbgnmlTextToJson(data.sbgn);
+
+
+            chiseInst.updateGraph(jsonObj, () =&gt; {
+
+                this.app.modelManager.newModel(appUtilities.getActiveNetworkId(), &quot;me&quot;); //delete the existing model first so that ids don&apos;t get mixed up
+
+
+                this.app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(), data.cyId,  &quot;me&quot;);
+
+
+                appUtilities.setActiveNetwork(data.cyId);
+
+                setTimeout(() =&gt; {
+
+                    // $(&quot;#perform-layout&quot;)[0].click();
+
+                    // this.app.callLayout(data.cyId);
+                    //open the network view and rerender it otherwise the graph becomes invisible
+                    $(&quot;#defaultOpen&quot;)[0].click();
+
+                    this.app.dynamicResize();
+                    appUtilities.getCyInstance(data.cyId).panzoom().fit();
+
+
+                    if (callback) callback(&quot;success&quot;);
+                }, 1000);
+
+
+            }, true);
+
+            //update cellular locations
+            this.app.updateCellularLocations();
+
+        }
+        catch (e) {
+            console.log(e);
+            if (callback) callback();
+        }
+    }
+
+    _mergeSbgn(data, callback){
+        try {
+
+            if (!data.cyId)
+                data.cyId = appUtilities.getActiveNetworkId();
+
+            let newJson = appUtilities.getChiseInstance(data.cyId).convertSbgnmlTextToJson(data.graph);
+
+            modelMergeFunctions.mergeJsonWithCurrent(newJson, data.cyId, this.app.modelManager, callback);
+
+        }
+        catch (e) {
+            console.log(e);
+            if (callback) callback();
+        }
+    }
+
+    _mergeJsonWithCurrent(data, callback){
+        try {
+            if (!data.cyId)
+                data.cyId = appUtilities.getActiveNetworkId();
+            modelMergeFunctions.mergeJsonWithCurrent(data.graph, data.cyId, this.app.modelManager, callback);
+        }
+        catch (e) {
+            console.log(e);
+            if (callback) callback();
+        }
+    }
+    _addProvenance(data, callback){
+        try {
+            if (!data.cyId)
+                data.cyId = appUtilities.getActiveNetworkId();
+
+
+            if (data.pc)
+                this.app.model.push(&apos;_page.doc.provenance&apos;, {
+                    html: data.html,
+                    pc: data.pc,
+                    title: data.title,
+                    userName: this.agentName
+                });
+            else if (data.title)
+                this.app.model.push(&apos;_page.doc.provenance&apos;, {
+                    html: data.html,
+                    title: data.title,
+                    userName: this.agentName
+                });
+            else
+                this.app.model.push(&apos;_page.doc.provenance&apos;, {html: data.html, userName: this.agentName});
+
+            if (callback)
+                callback(&quot;success&quot;);
+        }
+        catch (e) {
+            console.log(e);
+            if (callback) callback();
+        }
+    }
+
+    /**
+     * To use with Claire so that Bob does not interfere
+     * @param data
+     * @param callback
+     * @private
+     */
+    _removeBob(data, callback){
+        try {
+            if (this.app.tripsAgent) {
+
+                this.app.tripsAgent.disconnect();
+                if (callback) {
+
+                    callback();
+                }
+            }
+        }
+        catch (e) {
+            console.log(e);
+            if (callback) callback();
+        }
+    }
+
+    _moveGene(data, callback){
+        try {
+            this.app.visHandler.moveNode(data);
+            if (callback) callback(&quot;success&quot;);
+        }
+        catch (e) {
+            console.log(e);
+            if (callback) callback();
+        }
+    }
+
+    _moveGeneStream(data, callback){
+        try {
+            this.app.visHandler.moveNodeStream(data);
+            if (callback) callback(&quot;success&quot;);
+        }
+        catch (e) {
+            console.log(e);
+            if (callback) callback();
+        }
+    }
+
+    _highlightGeneStream(data, callback){
+        try {
+            this.app.visHandler.highlightNodeStream(data);
+            if (callback) callback(&quot;success&quot;);
+        }
+        catch (e) {
+            console.log(e);
+            if (callback) callback();
+        }
+    }
+
+    _changeLockState(data, callback){
+        try {
+            if (!data.cyId)
+                data.cyId = appUtilities.getActiveNetworkId();
+
+            if (data.lock)
+                appUtilities.getCyInstance(data.cyId).getElementById(data.id).lock();
+            else
+                appUtilities.getCyInstance(data.cyId).getElementById(data.id).unlock();
+
+            if (callback) callback(&quot;success&quot;);
+        }
+        catch (e) {
+            console.log(e);
+            if (callback) callback();
+        }
+    }
+
+    _addCellularLocation(data, callback){
+        try {
+            this.app.addCellularLocation(data.genes, data.compartment, data.cyId);
+
+            this.app.modelManager.addModelCellularLocation(data.genes, data.compartment, &quot;me&quot;);
+
+            //unselect back
+            // cy.elements().unselect();
+
+            //remove highlights
+            // chiseInst.removeHighlights();
+
+
+            if (callback) callback(&quot;success&quot;);
+        }
+        catch (e) {
+            console.log(e);
+            if (callback) callback();
+        }
+    }
+
+    _moveOutOfCellularLocation(data, callback){
+        try {
+
+            this.app.moveOutOfCellularLocation(data.genes, data.compartment, data.cyId);
+            this.app.modelManager.removeNodesFromCellularLocation(data.genes, data.compartment,  &quot;me&quot;);
+
+            // this.app.modelManager.addModelCellularLocation(data.genes, data.compartment, &quot;me&quot;);
+
+
+            //unselect back
+            // cy.elements().unselect();
+
+            //remove highlights
+            // chiseInst.removeHighlights();
+
+            if (callback) callback(&quot;success&quot;);
+        }
+        catch (e) {
+            console.log(e);
+            if (callback) callback();
+        }
+    }
+
+
 }
-</code></pre>
+
+module.exports = ClientSideSocketListener;</code></pre>
 
 </div>
 

@@ -1426,6 +1426,8 @@ class ModelManager{
 
             nodeData.annotationsView = null;
 
+            nodeData.auxunitlayouts = null;
+
             if(nodeData.statesandinfos) {
 
                 for (let i = 0; i < nodeData.statesandinfos.length; i++) {

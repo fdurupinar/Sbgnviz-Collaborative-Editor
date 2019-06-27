@@ -1,5 +1,11 @@
 window.esdocSearchIndex = [
   [
+    "sbgnviz-collaborative-editor/collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html",
+    "<span>ClientSideSocketListener</span> <span class=\"search-result-import-path\">Sbgnviz-Collaborative-Editor/collaborative-app/js/clientSideSocketListener.js</span>",
+    "class"
+  ],
+  [
     "sbgnviz-collaborative-editor/collaborative-app/js/merger/json-merger.js~jsonmerger",
     "class/collaborative-app/js/merger/json-merger.js~JsonMerger.html",
     "<span>JsonMerger</span> <span class=\"search-result-import-path\">Sbgnviz-Collaborative-Editor/collaborative-app/js/merger/json-merger.js</span>",
@@ -9,6 +15,12 @@ window.esdocSearchIndex = [
     "sbgnviz-collaborative-editor/collaborative-app/js/modelmanager.js~modelmanager",
     "class/collaborative-app/js/modelManager.js~ModelManager.html",
     "<span>ModelManager</span> <span class=\"search-result-import-path\">Sbgnviz-Collaborative-Editor/collaborative-app/js/modelManager.js</span>",
+    "class"
+  ],
+  [
+    "sbgnviz-collaborative-editor/collaborative-app/js/merger/model-merge-functions.js~modelmergefunctions",
+    "class/collaborative-app/js/merger/model-merge-functions.js~ModelMergeFunctions.html",
+    "<span>ModelMergeFunctions</span> <span class=\"search-result-import-path\">Sbgnviz-Collaborative-Editor/collaborative-app/js/merger/model-merge-functions.js</span>",
     "class"
   ],
   [
@@ -42,12 +54,6 @@ window.esdocSearchIndex = [
     "class"
   ],
   [
-    "sbgnviz-collaborative-editor/collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener",
-    "function/index.html#static-function-clientSideSocketListener",
-    "<span>clientSideSocketListener</span> <span class=\"search-result-import-path\">Sbgnviz-Collaborative-Editor/collaborative-app/js/clientSideSocketListener.js</span>",
-    "function"
-  ],
-  [
     "sbgnviz-collaborative-editor/collaborative-app/js/newt-functions/editor-listener.js~editorlistener",
     "function/index.html#static-function-editorlistener",
     "<span>editorlistener</span> <span class=\"search-result-import-path\">Sbgnviz-Collaborative-Editor/collaborative-app/js/newt-functions/editor-listener.js</span>",
@@ -63,12 +69,6 @@ window.esdocSearchIndex = [
     "sbgnviz-collaborative-editor/collaborative-app/js/reach-functions/idxcard-info.js~idxcardinfo",
     "function/index.html#static-function-idxCardinfo",
     "<span>idxCardinfo</span> <span class=\"search-result-import-path\">Sbgnviz-Collaborative-Editor/collaborative-app/js/reach-functions/idxCard-info.js</span>",
-    "function"
-  ],
-  [
-    "sbgnviz-collaborative-editor/collaborative-app/js/merger/model-merge-functions.js~modelmergefunctions",
-    "function/index.html#static-function-modelmergefunctions",
-    "<span>modelmergefunctions</span> <span class=\"search-result-import-path\">Sbgnviz-Collaborative-Editor/collaborative-app/js/merger/model-merge-functions.js</span>",
     "function"
   ],
   [
@@ -360,6 +360,186 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
+    "collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener#_addcellularlocation",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html#instance-method-_addCellularLocation",
+    "collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener#_addCellularLocation",
+    "method"
+  ],
+  [
+    "collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener#_addcompound",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html#instance-method-_addCompound",
+    "collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener#_addCompound",
+    "method"
+  ],
+  [
+    "collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener#_addimage",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html#instance-method-_addImage",
+    "collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener#_addImage",
+    "method"
+  ],
+  [
+    "collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener#_addnode",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html#instance-method-_addNode",
+    "collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener#_addNode",
+    "method"
+  ],
+  [
+    "collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener#_addprovenance",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html#instance-method-_addProvenance",
+    "collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener#_addProvenance",
+    "method"
+  ],
+  [
+    "collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener#_align",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html#instance-method-_align",
+    "collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener#_align",
+    "method"
+  ],
+  [
+    "collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener#_changelockstate",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html#instance-method-_changeLockState",
+    "collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener#_changeLockState",
+    "method"
+  ],
+  [
+    "collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener#_cleanmodel",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html#instance-method-_cleanModel",
+    "collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener#_cleanModel",
+    "method"
+  ],
+  [
+    "collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener#_clone",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html#instance-method-_clone",
+    "collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener#_clone",
+    "method"
+  ],
+  [
+    "collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener#_deleteeles",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html#instance-method-_deleteEles",
+    "collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener#_deleteEles",
+    "method"
+  ],
+  [
+    "collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener#_displayoncoprint",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html#instance-method-_displayOncoprint",
+    "collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener#_displayOncoprint",
+    "method"
+  ],
+  [
+    "collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener#_displaysbgn",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html#instance-method-_displaySbgn",
+    "collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener#_displaySbgn",
+    "method"
+  ],
+  [
+    "collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener#_displaysif",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html#instance-method-_displaySif",
+    "collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener#_displaySif",
+    "method"
+  ],
+  [
+    "collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener#_highlightgenestream",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html#instance-method-_highlightGeneStream",
+    "collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener#_highlightGeneStream",
+    "method"
+  ],
+  [
+    "collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener#_loadfile",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html#instance-method-_loadFile",
+    "collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener#_loadFile",
+    "method"
+  ],
+  [
+    "collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener#_mergejsonwithcurrent",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html#instance-method-_mergeJsonWithCurrent",
+    "collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener#_mergeJsonWithCurrent",
+    "method"
+  ],
+  [
+    "collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener#_mergesbgn",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html#instance-method-_mergeSbgn",
+    "collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener#_mergeSbgn",
+    "method"
+  ],
+  [
+    "collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener#_movegene",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html#instance-method-_moveGene",
+    "collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener#_moveGene",
+    "method"
+  ],
+  [
+    "collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener#_movegenestream",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html#instance-method-_moveGeneStream",
+    "collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener#_moveGeneStream",
+    "method"
+  ],
+  [
+    "collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener#_moveoutofcellularlocation",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html#instance-method-_moveOutOfCellularLocation",
+    "collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener#_moveOutOfCellularLocation",
+    "method"
+  ],
+  [
+    "collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener#_openpcquerywindow",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html#instance-method-_openPCQueryWindow",
+    "collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener#_openPCQueryWindow",
+    "method"
+  ],
+  [
+    "collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener#_removebob",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html#instance-method-_removeBob",
+    "collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener#_removeBob",
+    "method"
+  ],
+  [
+    "collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener#_runlayout",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html#instance-method-_runLayout",
+    "collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener#_runLayout",
+    "method"
+  ],
+  [
+    "collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener#_searchbylabel",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html#instance-method-_searchByLabel",
+    "collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener#_searchByLabel",
+    "method"
+  ],
+  [
+    "collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener#_updateexpandcollapse",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html#instance-method-_updateExpandCollapse",
+    "collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener#_updateExpandCollapse",
+    "method"
+  ],
+  [
+    "collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener#_updatehighlight",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html#instance-method-_updateHighlight",
+    "collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener#_updateHighlight",
+    "method"
+  ],
+  [
+    "collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener#_updatevisibility",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html#instance-method-_updateVisibility",
+    "collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener#_updateVisibility",
+    "method"
+  ],
+  [
+    "collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener#app",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html#instance-member-app",
+    "collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener#app",
+    "member"
+  ],
+  [
+    "collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener#constructor",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html#instance-constructor-constructor",
+    "collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener#constructor",
+    "method"
+  ],
+  [
+    "collaborative-app/js/clientsidesocketlistener.js~clientsidesocketlistener#listen",
+    "class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html#instance-method-listen",
+    "collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener#listen",
+    "method"
+  ],
+  [
     "collaborative-app/js/merger/json-merger.js",
     "file/collaborative-app/js/merger/json-merger.js.html",
     "collaborative-app/js/merger/json-merger.js",
@@ -406,6 +586,24 @@ window.esdocSearchIndex = [
     "file/collaborative-app/js/merger/model-merge-functions.js.html",
     "collaborative-app/js/merger/model-merge-functions.js",
     "file"
+  ],
+  [
+    "collaborative-app/js/merger/model-merge-functions.js~modelmergefunctions#constructor",
+    "class/collaborative-app/js/merger/model-merge-functions.js~ModelMergeFunctions.html#instance-constructor-constructor",
+    "collaborative-app/js/merger/model-merge-functions.js~ModelMergeFunctions#constructor",
+    "method"
+  ],
+  [
+    "collaborative-app/js/merger/model-merge-functions.js~modelmergefunctions#mergejsonwithcurrent",
+    "class/collaborative-app/js/merger/model-merge-functions.js~ModelMergeFunctions.html#instance-method-mergeJsonWithCurrent",
+    "collaborative-app/js/merger/model-merge-functions.js~ModelMergeFunctions#mergeJsonWithCurrent",
+    "method"
+  ],
+  [
+    "collaborative-app/js/merger/model-merge-functions.js~modelmergefunctions#mergejsons",
+    "class/collaborative-app/js/merger/model-merge-functions.js~ModelMergeFunctions.html#instance-method-mergeJsons",
+    "collaborative-app/js/merger/model-merge-functions.js~ModelMergeFunctions#mergeJsons",
+    "method"
   ],
   [
     "collaborative-app/js/merger/rephrase-handler.js",
