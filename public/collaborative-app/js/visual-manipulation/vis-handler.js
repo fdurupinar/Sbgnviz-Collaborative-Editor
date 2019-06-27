@@ -283,7 +283,7 @@ const appUtilities = window.appUtilities;
         });
 
 
-        let nodeIds = this.findStream(ids, data.direction, cy);
+        let nodeIds = this._findStream(ids, ids, data.direction, cy);
 
         //unselect all first
         cy.elements().unselect();
@@ -314,7 +314,7 @@ const appUtilities = window.appUtilities;
         });
 
 
-        let nodeIds = this.findStream(ids, data.direction, cy);
+        let nodeIds = this._findStream(ids, ids, data.direction, cy);
 
         if(!nodeIds)
             return;
@@ -383,11 +383,13 @@ const appUtilities = window.appUtilities;
     /***
      * Finds the upstream or downstream elements for given nodes with ids
      * @param {Array} ids
+     * @param {Array} visitedIds Ids of the nodes that we already visited
      * @param {string} direction : "up" or "down"
      * @param {Object} cy Cytoscape object
      * @returns {Array} nodeIds Node ids of upstream or downstream elements
+     * @private
      */
-    findStream (ids, direction, cy) {
+    _findStream (ids, visitedIds, direction, cy) {
 
         let self = this;
         let nodeIds = [];
@@ -399,17 +401,22 @@ const appUtilities = window.appUtilities;
 
             let edgeStr = "[" + directionMap[direction].node + "='" + nodeId + "']";
 
-            console.log(edgeStr);
             let edges = cy.edges(edgeStr);
 
             if(!edges)
                 return [];
 
-            //TODO: handle cyclic edges
-            edges.forEach(function (edge) {
+
+            edges.forEach((edge) => {
                 let neighborId = edge.data(directionMap[direction].neighbor);
 
-                let nextLevelNodeIds = self.findStream([neighborId], direction, cy);
+                if(visitedIds.lastIndexOf(neighborId) > -1) //we reached back an already tested node
+                    return [];
+
+                visitedIds.push(neighborId);
+
+                let nextLevelNodeIds = self._findStream([neighborId], visitedIds, direction, cy);
+
 
                 nodeIds = nodeIds.concat(nextLevelNodeIds);
                 nodeIds.push(neighborId);

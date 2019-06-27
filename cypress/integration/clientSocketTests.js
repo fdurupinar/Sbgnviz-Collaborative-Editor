@@ -399,6 +399,93 @@ describe('Client side socket listener', () => {
 
         });
 
+        it("Highlight gene stream", (done)=> {
+            cy.window().should((window) => {
+                let clientSideSocketListener = window.testApp.clientSideSocketListener;
+
+                setTimeout(()=> { //wait for the file to load
+                    let data  = {name:"ERK", direction:"down", cyId : 0};
+                    clientSideSocketListener._highlightGeneStream(data, (val)=>{
+                        expect(val).to.eq("success");
+                        done();
+                    });
+
+                }, 1000);
+
+
+            });
+
+        });
+
+        it("Change lock state", (done)=> {
+            cy.window().should((window) => {
+                let clientSideSocketListener = window.testApp.clientSideSocketListener;
+
+                setTimeout(()=> { //wait for the file to load
+                    let data  = {id:"id_1", lock: true, cyId : 0};
+                    clientSideSocketListener._changeLockState(data, (val)=>{
+                        expect(val).to.eq("success");
+                        done();
+                    });
+
+                }, 1000);
+
+
+            });
+
+        });
+
+
+        it("Add cellular location", (done)=> {
+            cy.window().should((window) => {
+                let clientSideSocketListener = window.testApp.clientSideSocketListener;
+
+                let model = window.testApp.model;
+
+                setTimeout(()=> { //wait for the file to load
+                    let data  = {genes:["ERK", "MEK"], compartment:"nucleus", cyId : 0};
+                    clientSideSocketListener._addCellularLocation(data, (val)=>{
+
+                        expect(model.get('_page.doc.cellularLocations.nucleus')).to.be.ok;
+                        expect(model.get('_page.doc.cellularLocations.nucleus').lastIndexOf("ERK")).to.gte(0);
+                        expect(model.get('_page.doc.cellularLocations.nucleus').lastIndexOf("MEK")).to.gte(0);
+
+                        expect(val).to.eq("success");
+                        done();
+                    });
+
+                }, 1000);
+
+            });
+
+        });
+
+
+        it("Move out of cellular location", (done)=> {
+            cy.window().should((window) => {
+                let clientSideSocketListener = window.testApp.clientSideSocketListener;
+
+                let model = window.testApp.model;
+
+                setTimeout(()=> { //wait for the file to load
+                    let data  = {genes:["ERK"], compartment:"nucleus", cyId : 0};
+                    clientSideSocketListener._moveOutOfCellularLocation(data, (val)=>{
+
+                        expect(model.get('_page.doc.cellularLocations.nucleus')).to.be.ok;
+                        expect(model.get('_page.doc.cellularLocations.nucleus').lastIndexOf("ERK")).to.lte(0);
+                        expect(model.get('_page.doc.cellularLocations.nucleus').lastIndexOf("MEK")).to.gte(0);
+
+                        expect(val).to.eq("success");
+                        done();
+                    });
+
+                }, 2000); //wait for them to be moved in
+
+            });
+
+        });
+
+
     }
 
 

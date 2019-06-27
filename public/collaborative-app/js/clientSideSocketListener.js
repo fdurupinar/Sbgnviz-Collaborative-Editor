@@ -717,7 +717,7 @@ class ClientSideSocketListener{
 
     /**
      *
-     * @param {Object} data
+     * @param {Object} data {name:<string>, direction:<"up" or "down">, state:<string>, cyId:<number>}
      * @param {function} callback
      * @private
      */
@@ -734,7 +734,7 @@ class ClientSideSocketListener{
 
     /**
      *
-     * @param {Object} data
+     * @param {Object} data {id {string}, cyId {number}, lock {boolean}}
      * @param {function} callback
      * @private
      */
@@ -758,7 +758,7 @@ class ClientSideSocketListener{
 
     /**
      *
-     * @param {Object} data
+     * @param {Object} data {genes {Array} Array of gena names, cyId {number}, compartment {string}}
      * @param {function} callback
      * @private
      */
@@ -767,13 +767,6 @@ class ClientSideSocketListener{
             this.app.addCellularLocation(data.genes, data.compartment, data.cyId);
 
             this.app.modelManager.addModelCellularLocation(data.genes, data.compartment, "me");
-
-            //unselect back
-            // cy.elements().unselect();
-
-            //remove highlights
-            // chiseInst.removeHighlights();
-
 
             if (callback) callback("success");
         }
@@ -785,7 +778,7 @@ class ClientSideSocketListener{
 
     /**
      *
-     * @param {Object} data
+     * @param {Object} data {genes {Array} Array of gena names, cyId {number}, compartment {string}}
      * @param {function} callback
      * @private
      */
@@ -795,14 +788,6 @@ class ClientSideSocketListener{
             this.app.moveOutOfCellularLocation(data.genes, data.compartment, data.cyId);
             this.app.modelManager.removeNodesFromCellularLocation(data.genes, data.compartment,  "me");
 
-            // this.app.modelManager.addModelCellularLocation(data.genes, data.compartment, "me");
-
-
-            //unselect back
-            // cy.elements().unselect();
-
-            //remove highlights
-            // chiseInst.removeHighlights();
 
             if (callback) callback("success");
         }

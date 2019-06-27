@@ -1643,8 +1643,9 @@ class ModelManager{
            return genes.indexOf(val) < 0
         });
 
-    //    reassign genes
-        this.model.pass({user:user}).this.model.set('documents.' + this.docId +'.cellularLocations.' + location, filteredGenes);
+        //reassign genes
+        this.model.pass({user:user}).set('documents.' + this.docId +'.cellularLocations.' + location, filteredGenes);
+
 
         if (!noHistUpdate) {
             this.updateHistory({opName: 'removeNodesFromCellularLocation', param: {location:location, genes: filteredGenes}, prevParam: {location:location, genes: modelGenes}, opTarget: 'model'});
