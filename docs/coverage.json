@@ -1,11 +1,27 @@
 {
-  "coverage": "60.11%",
-  "expectCount": 173,
-  "actualCount": 104,
+  "coverage": "73.51%",
+  "expectCount": 253,
+  "actualCount": 186,
   "files": {
-    "collaborative-app/js/clientSideSocketListener.js": {
+    "Sbgnviz-Collaborative-Editor/public/agent-interaction/src/js/TripsGeneralInterfaceAgent.js": {
+      "expectCount": 8,
+      "actualCount": 6,
+      "undocumentLines": [
+        14,
+        24
+      ]
+    },
+    "Sbgnviz-Collaborative-Editor/public/agent-interaction/src/js/agentAPI.js": {
+      "expectCount": 25,
+      "actualCount": 23,
+      "undocumentLines": [
+        79,
+        110
+      ]
+    },
+    "Sbgnviz-Collaborative-Editor/public/collaborative-app/js/clientSideSocketListener.js": {
       "expectCount": 34,
-      "actualCount": 7,
+      "actualCount": 25,
       "undocumentLines": [
         10,
         11,
@@ -14,29 +30,11 @@
         22,
         64,
         109,
-        143,
-        167,
-        180,
-        199,
-        226,
-        240,
-        268,
-        291,
-        312,
-        403,
-        468,
-        530,
-        547,
-        558,
-        612,
-        623,
-        634,
-        645,
-        663,
-        684
+        458,
+        523
       ]
     },
-    "collaborative-app/js/merger/json-merger.js": {
+    "Sbgnviz-Collaborative-Editor/public/collaborative-app/js/merger/json-merger.js": {
       "expectCount": 8,
       "actualCount": 0,
       "undocumentLines": [
@@ -50,7 +48,7 @@
         232
       ]
     },
-    "collaborative-app/js/merger/model-merge-functions.js": {
+    "Sbgnviz-Collaborative-Editor/public/collaborative-app/js/merger/model-merge-functions.js": {
       "expectCount": 6,
       "actualCount": 3,
       "undocumentLines": [
@@ -59,7 +57,7 @@
         9
       ]
     },
-    "collaborative-app/js/merger/rephrase-handler.js": {
+    "Sbgnviz-Collaborative-Editor/public/collaborative-app/js/merger/rephrase-handler.js": {
       "expectCount": 14,
       "actualCount": 0,
       "undocumentLines": [
@@ -79,14 +77,14 @@
         403
       ]
     },
-    "collaborative-app/js/modelManager.js": {
+    "Sbgnviz-Collaborative-Editor/public/collaborative-app/js/modelManager.js": {
       "expectCount": 74,
       "actualCount": 73,
       "undocumentLines": [
         22
       ]
     },
-    "collaborative-app/js/newt-functions/collaborative-backbone-views.js": {
+    "Sbgnviz-Collaborative-Editor/public/collaborative-app/js/newt-functions/collaborative-backbone-views.js": {
       "expectCount": 3,
       "actualCount": 1,
       "undocumentLines": [
@@ -94,7 +92,7 @@
         6
       ]
     },
-    "collaborative-app/js/newt-functions/editor-listener.js": {
+    "Sbgnviz-Collaborative-Editor/public/collaborative-app/js/newt-functions/editor-listener.js": {
       "expectCount": 3,
       "actualCount": 1,
       "undocumentLines": [
@@ -102,7 +100,7 @@
         13
       ]
     },
-    "collaborative-app/js/oncoprint/oncoprint-handler.js": {
+    "Sbgnviz-Collaborative-Editor/public/collaborative-app/js/oncoprint/oncoprint-handler.js": {
       "expectCount": 13,
       "actualCount": 4,
       "undocumentLines": [
@@ -117,24 +115,59 @@
         197
       ]
     },
-    "collaborative-app/js/reach-functions/idxCard-info.js": {
+    "Sbgnviz-Collaborative-Editor/public/collaborative-app/js/reach-functions/idxCard-info.js": {
       "expectCount": 1,
       "actualCount": 0,
       "undocumentLines": [
         23
       ]
     },
-    "collaborative-app/js/reach-functions/idxcardjson-to-json-converter.js": {
+    "Sbgnviz-Collaborative-Editor/public/collaborative-app/js/reach-functions/idxcardjson-to-json-converter.js": {
       "expectCount": 1,
       "actualCount": 1,
       "undocumentLines": []
     },
-    "collaborative-app/js/visual-manipulation/vis-handler.js": {
+    "Sbgnviz-Collaborative-Editor/public/collaborative-app/js/visual-manipulation/vis-handler.js": {
       "expectCount": 16,
       "actualCount": 14,
       "undocumentLines": [
         19,
         21
+      ]
+    },
+    "Sbgnviz-Collaborative-Editor/server/serverSideSocketListener.js": {
+      "expectCount": 4,
+      "actualCount": 4,
+      "undocumentLines": []
+    },
+    "Sbgnviz-Collaborative-Editor/server/trips/TripsGeneralInterfaceModule.js": {
+      "expectCount": 16,
+      "actualCount": 14,
+      "undocumentLines": [
+        45,
+        527
+      ]
+    },
+    "Sbgnviz-Collaborative-Editor/server/trips/TripsInterfaceModule.js": {
+      "expectCount": 13,
+      "actualCount": 6,
+      "undocumentLines": [
+        27,
+        31,
+        32,
+        33,
+        35,
+        36,
+        124
+      ]
+    },
+    "Sbgnviz-Collaborative-Editor/server/trips/TripsVisualizationInterfaceModule.js": {
+      "expectCount": 14,
+      "actualCount": 11,
+      "undocumentLines": [
+        28,
+        30,
+        33
       ]
     }
   }

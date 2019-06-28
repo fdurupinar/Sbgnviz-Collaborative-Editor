@@ -1,5 +1,7 @@
 {
-  "source": "./public/collaborative-app",
+  "source": ".",
+  "includes": ["^public/collaborative-app/js","^public/agent-interaction/src/js","^server" ],
+  "excludes": ["^server/index.js", "^server/server.js", "^server/trips/util"  ],
   "destination": "./docs",
   "plugins": [{"name": "esdoc-standard-plugin"}, {"name": "esdoc-node"}]
 }

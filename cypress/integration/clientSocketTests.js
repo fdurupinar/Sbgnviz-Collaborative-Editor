@@ -491,21 +491,21 @@ describe('Client side socket listener', () => {
 
     //
     connect();
-    // loadFile();
-    // runLayout();
-    // cleanModel();
-    //
-    // addOperations();
-    //
-    //
-    // addImage();
-    //
-    //
-    // openPCQuery();
-    // displayGraphs();
-    // displayOncoprint();
-    //
-    // displayAndCleanProvenance();
+    loadFile();
+    runLayout();
+    cleanModel();
+
+    addOperations();
+
+
+    addImage();
+
+
+    openPCQuery();
+    displayGraphs();
+    displayOncoprint();
+
+    displayAndCleanProvenance();
 
     visAgentOperations();
 

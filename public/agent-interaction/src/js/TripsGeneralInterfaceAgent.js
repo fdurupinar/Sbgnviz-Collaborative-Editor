@@ -1,82 +1,104 @@
 /**
  * Created by durupina on 5/13/16.
+
+ */
+
+// if(typeof module !== 'undefined' && module.exports) //ESDOC problem
+let Agent = require("./agentAPI.js");
+
+
+/**
  * Computer agent to provide communication between client and trips
  */
+class TripsGeneralInterfaceAgent extends Agent{
+    constructor(agentName, id){
+        super(agentName, id);
+        /**
+         *
+         * @type {number} tripsUttNum
+         */
+        this.tripsUttNum = 1;
+    }
+    
 
-if(typeof module !== 'undefined' && module.exports){
-    var Agent = require("./agentAPI.js");
-    module.exports = TripsGeneralInterfaceAgent;
-}
-TripsGeneralInterfaceAgent.prototype = new Agent();
+    init(){
 
-function TripsGeneralInterfaceAgent(agentName, id) {
-    this.agentName = agentName;
-    this.agentId = id;
-    this.tripsUttNum = 1;
-}
+        this.sendRequest('agentConnectToTripsRequest', {isInterfaceAgent: true, userName: this.agentName }, (result) => {
+            if(!result)
+                this.disconnect();
+        });
 
+        this.listenToMessages();
+    }
 
-TripsGeneralInterfaceAgent.prototype.init = function(){
+    /**
+     * Send the message coming from a human to server Trips interface
+     * @param {string} text
+     */
 
-    this.sendRequest('agentConnectToTripsRequest', {isInterfaceAgent: true, userName: this.agentName }, (result) => {
-        if(!result)
-            this.disconnect();
-    });
+    relayMessage(text){
 
-    this.listenToMessages();
-}
+        this.sendRequest('relayMessageToTripsRequest', {text: '"' + text +'"', uttNum: this.tripsUttNum});
+        this.tripsUttNum++;
+    }
 
-TripsGeneralInterfaceAgent.prototype.relayMessage = function(text){
+    /**
+     * Send the given request to Trips server interface so that it can send the request to Trips
+     * @param {Object} data
+     */
+    sendTripsRequest(data){
 
-    this.sendRequest('relayMessageToTripsRequest', {text: '"' + text +'"', uttNum: this.tripsUttNum});
-    this.tripsUttNum++;
-}
+        this.sendRequest('agentSendTripsRequestRequest', data);
 
-TripsGeneralInterfaceAgent.prototype.sendTripsRequest = function(data){
+    }
 
-    this.sendRequest('agentSendTripsRequestRequest', data);
+    /***
+     * Listen to messages from other actors and act accordingly
+     */
+    listenToMessages(){
 
-}
+        this.socket.on('message', (data) => {
 
-/***
- * Listen to messages from other actors and act accordingly
- * @param callback
- */
-TripsGeneralInterfaceAgent.prototype.listenToMessages = function(){
+            if(this.isIntendedForBob(data)){
+                let msg = data.comment.replace(/@[bB][Oo][bB]/, ""); //clean the message anyway
+                this.relayMessage(msg);
+            }
 
-    this.socket.on('message', (data) => {
-
-        if(this.isIntendedForBob(data)){
-            let msg = data.comment.replace(/@[bB][Oo][bB]/, ""); //clean the message anyway
-            this.relayMessage(msg);
-        }
-
-    });
-}
-
-TripsGeneralInterfaceAgent.prototype.isIntendedForBob = function(data){
-
-    let isBobChecked = false;
-    if(!data.targets || data.targets == '*')
-        isBobChecked = true;
-    else{
-        data.targets.forEach((target)=>{
-            if (target.id === 'Bob123')
-                isBobChecked = true;
         });
     }
 
-    if(data.userId != this.agentId && isBobChecked) {
-        let wizardMode = document.getElementById('wizard-mode').checked;
+    /**
+     * Is message for Bob or the wizard
+     * @param {Object} data {targets {Array}, comment {string}, userId {string}}
+     * @returns {boolean}
+     */
+    isIntendedForBob(data){
 
-        if(wizardMode && data.comment.toUpperCase().indexOf("@BOB")> -1 || !wizardMode) {  //trim
-            return true;
+        let isBobChecked = false;
+        if(!data.targets || data.targets == '*')
+            isBobChecked = true;
+        else{
+            data.targets.forEach((target)=>{
+                if (target.id === 'Bob123')
+                    isBobChecked = true;
+            });
         }
+
+        if(data.userId != this.agentId && isBobChecked) {
+            let wizardMode = document.getElementById('wizard-mode').checked;
+
+            if(wizardMode && data.comment.toUpperCase().indexOf("@BOB")> -1 || !wizardMode) {  //trim
+                return true;
+            }
+
+        }
+
+        return false;
 
     }
 
-    return false;
-
 }
 
+// if(typeof module !== 'undefined' && module.exports) //ESDOC problem
+    module.exports = TripsGeneralInterfaceAgent;
 

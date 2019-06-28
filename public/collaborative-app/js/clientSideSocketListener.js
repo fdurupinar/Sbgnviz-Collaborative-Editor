@@ -659,7 +659,7 @@ class ClientSideSocketListener{
     }
 
     /**
-     * To use with Claire so that Bob does not interfere
+     * To use with CLARE so that Bob does not interfere
      * @param data
      * @param callback
      * @private

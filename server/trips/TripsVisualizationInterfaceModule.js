@@ -4,28 +4,39 @@
  * Its role is to receive and decode messages and transfer them to causalityAgent
  */
 "use strict";
-let KQML = require('./KQML/kqml.js');
+let KQML = require('./util/KQML/kqml.js');
 
 let TripsInterfaceModule = require('./TripsInterfaceModule.js');
 
+/**
+ * Class to perform visual edits on the displayed graph
+ */
 class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
 
-
-    // @param socket : socket connection between the module and the agent --not server
-   constructor (agentId, agentName, socket,  model, askHuman) {
+    /**
+     *
+     * @param {string} agentId
+     * @param {string} agentName
+     * @param {WebSocket} socket Socket connection between the module and the agent --not server
+     * @param {Object} model
+     * @param {function} askHuman
+     */
+    constructor (agentId, agentName, socket,  model, askHuman) {
 
        super('Visualization-Interface-Agent',agentId, agentName, socket,  model);
 
        this.askHuman = askHuman;
 
        this.geneList = []; //list of molecules in the current pysb model
-   }
-   disconnect(){
+    }
+
+    disconnect(){
        super.disconnect();
-   }
+    }
 
-
-
+    /**
+     * Handlers that listen to TRIPS requests and perform edits
+     */
     setHandlers() {
         let self = this;
 
@@ -65,12 +76,10 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
             else
                 genes = this.extractGeneNamesFromEkb(termStr);
 
-            let compartment = trimDoubleQuotes(text.content[4]);
+            let compartment = this.trimDoubleQuotes(text.content[4]);
             this.askHuman(this.agentId, this.room, "addCellularLocation", {genes: genes, compartment:compartment},  () => {
                 this.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
             });
-
-
 
         });
 
@@ -86,7 +95,7 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
             else
                 genes = this.extractGeneNamesFromEkb(termStr);
 
-            let compartment = trimDoubleQuotes(text.content[4]);
+            let compartment = this.trimDoubleQuotes(text.content[4]);
             this.askHuman(this.agentId, this.room, "moveOutOfCellularLocation", {genes: genes, compartment:compartment},  () => {
                 this.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
             });
@@ -131,14 +140,16 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
 
     }
 
-
-
+    /**
+     *  Moves gene with a name and state to a location
+     * @param {string} text {content {string}}
+     */
     moveGene(text) {
         let contentObj = KQML.keywordify(text.content);
         if (contentObj) {
             this.getTermName(contentObj.name,  (geneName) => {
-                let state = trimDoubleQuotes(contentObj.state);
-                let location = trimDoubleQuotes(contentObj.location);
+                let state = this.trimDoubleQuotes(contentObj.state);
+                let location = this.trimDoubleQuotes(contentObj.location);
 
                 this.askHuman(this.agentId, this.room, "moveGene", {name: geneName, state: state, location: location, cyId: "0"},  () => {
 
@@ -147,14 +158,18 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
             });
         }
     }
+
+    /**
+     *  Moves compartment with a name to a location
+     * @param {string} text {content {string}}
+     */
+
     moveCompartment(text) {
         let contentObj = KQML.keywordify(text.content);
         if (contentObj) {
-            let compartmentName = trimDoubleQuotes(contentObj.name).replace("W::", '');
+            let compartmentName = this.trimDoubleQuotes(contentObj.name).replace("W::", '');
             compartmentName = compartmentName.replace("ONT::", '');
-            let location = trimDoubleQuotes(contentObj.location);
-
-
+            let location = this.trimDoubleQuotes(contentObj.location);
 
             this.askHuman(this.agentId, this.room, "moveGene", {name: compartmentName, state: "", location: location, cyId: "0"},  ()  => {
 
@@ -162,13 +177,18 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
         }
     }
 
+
+    /**
+     * Moves upstream or downstream of a gene with a state to a direction
+     * @param {string} text {content {string}}
+     */
     moveGeneStream(text) {
         let contentObj = KQML.keywordify(text.content);
         if (contentObj) {
             this.getTermName(contentObj.name,  (geneName) => {
-                let state = trimDoubleQuotes(contentObj.state);
-                let location = trimDoubleQuotes(contentObj.location);
-                let direction = trimDoubleQuotes(contentObj.direction);
+                let state = this.trimDoubleQuotes(contentObj.state);
+                let location = this.trimDoubleQuotes(contentObj.location);
+                let direction = this.trimDoubleQuotes(contentObj.direction);
                 if(direction.toLowerCase().indexOf("upstream")> -1)
                     direction = "up";
                 else if(direction.toLowerCase().indexOf("downstream")> -1)
@@ -179,13 +199,17 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
         }
     }
 
+    /**
+     * Highlights upstream or downstream of a gene with a state
+     * @param {string} text {content {string}}
+     */
 
     highlightGeneStream(text) {
         let contentObj = KQML.keywordify(text.content);
         if (contentObj) {
             this.getTermName(contentObj.name,  (geneName) => {
-                let state = trimDoubleQuotes(contentObj.state);
-                let direction = trimDoubleQuotes(contentObj.direction);
+                let state = this.trimDoubleQuotes(contentObj.state);
+                let direction = this.trimDoubleQuotes(contentObj.direction);
 
                 if(direction.toLowerCase().indexOf("upstream")> -1)
                     direction = "up";
@@ -202,8 +226,8 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
     }
 
     /***
-     * Find the variables between <name></name> tags
-     * @param termStr: ekb string
+     * Finds the variables between <name></name> tags
+     * @param {string} termStr ekb string
      * @returns {Array} of gene names
      */
     extractGeneNamesFromEkb(termStr){
@@ -220,6 +244,11 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
         return genes;
     }
 
+    /**
+     * Gets the gene names from a json model
+     * @param {Array} jsonModel
+     * @returns {Array}
+     */
     getGeneList(jsonModel){
 
         let geneList = [];
@@ -236,15 +265,18 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
 
 
         //unique elements
-        geneList = geneList.filter(function(elem, index, self) {
+        geneList = geneList.filter((elem, index, self) => {
             return index === self.indexOf(elem);
         });
 
         return geneList;
 
     }
-    /***
+
+    /**
      * Gets the INDRA model in json format
+     * @param {string} modelId
+     * @param {function} callback
      */
     modelGetJson(modelId, callback){
 
@@ -255,7 +287,7 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
 
         this.tm.addHandler(patternXml, (response) => {
 
-            let jsonStr = trimDoubleQuotes(response.content[2]);
+            let jsonStr = this.trimDoubleQuotes(response.content[2]);
 
             jsonStr = jsonStr.replace(/(\\")/g, '"');
             let jsonModel = JSON.parse(jsonStr);
@@ -269,22 +301,12 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
 
 module.exports = TripsVisualizationInterfaceModule;
 
-
-/////////////////////////////////////////////////
-// Local functions
-/////////////////////////////////////////////////
-
-function trimDoubleQuotes(str){
-    if(str[0]!== '"' || str[str.length-1]!== '"')
-        return str;
-
-    let strTrimmed = str.slice(1, str.length -1);
-
-    return strTrimmed;
-
-}
-
-
+/**
+ * Local function to test if two lists are different
+ * @param {Array} list1
+ * @param {Array} list2
+ * @returns {boolean}
+ */
 function areListsDifferent(list1, list2){
 
     Array.prototype.diff = function(a) {

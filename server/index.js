@@ -57,11 +57,11 @@ function run(app, options, cb) {
             server.listen(port, listenCallback);
 
 
-            //Call this to get profile ids for each cancer study on cBioPortal server
-            let cancerDataOrganizer = require('./cancerDataOrganizer.js')();
-            //    cancerDataOrganizer.getCancerStudies(); //initialize at the beginning
 
-            require('./serverSideSocketListener.js').start(io, model, cancerDataOrganizer);
+
+            let ServerSideSocketListener = require('./serverSideSocketListener.js');
+            new ServerSideSocketListener(io, model);
+
 
 
         });
