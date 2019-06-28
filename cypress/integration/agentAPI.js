@@ -600,7 +600,7 @@ describe('Agent API Test', function () {
 
                 agent.sendRequest("agentCleanModelRequest", {shouldCleanProvenance:true}, function(){
                     setTimeout(function () { //should wait here as well
-                        let cy = modelManager.getModelCy(cyId);
+                        // let cy = modelManager.getModelCy(cyId);
                         expect(jQuery.isEmptyObject(window.appUtilities.getActiveCy().nodes) && jQuery.isEmptyObject(window.appUtilities.getActiveCy().edges)).to.equal(true);
                         done();
                     },1000);

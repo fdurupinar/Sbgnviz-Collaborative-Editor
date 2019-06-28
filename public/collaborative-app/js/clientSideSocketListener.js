@@ -82,6 +82,7 @@ class ClientSideSocketListener{
      */
     _cleanModel(data, callback) {
         try {
+
             let cyIds = this.app.modelManager.getCyIds();
 
             cyIds.forEach((cyId) => {

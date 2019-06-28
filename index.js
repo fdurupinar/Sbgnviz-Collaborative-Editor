@@ -462,10 +462,8 @@ app.proto.loadCyFromModel = function(cyId, callback){
             if(callback) callback(false);
 
         }, true);
-
-
-
     }
+
     if(callback) callback(true); //model is empty
 };
 
