@@ -80,26 +80,30 @@ function addEdgeTest(cyId, id, src, tgt, className) {
       // get the related cy instance
       let cyInstance = chiseInstance.getCy();
 
+      let edgeParams = {class : className, language : chiseInstance.getMapType()};
       // perform the operation to test
-      chiseInstance.addEdge(src, tgt, className, id);
+      chiseInstance.addEdge(src, tgt, edgeParams, id);
 
-      // try to get the edge with the given id
-      let edge = cyInstance.getElementById(id);
+      setTimeout(()=>{
+          // try to get the edge with the given id
+          let edge = cyInstance.getElementById(id);
 
-      // perform assertions on the edge
-      expect(edge, "An edge with id: " + id + " is added.").to.be.ok;
-      expect(edge.data('source'), "the edge has the expected source").to.be.equal(src);
-      expect(edge.data('target'), "the edge has the expected target").to.be.equal(tgt);
+          // perform assertions on the edge
+          expect(edge, "An edge with id: " + id + " is added.").to.be.ok;
+          expect(edge.data('source'), "the edge has the expected source").to.be.equal(src);
+          expect(edge.data('target'), "the edge has the expected target").to.be.equal(tgt);
 
-      // test if the model manager is updated accordingly
-      let modelManager = window.testModelManager;
-      let edgeModel = modelManager.getModelEdge(id, cyId);
+          // test if the model manager is updated accordingly
+          let modelManager = window.testModelManager;
+          let edgeModel = modelManager.getModelEdge(id, cyId);
 
-      expect(edgeModel, "Edge is added to the model.").to.be.ok;
-      expect(modelManager.getModelEdgeAttribute("data.id", id, cyId) , "Edge is equal in model and cytoscape").to.be.equal(cyInstance.getElementById(id).data("id"));
-      expect(modelManager.getModelEdgeAttribute("data.class", id, cyId), "Edge class is equal in model and cytoscape.").to.be.equal(edge.data("class"));
-      expect(modelManager.getModelEdgeAttribute("data.source", id, cyId), "Edge target x is equal in model and cytoscape.").to.be.equal(edge.data('source'));
-      expect(modelManager.getModelEdgeAttribute("data.target", id, cyId), "Edge source y is equal in model and cytoscape.").to.be.equal(edge.data('target'));
+          expect(edgeModel, "Edge is added to the model.").to.be.ok;
+          expect(modelManager.getModelEdgeAttribute("data.id", id, cyId) , "Edge is equal in model and cytoscape").to.be.equal(cyInstance.getElementById(id).data("id"));
+          expect(modelManager.getModelEdgeAttribute("data.class", id, cyId), "Edge class is equal in model and cytoscape.").to.be.equal(edge.data("class"));
+          expect(modelManager.getModelEdgeAttribute("data.source", id, cyId), "Edge target x is equal in model and cytoscape.").to.be.equal(edge.data('source'));
+          expect(modelManager.getModelEdgeAttribute("data.target", id, cyId), "Edge source y is equal in model and cytoscape.").to.be.equal(edge.data('target'));
+        }, 1000);
+
     });
   });
 }

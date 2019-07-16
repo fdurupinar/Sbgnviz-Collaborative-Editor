@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../../">
+  <title data-ice="title">collaborative-app/js/oncoprint/oncoprint-handler.js | Sbgnviz-Collaborative-Editor</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js">js</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/clientSideSocketListener.js~ClientSideSocketListener.html">ClientSideSocketListener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/modelManager.js~ModelManager.html">ModelManager</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-merger">js/merger</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/merger/json-merger.js~JsonMerger.html">JsonMerger</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/merger/model-merge-functions.js~ModelMergeFunctions.html">ModelMergeFunctions</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/merger/rephrase-handler.js~RephraseHandler.html">RephraseHandler</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-newt-functions">js/newt-functions</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-editorlistener">editorlistener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-PathsBetweenQueryView">PathsBetweenQueryView</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-PathsByURIQueryView">PathsByURIQueryView</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-oncoprint">js/oncoprint</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/oncoprint/oncoprint-handler.js~OncoprintHandler.html">OncoprintHandler</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-reach-functions">js/reach-functions</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-idxCardinfo">idxCardinfo</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-idxCardToJson">idxCardToJson</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#js-visual-manipulation">js/visual-manipulation</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/collaborative-app/js/visual-manipulation/vis-handler.js~VisHandler.html">VisHandler</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">collaborative-app/js/oncoprint/oncoprint-handler.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">
+/**
+ * Created by durupina on 11/14/16.
+ * Class to visualize oncoprint data
+ */
+
+const Oncoprint = require(&apos;oncoprintjs&apos;);
+var DEFAULT_GREY = &quot;rgba(190, 190, 190, 1)&quot;;
+var MUT_COLOR_MISSENSE = &apos;#008000&apos;;
+var MUT_COLOR_FUSION = &apos;#8B00C9&apos;;
+var MUT_COLOR_GERMLINE = &apos;#FFFFFF&apos;;
+var PROT_COLOR_UP = &quot;#9224A6&quot;;
+var PROT_COLOR_DOWN = &quot;#00BCD4&quot;;
+
+const geneticRuleSet = {
+    &apos;type&apos;: &apos;gene&apos;,
+    &apos;legend_label&apos;: &apos;Genetic Alteration&apos;,
+    &apos;legend_base_color&apos;: DEFAULT_GREY,
+    &apos;rule_params&apos;:  {
+
+        // Default: gray rectangle
+        &apos;*&apos;: {
+            shapes: [{
+                &apos;type&apos;: &apos;rectangle&apos;,
+                &apos;fill&apos;: DEFAULT_GREY,
+                &apos;z&apos;: 1
+            }],
+            legend_label: &apos;No alterations&apos;,
+        },
+        // Copy number alteration
+        &apos;disp_cna&apos;: {
+            // Red rectangle for amplification
+            &apos;amp&apos;: {
+                shapes: [{
+                    &apos;type&apos;: &apos;rectangle&apos;,
+                    &apos;fill&apos;: &apos;rgba(255,0,0,1)&apos;,
+                    &apos;x&apos;: &apos;0%&apos;,
+                    &apos;y&apos;: &apos;0%&apos;,
+                    &apos;width&apos;: &apos;100%&apos;,
+                    &apos;height&apos;: &apos;100%&apos;,
+                    &apos;z&apos;: 2,
+                }],
+                legend_label: &apos;Amplification&apos;,
+            },
+            // Light red rectangle for gain
+            &apos;gain&apos;: {
+                shapes: [{
+                    &apos;type&apos;: &apos;rectangle&apos;,
+                    &apos;fill&apos;: &apos;rgba(255,182,193,1)&apos;,
+                    &apos;x&apos;: &apos;0%&apos;,
+                    &apos;y&apos;: &apos;0%&apos;,
+                    &apos;width&apos;: &apos;100%&apos;,
+                    &apos;height&apos;: &apos;100%&apos;,
+                    &apos;z&apos;: 2,
+                }],
+                legend_label: &apos;Gain&apos;,
+            },
+            // Blue rectangle for deep deletion
+            &apos;homdel&apos;: {
+                shapes: [{
+                    &apos;type&apos;: &apos;rectangle&apos;,
+                    &apos;fill&apos;: &apos;rgba(0,0,255,1)&apos;,
+                    &apos;x&apos;: &apos;0%&apos;,
+                    &apos;y&apos;: &apos;0%&apos;,
+                    &apos;width&apos;: &apos;100%&apos;,
+                    &apos;height&apos;: &apos;100%&apos;,
+                    &apos;z&apos;: 2,
+                }],
+                legend_label: &apos;Deep Deletion&apos;,
+            },
+            // Light blue rectangle for shallow deletion
+            &apos;hetloss&apos;: {
+                shapes: [{
+                    &apos;type&apos;: &apos;rectangle&apos;,
+                    &apos;fill&apos;: &apos;rgba(143, 216, 216,1)&apos;,
+                    &apos;x&apos;: &apos;0%&apos;,
+                    &apos;y&apos;: &apos;0%&apos;,
+                    &apos;width&apos;: &apos;100%&apos;,
+                    &apos;height&apos;: &apos;100%&apos;,
+                    &apos;z&apos;: 2,
+                }],
+                legend_label: &apos;Shallow Deletion&apos;,
+            }
+        },
+        // mRNA regulation
+        &apos;disp_mrna&apos;: {
+            // Light red outline for upregulation
+            &apos;up&apos;: {
+                shapes: [{
+                    &apos;type&apos;: &apos;rectangle&apos;,
+                    &apos;fill&apos;: &apos;rgba(0, 0, 0, 0)&apos;,
+                    &apos;stroke&apos;: &apos;rgba(255, 153, 153, 1)&apos;,
+                    &apos;stroke-width&apos;: &apos;2&apos;,
+                    &apos;x&apos;: &apos;0%&apos;,
+                    &apos;y&apos;: &apos;0%&apos;,
+                    &apos;width&apos;: &apos;100%&apos;,
+                    &apos;height&apos;: &apos;100%&apos;,
+                    &apos;z&apos;: 3,
+                }],
+                legend_label: &apos;mRNA Upregulation&apos;,
+            },
+            // Light blue outline for downregulation
+            &apos;down&apos;: {
+                shapes: [{
+                    &apos;type&apos;: &apos;rectangle&apos;,
+                    &apos;fill&apos;: &apos;rgba(0, 0, 0, 0)&apos;,
+                    &apos;stroke&apos;: &apos;rgba(102, 153, 204, 1)&apos;,
+                    &apos;stroke-width&apos;: &apos;2&apos;,
+                    &apos;x&apos;: &apos;0%&apos;,
+                    &apos;y&apos;: &apos;0%&apos;,
+                    &apos;width&apos;: &apos;100%&apos;,
+                    &apos;height&apos;: &apos;100%&apos;,
+                    &apos;z&apos;: 3,
+                }],
+                legend_label: &apos;mRNA Downregulation&apos;,
+            },
+        },
+        // protein expression regulation
+        &apos;disp_prot&apos;: {
+            // small top rectangle for upregulated
+            &apos;up&apos;: {
+                shapes: [{
+                    &apos;type&apos;: &apos;rectangle&apos;,
+                    &apos;fill&apos;: PROT_COLOR_UP,
+                    &apos;x&apos;:&quot;0%&quot;,
+                    &apos;y&apos;:&quot;0%&quot;,
+                    &apos;width&apos;:&quot;100%&quot;,
+                    &apos;height&apos;:&quot;20%&quot;,
+                    &apos;z&apos;: 4,
+                }],
+                legend_label: &apos;Protein Upregulation&apos;,
+            },
+            // small bottom rectangle for upregulated
+            &apos;down&apos;: {
+                shapes: [{
+                    &apos;type&apos;: &apos;rectangle&apos;,
+                    &apos;fill&apos;: PROT_COLOR_DOWN,
+                    &apos;x&apos;:&quot;0%&quot;,
+                    &apos;y&apos;:&quot;80%&quot;,
+                    &apos;width&apos;:&quot;100%&quot;,
+                    &apos;height&apos;:&quot;20%&quot;,
+                    &apos;z&apos;: 4,
+                }],
+                legend_label: &apos;Protein Downregulation&apos;,
+            }
+        },
+        // fusion
+        &apos;disp_fusion&apos;: {
+            // tall inset purple rectangle for fusion
+            &apos;true&apos;: {
+                shapes: [{
+                    &apos;type&apos;: &apos;rectangle&apos;,
+                    &apos;fill&apos;: MUT_COLOR_FUSION,
+                    &apos;x&apos;: &apos;0%&apos;,
+                    &apos;y&apos;: &apos;20%&apos;,
+                    &apos;width&apos;: &apos;100%&apos;,
+                    &apos;height&apos;: &apos;60%&apos;,
+                    &apos;z&apos;: 5
+                }],
+                legend_label: &apos;Fusion&apos;
+            }
+        },
+        // germline
+        &apos;disp_germ&apos;: {
+            // white stripe in the middle
+            &apos;true&apos;: {
+                shapes: [{
+                    &apos;type&apos;: &apos;rectangle&apos;,
+                    &apos;fill&apos;: MUT_COLOR_GERMLINE,
+                    &apos;x&apos;: &apos;0%&apos;,
+                    &apos;y&apos;: &apos;46%&apos;,
+                    &apos;width&apos;: &apos;100%&apos;,
+                    &apos;height&apos;: &apos;8%&apos;,
+                    &apos;z&apos;: 7
+                }],
+                legend_label: &apos;Germline Mutation&apos;
+            }
+        },
+        &apos;disp_mut&apos;: {
+            &apos;trunc,inframe,missense,promoter,trunc_rec,inframe_rec,missense_rec,promoter_rec&apos;: {
+                shapes: [{
+                    &apos;type&apos;: &apos;rectangle&apos;,
+                    &apos;fill&apos;: MUT_COLOR_MISSENSE,
+                    &apos;x&apos;: &apos;0%&apos;,
+                    &apos;y&apos;: &apos;33.33%&apos;,
+                    &apos;width&apos;: &apos;100%&apos;,
+                    &apos;height&apos;: &apos;33.33%&apos;,
+                    &apos;z&apos;: 6
+                }],
+                legend_label: &apos;Mutation&apos;,
+
+            }
+        }
+    }
+};
+
+class OncoprintHandler{
+
+    /**
+     *
+     * @param {Number} width Width of the container element
+     */
+    constructor(width){
+        /**
+         *
+         * @type {module:oncoprintjs}
+         */
+        this.oncoprint = new Oncoprint(&apos;#oncoprint-container&apos;, width);
+        // this.updateData(ga_data);
+        this.listenToEvents();
+    }
+
+    /**
+     * Update the Oncoprint with data
+     * @param {Object} data
+     */
+    updateData(data) {
+        //clean previous data
+
+
+        if (this.oncoprint.getTracks().length &gt; 0)
+            this.oncoprint.removeAllTracks();
+
+        let share_id = null;
+
+        for (let i = 0; i &lt; data.length; i++) {
+
+            let track_params = {
+                &apos;rule_set_params&apos;: geneticRuleSet,
+                &apos;label&apos;: data[i].gene,
+                &apos;target_group&apos;: 0,
+                &apos;sortCmpFn&apos;: geneticComparator(),
+                &apos;description&apos;: data[i].desc,
+                &apos;na_z&apos;: 1.1,
+                &apos;value_key&apos;: &apos;frequency&apos;,
+                &apos;value_range&apos;: [0, 100],
+
+            };
+            let new_ga_id = this.oncoprint.addTracks([track_params])[0];
+            data[i].track_id = new_ga_id;
+            if (i === 0) {
+                share_id = new_ga_id;
+            } else {
+                this.oncoprint.shareRuleSet(share_id, new_ga_id);
+            }
+
+        }
+
+        this.oncoprint.hideIds([], true);
+        this.oncoprint.keepSorted(false);
+
+        for (let i = 0; i &lt; data.length; i++) {
+            this.oncoprint.setTrackData(data[i].track_id, data[i].data, &apos;sample&apos;);
+            this.oncoprint.setTrackInfo(data[i].track_id, &quot;&quot;);
+
+            this.oncoprint.setTrackTooltipFn(data[i].track_id,  (data) =&gt; {
+                let sampleInfo = &quot;&lt;b&gt;Sample: &quot; + data.sample + &quot;&lt;/b&gt;&quot;;
+                if(data.disp_mut)
+                    sampleInfo += &quot;&lt;p&gt;&quot; + data.disp_mut + &quot; &lt;/p&gt;&quot;;
+                if(data.disp_cna)
+                    sampleInfo += &quot;&lt;p&gt;&quot; + data.disp_cna + &quot; &lt;/p&gt;&quot;;
+                if(data.disp_prot)
+                    sampleInfo += &quot;&lt;p&gt;&quot; + data.disp_prot + &quot; &lt;/p&gt;&quot;;
+                if(data.disp_fusion)
+                    sampleInfo += &quot;&lt;p&gt;&quot; + data.disp_fusion + &quot; &lt;/p&gt;&quot;;
+                if(data.disp_germ)
+                    sampleInfo += &quot;&lt;p&gt;&quot; + data.disp_germ + &quot; &lt;/p&gt;&quot;;
+                if(data.disp_mrna)
+                    sampleInfo += &quot;&lt;p&gt;&quot; + data.disp_mrna + &quot; &lt;/p&gt;&quot;;
+
+                return sampleInfo;
+
+
+            });
+        }
+        this.oncoprint.keepSorted(false);
+        this.oncoprint.releaseRendering();
+    }
+
+    /**
+     * Listens to Oncoprint events
+     */
+    listenToEvents() {
+
+        // Basic rangeslider initialization
+        $(&apos;#oncoprint-zoom&apos;).rangeslider({
+          // Deactivate the feature detection
+          polyfill: false,
+          rangeClass: &apos;rangeslider&apos;,
+          disabledClass: &apos;rangeslider--disabled&apos;,
+          horizontalClass: &apos;rangeslider--horizontal&apos;,
+          fillClass: &apos;rangeslider__fill&apos;,
+          handleClass: &apos;rangeslider__handle_custom&apos;,
+
+
+          // Callback function
+          onInit: function() {
+
+          },
+          // Callback function
+          onSlide: function(position, value) {
+              let zoom = value/100.0;
+
+              this.oncoprint.setHorzZoom(zoom);
+              $(&apos;#oncoprint-zoom-value&apos;).val(value);
+
+          },
+
+        });
+
+     }
+
+}
+
+module.exports = OncoprintHandler;
+
+function geneticComparator() {
+  let cna_key = &apos;disp_cna&apos;;
+  let cna_order = {&apos;amp&apos;: 0, &apos;homdel&apos;: 1, &apos;gain&apos;: 2, &apos;hetloss&apos;: 3, &apos;diploid&apos;: 4, undefined: 5};
+  let mut_type_key = &apos;disp_mut&apos;;
+  let mut_order = {&apos;trunc&apos;: 0, &apos;inframe&apos;: 1, &apos;promoter&apos;: 2, &apos;missense&apos;: 3, undefined: 4};
+  let mrna_key = &apos;disp_mrna&apos;;
+  let prot_key = &apos;disp_prot&apos;;
+  let reg_order = {&apos;up&apos;: 0, &apos;down&apos;: 1, undefined: 2};
+  return function (d1, d2) {
+    let keys = [cna_key, mut_type_key, mrna_key, prot_key];
+    let orders = [cna_order, mut_order, reg_order, reg_order];
+    let diff = 0;
+    for (let i = 0; i &lt; keys.length; i++) {
+      let key = keys[i];
+      let order = orders[i];
+      if (d1[key] &amp;&amp; d2[key]) {
+        diff = order[d1[key]] - order[d2[key]];
+      } else if (d1[key]) {
+        diff = -1;
+      } else if (d2[key]) {
+        diff = 1;
+      }
+    }
+    return diff;
+  }
+}
+
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

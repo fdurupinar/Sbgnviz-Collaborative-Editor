@@ -5,7 +5,7 @@ var appUndoActionsFactory = require('./app-undo-actions-factory');
 var modeHandler = require('./app-mode-handler');
 var keyboardShortcuts = require('./keyboard-shortcuts');
 inspectorUtilities = window.inspectorUtilities = require('./inspector-utilities'); //FUNDA made this global
-var collaborativeBackboneViews = require("../../collaborative-app/collaborative-backbone-views.js"); //FUNDA
+var collaborativeBackboneViews = require("../../collaborative-app/js/newt-functions/collaborative-backbone-views.js"); //FUNDA
 var tutorial = require('./tutorial');
 var sifStyleFactory = require('./sif-style-factory');
 var _ = require('underscore');

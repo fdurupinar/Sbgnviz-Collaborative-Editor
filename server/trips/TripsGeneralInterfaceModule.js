@@ -6,13 +6,23 @@
  */
 "use strict";
 let request = require('request'); //REST call over http/https
-let KQML = require('./KQML/kqml.js');
+let KQML = require('./util/KQML/kqml.js');
 let TripsInterfaceModule = require('./TripsInterfaceModule.js');
 
-
+/**
+ * Class that handles general Trips requests
+ */
 
 class TripsGeneralInterfaceModule extends TripsInterfaceModule {
 
+    /**
+     *
+     * @param {string} agentId
+     * @param {string} agentName
+     * @param {WebSocket} socket Socket connection between the module and the agent --not server
+     * @param {Object} model
+     * @param {function} askHuman
+     */
     constructor(agentId, agentName, socket, model, askHuman){
 
         super('Sbgnviz-Interface-Agent', agentId, agentName, socket, model);
@@ -22,7 +32,7 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
         self.askHuman = askHuman;
 
 
-        setTimeout(function(){
+        setTimeout(() =>{
 
             // self.tm.sendMsg({0: 'tell', content: ['start-conversation']});
             self.tm.sendMsg({0: 'broadcast', content: ['tell','start-conversation']});
@@ -36,12 +46,12 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
         super.disconnect();
     }
 
-    /***
+    /**
      * When socket changes, update the listeners on that socket
      */
     updateListeners(){
         let self = this;
-        self.socket.on('relayMessageToTripsRequest', function (data) {
+        self.socket.on('relayMessageToTripsRequest', (data) => {
 
             let pattern = {0: 'tell', content: {0: 'started-speaking', mode: 'text', uttnum: data.uttNum, channel: 'Desktop', direction: 'input'}};
             self.tm.sendMsg(pattern);
@@ -57,28 +67,24 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
 
         });
 
-        //
-        // this.askHuman(this.agentId, this.room, "displaySif", {sif: "", cyId: "0"},  (val) => {
-        //
-        // });
-        //
-        // this.askHuman(this.agentId, this.room, "displaySbgn", {sbgn: "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n" +
-        //         "<sbgn xmlns=\"http://sbgn.org/libsbgn/0.2\">\n" +
-        //         "  <map language=\"process description\"> </map>\n" +
-        //         "</sbgn>", cyId: "1"},  (val) => {
-        //
-        // });
     }
 
+    /**
+     * Send the request in the given format
+     * @param {string} req
+     * @param {Object} data
+     */
     sendTripsRequest(req, data){
+
         let pattern = {0: 'request', content: {0: req, data: data}};
         this.tm.sendMsg(pattern);
 
     }
 
+    /**
+     * Handlers that listen to TRIPS requests and perform functions on the editor
+     */
     setHandlers() {
-        let self = this;
-
         //Listen to spoken sentences
         let pattern = {0: 'tell', 1: '&key', content: ['spoken', '.', '*']};
         this.tm.addHandler(pattern, (text) => {
@@ -87,7 +93,7 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
             if (contentObj) {
                 let msg = {userName: this.agentName, userId: this.agentId, room: this.room, date: +(new Date)};
 
-                msg.comment = trimDoubleQuotes(contentObj.what);
+                msg.comment = this.trimDoubleQuotes(contentObj.what);
 
                 if (msg.comment) {
 
@@ -194,7 +200,7 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
         //Listen to model json request from MRA
         // pattern = {0: 'reply', 1: '&key', content: ['success', '.', '*'], sender: 'MRA'};
         //
-        // self.tm.addHandler(pattern, function (text) { //listen to requests
+        // self.tm.addHandler(pattern,  (text)=> { //listen to requests
         //     let contentObj = KQML.keywordify(text.content);
         //
         //
@@ -212,6 +218,10 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
         // });
     }
 
+    /**
+     * Asks a browser client to display an image
+     * @param {Object} text {content {Object}}
+      */
     displayImage(text) {
         let self = this;
         let contentObj = KQML.keywordify(text.content);
@@ -225,10 +235,10 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
             };
 
 
-            let imgPath = trimDoubleQuotes(contentObj.path);
+            let imgPath = this.trimDoubleQuotes(contentObj.path);
             try {
                 let fs = require('fs');
-                fs.readFile(imgPath, function (error, fileContent) {
+                fs.readFile(imgPath,  (error, fileContent) => {
                     if (error) {
                         console.log('exec error: ' + error);
                         return;
@@ -247,7 +257,8 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
 
                     //The socket connection is between the interface and the agent, so we cannot directly emit messages
                     //we must ask the client with the browser to do it for us
-                    self.askHuman(self.agentId, self.room, "addImage", imgData, function (val) {
+                    self.askHuman(self.agentId, self.room, "addImage", imgData, (val)  => {
+                        console.log(val);
                       // self.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
                     });
 
@@ -260,11 +271,12 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
         }
     }
 
-
+    /**
+     * Asks a browser client to open a new PC tab
+     * @param {string} text
+     */
     displayPCPath(text) {
         let self = this;
-
-
 
         let contentObj = KQML.keywordify(text.content);
         if (contentObj) {
@@ -309,6 +321,14 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
         }
     }
 
+    /**
+     *
+     * @param {string} queryType
+     * @param {string} source
+     * @param {string} target
+     * @param {number} limit Path length limit
+     * @param {function} callback
+     */
     callPCQuery(queryType, source, target, limit, callback){
         let self = this;
         let responseHeaders = {
@@ -327,7 +347,7 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
             method: 'GET',
             headers: responseHeaders,
 
-        }, function (error, response, body) {
+        },  (error, response, body) => {
 
             if (error) {
                 callback("failure")
@@ -337,7 +357,8 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
                     if(body.length == 0)
                         callback("");
                     else {
-                        self.askHuman(self.agentId, self.room, "openPCQueryWindow", {graph: body, type: 'sif'}, () => {
+                        self.askHuman(self.agentId, self.room, "openPCQueryWindow", {graph: body, type: 'sif'}, (val) => {
+                            console.log(val);
                             callback("success");
                         });
                     }
@@ -346,6 +367,10 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
         });
     }
 
+    /**
+     * Open a new tab to show query result
+     * @param {string} text
+     */
     openQueryWindow(text){
         let self = this;
         let contentObj = KQML.keywordify(text.content);
@@ -354,23 +379,26 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
             let sbgnModel = contentObj.graph;
 
 
-            sbgnModel = trimDoubleQuotes(sbgnModel);
+            sbgnModel = this.trimDoubleQuotes(sbgnModel);
 
             sbgnModel = sbgnModel.replace(/(\\")/g, '"');
             sbgnModel = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n" + sbgnModel;
 
             //The socket connection is between the interface and the agent, so we cannot directly emit messages
             //we must ask the client with the browser to do it for us
-            self.askHuman(self.agentId, self.room, "openPCQueryWindow", {graph: sbgnModel}, function (val) {
-
+            self.askHuman(self.agentId, self.room, "openPCQueryWindow", {graph: sbgnModel},  (val) => {
+                console.log(val);
                 // self.tm.replyToMsg(text, {0: 'reply', content: {0: 'success'}});
             });
         }
 
     }
 
+    /**
+     * Display a graph in sif format
+     * @param {string} text
+     */
     displaySif(text) {
-
 
         let contentObj = KQML.keywordify(text.content);
         if (contentObj) {
@@ -378,12 +406,12 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
             let sifModel = contentObj.sif;
 
 
-            sifModel = trimDoubleQuotes(sifModel);
+            sifModel = this.trimDoubleQuotes(sifModel);
 
             sifModel = sifModel.replace(/(\\")/g, '"');
 
 
-            let cyId = trimDoubleQuotes(contentObj.cyid);
+            let cyId = this.trimDoubleQuotes(contentObj.cyid);
             cyId = cyId.replace(/(\\")/g, '"');
 
 
@@ -391,60 +419,53 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
             //we must ask the client with the browser to do it for us
             //TODO: get the cyId from TRIPS
             this.askHuman(this.agentId, this.room, "displaySif", {sif: sifModel, cyId: cyId || "0"},  (val) => {
-
+                console.log(val);
             });
         }
     }
+
+    /**
+     * Display a graph in sbgn format
+     * @param {string} text
+     */
     displaySbgn(text) {
-
-
-
         let contentObj = KQML.keywordify(text.content);
         if (contentObj) {
 
-
-
             let sbgnModel = contentObj.sbgn;
 
-            
-            sbgnModel = trimDoubleQuotes(sbgnModel);
+            sbgnModel = this.trimDoubleQuotes(sbgnModel);
 
             sbgnModel = sbgnModel.replace(/(\\")/g, '"');
             sbgnModel = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n" + sbgnModel;
 
 
-            let cyId = trimDoubleQuotes(contentObj.cyid);
+            let cyId = this.trimDoubleQuotes(contentObj.cyid);
             cyId = cyId.replace(/(\\")/g, '"');
 
             //The socket connection is between the interface and the agent, so we cannot directly emit messages
             //we must ask the client with the browser to do it for us
             //TODO: get the cyId from TRIPS
             this.askHuman(this.agentId, this.room, "displaySbgn", {sbgn: sbgnModel, cyId: cyId || "0"},  (val) => {
-            // this.askHuman(this.agentId, this.room, "mergeSbgn", {graph: sbgnModel,  type:'sbgn', cyId: contentObj.cyId || "0"},  (val) => {
+                console.log(val);
+            // this.askHuman(this.agentId, this.room, "mergeSbgn", {graph: sbgnModel,  type:'sbgn', cyId: contentObj.cyId || "0"},  () => {
 
             // this.tm.replyToMsg(text, {0: 'reply', content: {das: 'success'}});
             });
         }
     }
 
+    /**
+     * Display oncoprint result on the dedicated tab
+     * @param {string} text
+     */
     displayOncoprint(text){
 
         let contentObj = KQML.keywordify(text.content);
         if (contentObj) {
 
             let data = contentObj.data;
-//
-//             console.log(data);
-//             // data = trimDoubleQuotes(data);
-//             //
-//             // data = data.replace(/(\\")/g, '"');
-//
-//
-//
-//             // data = JSON.stringify(json1);
-//
-//
-//
+
             // data = data.replace(/[\']/g, '\"');
             data = data.replace(/’/g, "'");
             data = data.replace(/'/g, '"');
@@ -452,25 +473,10 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
 
             data  =  data.substr(1, data.length - 2);
 
-            // data[0] ="'";
-            // data[data.length-1] ="'";
-// // //
-// // // preserve newlines, etc - use valid JSON
-// //             data = data.replace(/\\n/g, "\\n")
-// //                 .replace(/\\'/g, "\\'")
-// //                 .replace(/\\"/g, '\\"')
-// //                 .replace(/\\&/g, "\\&")
-// //                 .replace(/\\r/g, "\\r")
-// //                 .replace(/\\t/g, "\\t")
-// //                 .replace(/\\b/g, "\\b")
-// //                 .replace(/\\f/g, "\\f");
-// // // remove non-printable and other non-valid JSON chars
-// //             data = data.replace(/[\u0000-\u0019]+/g,"");
-
             try {
-
                 let json = JSON.parse(data);
                 this.askHuman(this.agentId, this.room, "displayOncoprint", json, (val) => {
+                    console.log(val);
                 });
             }
             catch(e) {
@@ -479,8 +485,12 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
         }
     }
 
-    //Clean model request comes from another agent
-    cleanModel(){
+
+    /**
+     * Clean model request comes from another agent
+     * @param {boolean} shouldCleanProvenance
+     */
+    cleanModel(shouldCleanProvenance){
         let responseHeaders = {
             "access-control-allow-origin": "*",
             "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
@@ -497,104 +507,50 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
             headers: responseHeaders,
             form: ''
 
-        }, function (error) {
+        },  (error) => {
 
             if (error) {
                 console.log(error);
             }
         });
 
+
         //this will clean the image tabs and sbgn model
-        this.askHuman(this.agentId, this.room, "cleanModel",{},  function (val) {
+        this.askHuman(this.agentId, this.room, "cleanModel", {shouldCleanProvenance: shouldCleanProvenance},   (val) =>{
+            console.log(val);
         });
 
 
         this.sendResetCausalityRequest();
     }
 
-
-    //Similar to clean model, but also cleans the provenance
-    cleanAll(){
-        let responseHeaders = {
-            "access-control-allow-origin": "*",
-            "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
-            "access-control-allow-headers": "content-type, accept",
-            "access-control-max-age": 10,
-            "Content-Type": "application/json"
-        };
-
-        //The socket connection is between the interface and the agent, so we cannot directly emit messages
-        //we must ask the client with the browser to do it for us
-        //Reset through clic
-        request({
-            url: 'http://localhost:8000/clic/initiate-reset', //URL to hit
-            headers: responseHeaders,
-            form: ''
-
-        }, function (error) {
-
-            if (error) {
-                console.log(error);
-            }
-        });
-
-        //this will clean the image tabs and sbgn model
-        this.askHuman(this.agentId, this.room, "cleanAll",{},  function (val) {
-        });
-
-
-        this.sendResetCausalityRequest();
-    }
 
     sendResetCausalityRequest(){
         let pattern = {0: 'request', content: {0: 'RESET-CAUSALITY-INDICES'}};
         this.tm.sendMsg(pattern);
     }
 
+
     /***
      * Extra messages that agents send
-     * @param text
+     * @param {string} text
      */
     addProvenance(text){
 
-        console.log("add provenance");
-        let self = this;
         let contentObj = KQML.keywordify(text.content);
         if(contentObj.html)
-            contentObj.html = trimDoubleQuotes(contentObj.html);
+            contentObj.html = this.trimDoubleQuotes(contentObj.html);
         if(contentObj.pc)
-            contentObj.pc = trimDoubleQuotes(contentObj.pc);
+            contentObj.pc = this.trimDoubleQuotes(contentObj.pc);
 
-
-        this.askHuman(this.agendId, this.room, "addProvenance", contentObj);
-        //we can directly update the model
-        // if(contentObj.pc)
-        //     self.model.push('documents.' + this.room + '.provenance', {html:contentObj.html, pc: contentObj.pc, title: contentObj.title, userName: self.agentName});
-        // else if (contentObj.title)
-        //     self.model.push('documents.' + this.room + '.provenance', {html:contentObj.html,  title: contentObj.title, userName: self.agentName});
-        // else
-        //     self.model.push('documents.' + this.room + '.provenance', {html:contentObj.html,  userName: self.agentName});
+        this.askHuman(this.agentId, this.room, "addProvenance", contentObj);
 
     }
-
-
 }
 
 
 module.exports = TripsGeneralInterfaceModule;
 
-/////////////////////////////////////////////////
-// Local functions
-/////////////////////////////////////////////////
 
-function trimDoubleQuotes(str){
-    if(str[0]!== '"' || str[str.length-1]!== '"')
-        return str;
-
-    let strTrimmed = str.slice(1, str.length -1);
-
-    return strTrimmed;
-
-}
 
 

@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="../css/agentTester.css" type="text/css" rel="stylesheet">
+    <title></title>
+</head>
+<body>
+<script src="../../libs/socket.io.js"></script>
+<script src="../../libs/jquery-1.8.2.js"></script>
+<script src="../../libs/tinycolor.js"></script>
+<script src="../../libs/LineReader.js"></script>
+<script src="../../../collaborative-app/js/reach-functions/idxcardjson-to-json-converter.js"></script>
+
+
+<script src="../js/agentAPI.js"></script>
+<script src="../js/ContextAgent.js"></script>
+
+<script src="AgentAPI.js"></script>
+
+<form>
+    <input type="button" value="Delete Cookies" onclick=deleteAllCookies()>
+</form>
+
+<form id = "serverIpForm" >
+    Agent name: <input type = "text" id = "agentName" name="agentName" value = "Agent">
+    Server IP: <input type = "text" id = "serverIp" name="serverIp" >
+    <!--<input type = "button" id = "createAgentButton" value="Create agent" onclick = getServerIp()>-->
+
+
+
+</form>
+
+
+<div id = agentOperations>
+    <br>   <b> Agent Operations</b> <br>
+
+    <br>
+
+    <input type="button" value="Run tests" onclick=runTests()>
+
+    <button id = "newFile" onclick = newFile()>New model</button>
+
+    <input id="fileInput" type="file" onchange = loadFile() />
+
+    <button id = "updateModel" onclick = updateModel()>Request updated model</button>
+
+    <!--<input type="button" value="cBioPortal query" onclick=callQuery()>-->
+
+    <br>
+    <button id = "undoButton" onclick = undoOperation()>Undo</button>
+
+    <button id = "redoButton" onclick = redoOperation()>Redo</button>
+
+
+    <br>
+    <br>
+    <form id = "layoutOperations">
+        Name: <input type = "text" id = "layoutName" value = "cose-bilkent"><br>
+        Node repulsion: <input type = number id = "nodeRepulsion" value = 4500>
+        Node overlap: <input type = number id = "nodeOverlap" value = 10><br>
+        Ideal edge length: <input type = number id = "idealEdgeLength" value = 50>
+        Edge elasticity: <input type = number id = "edgeElasticity" value = 0.45><br>
+        Nesting factor: <input type = number id = "nestingFactor" value = 0.1>
+        Gravity: <input type = number id = "gravity" value = 0.4><br>
+        Number of iterations: <input type = number id = "numIter" value = 2500><br>
+        Tile: <input type = "checkbox" id = "tile" unchecked>
+        Animate: <input type = "checkbox" id = "animate" checked>
+        Randomize: <input type = "checkbox" id = "randomize" checked><br>
+        Tiling Vertical Padding: <input type = number id = "tilingPaddingVertical" value = 20><br>
+        Tiling Horizontal Padding: <input type = number id = "tilingPaddingHorizontal" value = 20><br>
+        <br>
+        <input type="button" value="Set layout properties" onclick=setLayoutProperties()>
+
+        <input type="button" value="Run layout" onclick=runLayout()>
+
+
+
+
+    </form>
+    <br>
+    <form id = "nodeOperations">
+
+        Pos x : <input type = number id = "posX" name="posX" value = 200>
+        Pos y : <input type = number id = "posY" name="posY" value = 200>
+        Sbgnclass: <input type = "text" id = "sbgnclass" name="sbgnclass" value = "macromolecule">
+        <input type="button" value="Add node" onclick=addNode()>
+
+        <br>
+        <b>Node Id </b>: <select multiple name="Id" id = "nodeId" >
+    </select>
+        <br>
+        <input type="button" value="Color selected node(s)" onclick=highlightNodes()>
+        <input type="button" value="Remove coloring" onclick=unhighlightNodes()>
+        <br>
+
+        <input type="button" value="Highlight neighbors of node(s)" onclick=highlightNeighborsOfSelected()>
+        <input type="button" value="Highlight processes of node(s)" onclick=highlightProcessesOfSelected()>
+        <input type="button" value="Remove highlights" onclick=removeHighlights()>
+
+        <br>
+        <input type="button" value="Show selected" onclick=showNodes()>
+        <input type="button" value="Hide selected" onclick=hideNodes()>
+        <input type="button" value="Show all" onclick=showAll()>
+        <br>
+        <input type="button" value="Add complex for selected" onclick=addCompound("complex")>
+
+        <input type="button" value="Add compartment for selected" onclick=addCompound("compartment")>
+
+
+        <br>
+
+
+        <br>
+        <input type="button" value="Delete node" onclick=deleteNode()>
+        <br> <br>
+        Pos x : <input  id = "newPosX" type = number>
+        Pos y : <input  id = "newPosY" type = number>
+        <input type="button" value="Move node" onclick=moveNode()>
+
+        <br>
+
+        <input id = "sbgnlabel">
+        <input type="button" value="Update node label" onclick=changeNodeAttribute("sbgnlabel","data.label")>
+
+        <br>
+        <input id = "width" type = number>
+        <input type="button" value="Update node width" onclick=changeNodeAttribute("width","data.bbox.w")>
+
+
+        <input id = "height" type = number>
+        <input type="button" value="Update node height" onclick=changeNodeAttribute("height","data.bbox.h")>
+
+
+        <br>
+        <input id = "borderColor" type = "color">
+        <input type="button" value="Update border color" onclick=changeNodeAttribute("borderColor","data.border-color")>
+
+        <br>
+        <input id = "backgroundColor" type = "color">
+        <input type="button" value="Update background color" onclick=changeNodeAttribute("backgroundColor","data.background-color")>
+
+        <br>
+        <input id = "borderWidth">
+        <input type="button" value="Update border width" onclick=changeNodeAttribute("borderWidth","data.border-width")>
+
+
+        <br>
+        Update clone marker status <input id = "isCloneMarker" type="checkbox"  onclick=changeNodeAttribute("isCloneMarker","data.cloneMarker")>
+
+        <br>
+        Update multimer status <input id = "isMultimer" type="checkbox"  onclick=changeNodeAttribute("isMultimer","data.class")>
+
+        <br>
+        <table>
+            <tr style='border: 1px solid #dddddd;'><td style='width: 100px'> State Variables </td><td id='stateVariables'style='width: 10px'></td></tr>
+
+            <br>
+            <tr style='border: 1px solid #dddddd;'><td style='width: 100px'> Unit Of Information</td><td id='unitsOfInformation' style='width: 10px'></td></tr>
+        </table>
+
+    </form>
+    <br>
+
+    <!-- Edge operations-->
+    <form id = "edgeOperations">
+        Source : <input  id = "source" name="source" value = "">
+        Target : <input  id = "target" name="target" value = "" >
+        Sbgnclass: <input id = "sbgnclassEdge" name = "sbgnclassEdge" value = "consumption">
+        <input type="button" value="Add edge" onclick=addEdge()>
+
+        <br><br>
+
+        <b>Edge Id </b>: <select multiple name="Id" id = "edgeId" ></select>
+        <br><br>
+
+        <input type="button" value="Color selected edge(s)" onclick=highlightEdges()>
+        <input type="button" value="Remove coloring" onclick=unhighlightEdges()>
+        <br>
+        <input type="button" value="Delete edge" onclick=deleteEdge()>
+
+        <br><br>
+        <input id = "sbgncardinality" type = number>
+        <input type="button" value="Update edge cardinality" onclick=changeEdgeAttribute("sbgncardinality","data.cardinality")>
+
+        <br><br>
+        <input id = "widthEdge">
+        <input type="button" value="Update edge width" onclick=changeEdgeAttribute("widthEdge","data.width")>
+
+
+        <br><br>
+        <input id = "lineColor" type = color>
+        <input type="button" value="Update edge color" onclick=changeEdgeAttribute("lineColor","data.line-color")>
+
+
+
+    </form>
+</div>
+
+
+<div id = modelHistory>
+    <ul id = 'operationHistory'  as="container" onchange = scrollToBottom('operationHistory')><b>Operations<br></b></ul>
+    <ul id = 'chat' as="container" onchange = scrollToBottom('chat')><b>Chat Messages<br></b>
+
+
+        <input id="chatMessage" type = "text"> <button onclick = "sendMessage()">Send</button>
+
+
+        <!--<label for="file-upload" class="image-file">-->
+            <!--<i class="fa fa-cloud-upload"></i> Upload Image-->
+        <!--</label>-->
+        <!--<input id="file-upload" type="file"/>-->
+
+        <div> Tab id <input type = text id = "imgTab" value = "0"><br></div>
+        <div ><input type="file" id="file-upload" accept="image/*" onchange = "uploadFile(this)"></div>
+
+    </ul>
+
+
+
+    <ul id = 'userList' as="container" onchange = scrollToBottom('userList')><b>Online Users<br></b></ul>
+
+
+    <br>
+    <br>
+    <div id = "receivedImage"  onclick =openImage() ></div>
+
+
+
+
+    <ul id = contextInformation><b>Context</b></ul>
+
+</div>
+
+
+</body>
+
+
+<script>
+
+    var agent;
+    var serverIp;
+
+
+    var sbgnContent = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?> <sbgn xmlns='http://sbgn.org/libsbgn/0.2'> <map language='process description'> <glyph id='ele11' class='macromolecule' > <bbox y='190' x='207' w='50' h='50' /> </glyph> </map> </sbgn>"
+
+
+
+    window.onload = function () {
+
+
+         createAgent();
+
+
+        $('#agentName').change(function () {
+            agent.changeName($('#agentName')[0].value);
+
+
+        });
+
+        $('#operationHistory').bind('contentchanged', function () {
+            scrollToBottom('operationHistory');
+        });
+
+        $('#chat').bind('contentchanged', function () {
+            scrollToBottom('chat');
+
+        });
+        $('#serverIp').change(function () {
+            //deleteCookie('docId'); //delete previous cookie
+            $('#createAgentButton').removeAttr('disabled');
+            // serverIp = $('#serverIp')[0].value;  //change cookie
+            // document.cookie = 'docId=' + serverIp;  //add cookie docId
+
+        });
+
+//        $('#serverIp').change(function () {
+//            deleteCookie('docId'); //delete previous cookie
+//
+//            //add the new cookie
+//            serverIp = $('#serverIp')[0].value;  //change cookie
+//            document.cookie = 'docId=' + serverIp;  //add cookie docId
+//
+//            createAgent();
+//        });
+
+        $('#nodeId').change(function () {
+
+
+
+            if($('#target')[0].value != "")
+                $('#source')[0].value = $('#nodeId')[0].value;
+            else
+                $('#target')[0].value = $('#nodeId')[0].value;
+
+            //update node info
+            agent.getNodeRequest($('#nodeId')[0].value, function () {
+
+                $('#newPosX')[0].value = preciseRound(agent.selectedNode.position.x, 3);
+                $('#newPosY')[0].value = preciseRound(agent.selectedNode.position.y, 3);
+                if(agent.selectedNode.data.bbox.w == null) agent.selectedNode.data.bbox.w = 0;
+                $('#width')[0].value = preciseRound(agent.selectedNode.data.bbox.w , 3);
+                if(agent.selectedNode.data.bbox.h == null) agent.selectedNode.data.bbox.h = 0;
+                $('#height')[0].value = preciseRound(agent.selectedNode.data.bbox.h, 3);
+                $('#borderWidth')[0].value = agent.selectedNode.data["border-width"];
+                $('#borderColor')[0].value = agent.selectedNode.data["border-color"];
+                $('#backgroundColor')[0].value = agent.selectedNode.data["background-color"];
+                $('#sbgnlabel')[0].value = agent.selectedNode.data.label;
+
+
+                if (agent.selectedNode.isCloneMarker)
+                    $('#isCloneMarker').attr('checked', 'checked');
+                else
+                    $('#isCloneMarker').attr('checked', false);
+
+
+                if (agent.selectedNode.isMultimer)
+                    $('#isMultimer').attr('checked', 'checked');
+                else
+                    $('#isMultimer').attr('checked', false);
+
+
+                fillInspectorStateAndInfos(agent.selectedNode);
+            });
+        });
+
+
+        $('#edgeId').change(function () {
+            //update node info
+            agent.getEdgeRequest($('#edgeId')[0].value, function () {
+                $('#sbgncardinality')[0].value = agent.selectedEdge.data.cardinality;
+                $('#lineColor')[0].value = agent.selectedEdge.data["line-color"];
+                $('#widthEdge')[0].value = agent.selectedEdge.data.width;
+            });
+        });
+
+
+        $('#serverIp')[0].value = getCookie('docId');
+    };
+
+    function getServerIp(){
+        deleteCookie('docId'); //delete previous cookie
+        serverIp = $('#serverIp')[0].value;  //change cookie
+        document.cookie = 'docId=' + serverIp;  //add cookie docId
+        createAgent();
+    }
+
+    function createAgent(){
+
+        var contextInitialized = false;
+        //don't open a new socket unless it is a new agent
+        var agentId = getCookie('userId');
+        if(agentId == null || agentId == ''){
+            agentId = generateHash(32);
+            document.cookie = 'userId=' +  agentId;  //add cookie docId
+        }
+
+        var ip = getCookie('docId');
+
+
+
+
+       agent = new Agent($('#agentName')[0].value, agentId);
+
+//        agent = new ContextAgent($('#agentName')[0].value, agentId);
+
+//        agent.sendRequest("agentActiveRoomsRequest", {param:null}, function(rooms){
+//
+//            console.log(rooms);
+//        });
+
+
+        agent.connectToServer("http://localhost:3000/", function(socket){
+
+//            $('#createAgentButton').attr('disabled','disabled');
+            $('#serverIp')[0].value = "http://localhost:3000/" + agent.room;
+
+
+            agent.loadModel(function() {
+
+                //get users in that room subscribed to that model
+                writeUserList(agent.userList);
+
+                if(agent instanceof ContextAgent){
+                    agent.initContext(function(){
+                        fillContextInformation(agent.cancerList,  agent.speciesList, agent.organList);
+                        contextInitialized = true;
+
+                    });
+                }
+
+                //TODO: open later fillLayoutProperties();
+                agent.loadOperationHistory(function(){
+
+                    agent.loadChatHistory(function(){
+
+                        //Write history
+                        if(agent.opHistory != null){
+                            agent.opHistory.forEach(function(op){
+                                writeOperation(op);
+                            });
+                        }
+
+                        if(agent.chatHistory != null){
+                            for(var ind in agent.chatHistory){
+                                writeMessage(agent.chatHistory[ind]);
+
+                            };
+                        }
+
+                        fillNodeIds('nodeId');
+                        fillEdgeIds('edgeId');
+
+                    });
+                });
+            });
+
+
+
+            //contextAgent
+            if(agent instanceof ContextAgent)
+                agent.evaluateMessage( function(){
+                    fillContextInformation(agent.cancerList,  agent.speciesList, agent.organList);
+                });
+
+
+
+            socket.on('processToIntegrate', function(graph){
+                console.log(graph);
+            })
+
+
+            socket.on('operation', function(op){
+                agent.opHistory.push(op);
+                writeOperation(op);
+                agent.loadModel(function() { //first make sure to get the latest model
+                    if(agent instanceof ContextAgent) {
+
+                        if(contextInitialized) {
+                            agent.updateContextCancer(function () {
+
+                                fillContextInformation(agent.cancerList, agent.speciesList, agent.organList);
+                                //agent.printcancerList();
+                            });
+                        }
+                    }
+
+                });
+
+            });
+
+            if(agent instanceof ContextAgent) {
+                agent.updateContextSpeciesAndOrgans(function () {
+
+                    fillContextInformation(agent.cancerList, agent.speciesList, agent.organList);
+                });
+
+
+            }
+
+            socket.on('message', function(data){
+                agent.chatHistory.push(data);
+                writeMessage(data);
+            });
+
+            //writeUserList(agent.getUserList());
+//            socket.on('userList', function(data){
+//                agent.userList = data;
+//                writeUserList(data);
+//            });
+
+            socket.on('imageFile', function(data){
+                writeImage(data);
+            });
+
+
+
+        });
+
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Agent requests and operations
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    function computeTargets(){
+        var targets = [];
+        for(var i = 0; i < agent.userList.length; i++){
+            var user = agent.userList[i].userId;
+
+
+            if(user == agent.agentId ||  $('#' + user)[0].checked){
+                targets.push({id: user});
+            }
+        }
+
+        return targets;
+    }
+    function sendMessage(){
+
+        agent.sendRequest('agentMessage', {comment: $('#chatMessage')[0].value, targets:"*"}, function(){
+            $('#chatMessage')[0].value = "";
+        } );
+    };
+
+
+
+    function readTextFile(filePath, callback) {
+
+        var rawFile;
+        if (window.XMLHttpRequest)
+            rawFile = new XMLHttpRequest();
+        else
+            rawFile = new ActiveXObject("Microsoft.XMLHTTP");
+
+
+        rawFile.open("GET", filePath, false);
+
+
+        rawFile.onreadystatechange = function () {
+
+            if(rawFile.readyState === 4) {
+                if(rawFile.status === 200 || rawFile.status == 0) {
+                    var allText = rawFile.responseText;
+                    console.log("File reading complete");
+                    callback(allText);
+
+
+                }bode
+            }
+        }
+        rawFile.send(null);
+    };
+
+
+    function saveFile(data, filename, type) {
+        var a = document.createElement("a"),
+            file = new Blob(data, {type: type});
+        if (window.navigator.msSaveOrOpenBlob) // IE10+
+            window.navigator.msSaveOrOpenBlob(file, filename);
+        else { // Others
+            var url = URL.createObjectURL(file);
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function() {
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            }, 0);
+        }
+    }
+
+
+    function uploadFile(el){
+        try{
+            var room = agent.room;
+            //var fileStr = ($('#imagefile')[0].value).split('\\');
+            //var filePath = fileStr[fileStr.length-1];
+
+
+            var fileName = "dummy";
+            //var file = evt.target.files[0];
+            var file = el.files[0];
+
+            var reader = new FileReader();
+            reader.onload = function(evt){
+                var imgParam = {img: evt.target.result, fileName: fileName, tabIndex:$('#imgTab')[0].value, tabLabel:"newLabel"};
+
+                agent.sendRequest("agentSendImageRequest", imgParam);
+            };
+
+            reader.readAsDataURL(file);
+
+            //Add file name as a text message
+
+        //    agent.sendMessage(("Sent image: " +fileName), '*');
+
+
+        }
+        catch(error){ //clicking cancel when the same file is selected causes error
+            console.log(error);
+
+        }
+    }
+
+    function setLayoutProperties(){
+        var layoutProperties;
+        layoutProperties= {
+            name: $('#layoutName')[0].value,
+            nodeRepulsion: $('#nodeRepulsion')[0].value,
+            nodeOverlap: $('#nodeOverlap')[0].value,
+            idealEdgeLength: $('#idealEdgeLength')[0].value,
+            edgeElasticity: $('#edgeElasticity')[0].value,
+            nestingFactor: $('#nestingFactor')[0].value,
+            gravity: $('#gravity')[0].value,
+            numIter: $('#numIter')[0].value,
+            tile: $('#tile')[0].checked,
+            animate: $('#animate')[0].checked,
+            randomize: $('#randomize')[0].checked,
+            tilingPaddingVertical: $('#tilingPaddingVertical')[0].value,
+            tilingPaddingHorizontal: $('#tilingPaddingHorizontal')[0].value,
+        };
+
+        agent.sendRequest("agentSetLayoutProperties", {param:layoutProperties});
+    }
+    function runLayout(){
+        agent.sendRequest("agentRunLayoutRequest",{param:null});
+    }
+
+    function callQuery(){
+        //agent.requestMutationQuery("KRAS");
+        agent.requestMutationQuery("TP53");
+
+    }
+
+
+
+    function updateModel(callback){
+        agent.loadModel(function() {
+
+           // fillLayoutProperties();
+            //agent.updateNextAgentNodeId();
+            agent.loadOperationHistory(function () {
+
+                agent.loadChatHistory(function () {
+                    //Write history
+                    if (agent.opHistory != null) {
+                        agent.opHistory.forEach(function (op) {
+                            writeOperation(op);
+                        });
+                    }
+
+                    if (agent.chatHistory != null) {
+                        for (var ind in agent.chatHistory) {
+                            writeMessage(agent.chatHistory[ind]);
+
+                        }
+
+                    }
+
+                    fillNodeIds('nodeId');
+                    fillEdgeIds('edgeId');
+
+
+                });
+            });
+        });
+    };
+
+    function runTests(){
+
+        for(var i =0; i < 10; i++){
+        setTimeout(function(){
+            agent.tellCorrelation('AKT1', function(data){
+                console.log(data);
+            });
+
+        }, i*1000)}
+    }
+
+    function newFile(){
+        agent.sendRequest("agentCleanModelRequest",{shouldCleanProvenance:true});
+    }
+    function loadFile(){
+        if ($("#fileInput").val() == "") {
+            return;
+        }
+
+        var fileInput = $("#fileInput")[0];
+
+        var file = fileInput.files[0];
+        if(file){
+            var textType = /text.*/;
+            var txtFile;
+
+            var reader = new FileReader();
+
+
+            reader.onload = function (e) {
+
+                var txtContent = this.result
+                var fileType = "sbgn";
+                if(file.name.indexOf(".owl") > -1)
+                    fileType = "owl";
+
+                agent.sendRequest("agentLoadFileRequest",{content:txtContent, fileType:fileType });
+            }
+        }
+
+        reader.readAsText(file);
+    //    setFileContent(file.name);
+        $("#fileInput").val("");
+
+        //  agent.sendRequest("agentLoadFileRequest",{file:txtFile});
+    };
+
+
+
+
+    function undoOperation(){
+        agent.sendRequest("agentUndoRequest");
+
+    }
+
+    function redoOperation(){
+        agent.sendRequest("agentRedoRequest");
+    }
+
+    function addNode(){
+        var x = $('#posX')[0].value;
+        var y = $('#posY')[0].value;
+        var sbgnclass = $('#sbgnclass')[0].value;
+
+        var param = {x:Number(x), y:Number(y), class:sbgnclass }
+
+        agent.sendRequest("agentAddNodeRequest", {param:param}, function(nodeId){
+            console.log("New node added " + nodeId);
+        });
+
+    }
+
+    function addEdge(){
+
+        var source = $('#source')[0].value;
+        var target = $('#target')[0].value;
+        var sbgnclass = $('#sbgnclassEdge')[0].value;
+        var param = {source:source, target:target, class:sbgnclass }
+
+        agent.sendRequest("agentAddEdgeRequest", {id: (source+ "-" + target + "-" + sbgnclass), param:param});
+
+    }
+
+    function deleteNode(){
+        agent.sendRequest("agentDeleteNodeRequest", {id: $('#nodeId')[0].value});
+    }
+    function deleteEdge(){
+        agent.sendRequest("agentDeleteEdgeRequest", {id: $('#edgeId')[0].value});
+    }
+
+    function highlightNodes(callback){
+        var nodeIdList = $('#nodeId').val();
+        nodeIdList.forEach(function(nodeId){
+            agent.sendRequest("agentChangeNodeAttributeRequest", {id: nodeId, attStr: "highlightColor", attVal: agent.colorCode});
+        });
+
+
+    }
+
+    function highlightEdges(callback){
+        var edgeIdList = $('#edgeId').val();
+        edgeIdList.forEach(function(edgeId){
+            agent.sendRequest("agentChangeEdgeAttributeRequest", {id: edgeId, attStr: "highlightColor", attVal: agent.colorCode});
+        });
+
+
+    }
+
+    function removeHighlights(){
+        agent.sendRequest("agentHighlightStatusRequest", {val:0});
+    }
+    function highlightNeighborsOfSelected(){
+        var nodeIdList = $('#nodeId').val();
+        agent.sendRequest("agentHighlightStatusRequest", {val:1, selectedNodeIds:nodeIdList});
+    }
+    function highlightProcessesOfSelected(){
+        var nodeIdList = $('#nodeId').val();
+        agent.sendRequest("agentHighlightStatusRequest", {val:2, selectedNodeIds:nodeIdList});
+    }
+    function unhighlightNodes(){
+        var nodeIdList = $('#nodeId').val();
+        nodeIdList.forEach(function(nodeId){
+            agent.sendRequest("agentChangeNodeAttributeRequest", {id: nodeId, attStr: "highlightColor", attVal: null});
+        });
+    }
+    function unhighlightEdges(){
+        var edgeIdList = $('#edgeId').val();
+        edgeIdList.forEach(function(edgeId){
+            agent.sendRequest("agentChangeEdgeAttributeRequest", {id: edgeId, attStr: "highlightColor", attVal: null});
+        });
+    }
+
+    function showNodes(){
+        var nodeIdList = $('#nodeId').val();
+        agent.sendRequest("agentUpdateVisibilityRequest", {val:"show", selectedNodeIds:nodeIdList});
+    }
+
+
+    function hideNodes(){
+        var nodeIdList = $('#nodeId').val();
+        agent.sendRequest("agentUpdateVisibilityRequest", {val:"hide", selectedNodeIds:nodeIdList});
+    }
+
+
+    function showAll(){
+        highlightNodes(); //select all
+
+
+        agent.sendRequest("agentUpdateVisibilityRequest", {val:'showAll'});
+    }
+
+    function moveNode(){
+        var id = $('#nodeId')[0].value;
+        var x = $('#newPosX')[0].value;
+        var y = $('#newPosY')[0].value;
+
+
+
+        var pos = {x:Number(x), y:Number(y)};
+
+
+        agent.sendRequest("agentMoveNodeRequest", {id: id, pos:pos});
+
+    }
+
+    //TODO: Error checking if compound can be added
+    function addCompound(type){
+        var nodes = $('#nodeId').val();
+
+
+        agent.sendRequest("agentAddCompoundRequest", {type:type, selectedNodeIds: nodes}, function(compoundId){
+
+
+            console.log(compoundId + " added.");
+        });
+
+    }
+
+    function changeNodeAttribute(attDiv, attStr){
+
+
+        var val;
+        var id = $('#nodeId')[0].value;
+        agent.getNodeRequest(id, function () {
+            if (attDiv == 'isCloneMarker')
+                val = ($('#isCloneMarker').attr('checked') == 'checked');
+
+            else if (attDiv == 'isMultimer')
+                val = ($('#isMultimer').attr('checked') == 'checked');
+
+            else
+                val = $('#' + attDiv)[0].value;
+
+            if(attDiv == "width" || attDiv == "height")
+                val = Number(val);
+            agent.sendRequest("agentChangeNodeAttributeRequest", {id: id, attStr: attStr, attVal: val});
+        });
+    }
+
+
+
+    function changeUnitOfInformation(oldLabelText){
+        var id = $('#nodeId')[0].value;
+
+        agent.getNodeRequest(id, function () {
+            var states = agent.selectedNode.sbgnStatesAndInfos;
+
+            //find which state this corresponds to
+            states.forEach(function (s) {
+                if (s.clazz == 'unit of information') {
+                    if (s.label.text == oldLabelText)
+                        s.label.text = $('.unitOfInformationLabel')[0].value;
+                }
+            });
+            agent.sendRequest("agentChangeNodeAttributeRequest", {
+                id: id,
+                attStr: "data.statesandinfos",
+                attVal: states
+            });
+        });
+
+    }
+
+    function changeStateVariable(oldStateVariable, oldStateValue){
+        var id = $('#nodeId')[0].value;
+
+        agent.getNodeRequest(id, function () {
+            var states = agent.selectedNode.sbgnStatesAndInfos;
+
+
+            //find which state this corresponds to
+            states.forEach(function (s) {
+                if (s.clazz == 'state variable') {
+                    if (s.state.value == oldStateValue && s.state.variable == oldStateVariable) {
+                        s.state.value = $('.stateVariableValue')[0].value;
+                        s.state.variable = $('.stateVariableVariable')[0].value;
+                    }
+                }
+            });
+            agent.sendRequest("agentChangeNodeAttributeRequest", {
+                id: id,
+                attStr: "data.statesAndInfos",
+                attVal: states
+            });
+        });
+
+    }
+
+
+    function changeEdgeAttribute(attDiv, attStr){
+        var val;
+        var id = $('#edgeId')[0].value;
+
+        val = $('#' + attDiv)[0].value;
+
+        agent.sendRequest("agentChangeEdgeAttributeRequest", {id:id, attStr:attStr, attVal: Number(val)});
+
+
+    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///Page editing
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    function fillLayoutProperties(){
+//
+//        var layoutProperties = agent.getLayoutProperties();
+//
+//        $('#layoutName')[0].value = layoutProperties.name;
+//        $('#nodeRepulsion')[0].value = layoutProperties.nodeRepulsion;
+//        $('#nodeOverlap')[0].value = layoutProperties.nodeOverlap;
+//        $('#idealEdgeLength')[0].value = layoutProperties.idealEdgeLength;
+//        $('#edgeElasticity')[0].value= layoutProperties.edgeElasticity;
+//        $('#nestingFactor')[0].value= layoutProperties.nestingFactor;
+//        $('#gravity')[0].value = layoutProperties.gravity;
+//        $('#numIter')[0].value= layoutProperties.numIter;
+//        $('#tile')[0].checked = layoutProperties.tile;
+//        $('#animate')[0].checked= layoutProperties.animate;
+//        $('#randomize')[0].checked= layoutProperties.randomize;
+//        $('#tilingPaddingVertical')[0].value= layoutProperties.tilingPaddingVertical;
+//        $('#tilingPaddingHorizontal')[0].value= layoutProperties.tilingPaddingHorizontal;
+//
+//
+//    }
+    function fillNodeIds(divId){
+        $('#'+divId).empty();
+        var nodeList = agent.getNodeList();
+
+
+        var nodeNameList = [];
+
+        var i = 0;
+        for( var node in nodeList){
+            nodeNameList[i++] = node;
+
+        };
+        nodeNameList.sort();
+        nodeNameList.forEach(function(nodeName){
+            $('#'+divId).append("<option value =\"" + nodeName + "\">" + nodeName + "</option>") ;
+        });
+    }
+
+    function fillEdgeIds(divId){
+        $('#'+divId).empty();
+        var edgeList = agent.getEdgeList();
+
+        var edgeNameList = [];
+
+        var i = 0;
+        for( var edge in edgeList){
+            edgeNameList[i++] = edge;
+
+        };
+        edgeNameList.sort();
+        edgeNameList.forEach(function(edgeName){
+            $('#'+divId).append("<option value =\"" + edgeName + "\">" + edgeName + "</option>") ;
+        });
+    }
+
+    function writeOperation(op){
+
+        var id = op.elId !=null? JSON.stringify(op.elId):'';
+        var param = op.param !=null? JSON.stringify(op.param):'';
+        var attr = op.opAttr!= null? op.opAttr : '';
+
+        var operation = "<b>" + op.userName + " (" + formatTime(op) + "): " + "</b>"  + id + " " + op.opName + " " + attr + " " + op.opTarget + " " + param;
+        //can also be called as:
+        // var command = JSON.stringify(op);
+
+        $('#operationHistory').append("<li>" + operation+ "</li>");
+        $('#operationHistory').trigger('contentchanged');
+
+    }
+
+    function fillContextInformation(cancerList, speciesList, organList){
+
+
+        $('#contextInformation').empty();
+        $('#contextInformation').append("<b>Context</b>")
+        $('#contextInformation').append("<table>");
+
+        $('#contextInformation').append("<tr> <th>" + "Cancer type" +  "</th><th>" + "Relevance" + "</th><th>"   + "Confidence" +  "</th></tr>" );
+
+        for(var i = 0; i < cancerList.length; i++){
+            var cancer = cancerList[i];
+            $('#contextInformation').append("<tr> <th>" + cancer.cancerType.abbr +  "</th><th>" + cancer.relevance.toFixed(3) + "</th><th>"   + cancer.confidence +  "</th></tr>" );
+
+        }
+
+        $('#contextInformation').append("<tr> <th>" + "Species" +  "</th><th>" + "Score" +  "</th></tr>");
+        for(var att in speciesList)
+            $('#contextInformation').append("<tr> <th>" + att +  "</th><th>" +   speciesList[att]+"</th></tr>");
+
+
+        $('#contextInformation').append("<tr> <th>" + "Organs" +  "</th><th>" + "Score" +  "</th></tr>");
+        for(var att in organList)
+            $('#contextInformation').append("<tr> <th>" + att +  "</th><th>" +   organList[att]+"</th></tr>");
+
+
+
+        $('#contextInformation').append("</table>");
+
+
+    }
+
+    function writeMessage(msg){
+
+        var htmlMessage = "<b>" + msg.userName + " (" + formatTime(msg) + "): "+ "</b>"  + " <p>" + msg.comment + "</p>" ;
+        $('#chat').append("<li>" + htmlMessage+ "</li>");
+        $('#chat').trigger('contentchanged');
+    }
+
+
+    function writeUserList(userList){
+        $('#userList').empty();
+        $('#userList').append("<b> Online Users<br>");
+
+
+        if(userList!=null){
+            userList.forEach(function(usr){
+                if(usr.userId == agent.agentId)
+                    $('#userList').append('<div>' +  usr.userName + '</div>');
+                else
+                    $('#userList').append('<input type="checkbox" id = '+  usr.userId + ' checked>' +  usr.userName + '<br>');
+            });
+        }
+    }
+
+    function writeImage(data){
+
+
+        $('#receivedImage').append('<div><img src="' + data.img + '"/><div>');
+
+    }
+
+
+
+    function generateHash(len) {
+        var symbols = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+        var hash = '';
+        for (var i = 0; i < len; i++) {
+            var symIndex = Math.floor(Math.random() * symbols.length);
+            hash += symbols.charAt(symIndex);
+        }
+        return hash;
+    }
+    function getCookie(cname) {
+        var name = cname + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i<ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0)==' ') c = c.substring(1);
+            if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+        }
+        return "";
+    }
+
+    var deleteCookie = function(cname) {
+        document.cookie = cname + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    };
+
+    var deleteAllCookies = function(){
+        deleteCookie('userId'); //delete previous cookie
+        deleteCookie('docId'); //delete previous cookie
+
+    };
+
+
+    function formatTime(message){
+        var hours, minutes, seconds, period, time;
+        time = message && message.date;
+        if (!time) {
+            return;
+        }
+        time = new Date(time);
+        hours = time.getHours();
+
+        minutes = time.getMinutes();
+
+        seconds = time.getSeconds();
+
+        if (minutes < 10) {
+            minutes = '0' + minutes;
+        }
+        if (seconds < 10) {
+            seconds = '0' + seconds;
+        }
+        return hours + ':' + minutes + ':' + seconds;
+    }
+
+    function preciseRound(num, decimals) {
+        if(decimals == null) decimals = 3;
+        var t=Math.pow(10, decimals);
+        return (Math.round((num * t) + (decimals>0?1:0)*(Math.sign(num) * (10 / Math.pow(100, decimals)))) / t).toFixed(decimals);
+    }
+
+    function scrollToBottom(docId){
+        document.getElementById(docId).scrollTop = document.getElementById(docId).scrollHeight;
+
+    }
+    function openImage(){
+        var largeImage = $('#receivedImage')[0];
+        if( $('#receivedImage img')[0] !=null) {
+            var url = $('#receivedImage img')[0].src;
+            window.open(url, 'Image', 'width=largeImage.stylewidth,height=largeImage.style.height,resizable=1');
+        }
+    }
+
+
+
+
+    function fillInspectorStateAndInfos(ele) {
+
+
+        var width = 100;
+        //first empty the state variables and infos data in inspector
+        $("#stateVariables").html("");
+        $("#unitsOfInformation").html("");
+        var stateAndInfos = ele.sbgnStatesAndInfos;
+
+
+        for(var si in stateAndInfos){
+
+            var state = stateAndInfos[si];
+
+            if (state.clazz == "state variable") {
+
+                $("#stateVariables").append("<div><input type='text' style=\"width:40px\" class='justAddedStateVariablesInput stateVariableValue' value='"   + state.state.value + "'/>"
+
+                        + "@<input type='text' style=\"width:40px\" class='justAddedStateVariablesInput stateVariableVariable'  + value='" + state.state.variable + "'/>"
+                        + "<img style=\"width:12px;height:12px;\" class='justAddedStateVariablesInput deleteStateAndInfo' src='../../img/delete.png'></div>");
+
+
+                var oldStateVariable = state.state.variable;
+                var oldStateValue = state.state.value;
+
+                //Change variable
+                $(".stateVariableVariable").unbind('change').on('change', function () {
+                    changeStateVariable(oldStateVariable, oldStateValue);
+                });
+
+
+                //Change value
+                $(".stateVariableValue").unbind('change').on('change', function () {
+                    changeStateVariable(oldStateVariable, oldStateValue);
+                });
+
+
+            }
+            else if (state.clazz == "unit of information") {
+
+                //var total = width / 5 + width / 5 + width / 2.5;
+                $("#unitsOfInformation").append("<div><input type='text' class='justAddedStateVariablesInput unitOfInformationLabel' value='" + state.label.text+ "'/>"
+                        +"<img style=\"width:12px;height:12px;\" class='justAddedStateVariablesInput deleteStateAndInfo' src='../../img/delete.png'></div>");
+
+                var oldLabelText = state.label.text;
+                $(".unitOfInformationLabel").unbind('change').on('change', function () {
+                    changeUnitOfInformation(oldLabelText);
+                });
+            }
+
+            $(".deleteStateAndInfo").unbind('click').click(function (event) {
+                var param = {
+                    obj: $(this).data("state"),
+                    ele: ele,
+                    width: width
+                };
+                //todo    editorActions.manager._do(editorActions.RemoveStateAndInfoCommand(param));
+            });
+
+            $(".justAddedStateVariablesInput").data("state", state);
+            $(".justAddedStateVariablesInput").removeClass("justAddedStateVariablesInput");
+        }
+        $("#stateVariables").append("<img id='addStateVariable' style=\"width:12px;height:12px;\" src='../../img/add.png'/>");
+        $("#unitsOfInformation").append("<img id='addUnitOfInformation' style=\"width:12px;height:12px;\" src='../../img/add.png'/>");
+
+        $("#addStateVariable").click(function () {
+            var obj = {};
+            obj.clazz = "state variable";
+
+            obj.state = {
+                value: "",
+                variable: ""
+            };
+            obj.bbox = {
+                w: 69,
+                h: 28
+            };
+            var param = {
+                obj: obj,
+                ele: ele,
+                width: width
+            };
+            //todo  editorActions.manager._do(editorActions.AddStateAndInfoCommand(param));
+        });
+
+        $("#addUnitOfInformation").click(function () {
+            var obj = {};
+            obj.clazz = "unit of information";
+            obj.label = {
+                text: ""
+            };
+            obj.bbox = {
+                w: 53,
+                h: 18
+            };
+            var param = {
+                obj: obj,
+                ele: ele,
+                width: width
+            };
+            //todo editorActions.manager._do(editorActions.AddStateAndInfoCommand(param));
+        });
+    }
+
+
+
+</script>
+
+
+
+
+</html>

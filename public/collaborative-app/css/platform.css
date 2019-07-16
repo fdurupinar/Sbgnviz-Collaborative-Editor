@@ -548,57 +548,14 @@ input[type="file"] {
 }
 
 
-#factoid-area{
-    position: absolute;
-    border: 1px solid #dddddd;
-    width: 100%;
-    height: 90%;
-    right: 0px;
-    top: 0px;
-    font-size: small;
-    overflow: auto;
-    overflow-y: auto;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    padding: 5px;
-    -webkit-overflow-scrolling: touch;
-    border-radius: 0.25em;
-}
 
 #pmcBox{
     width: 120px;
     margin: 10px;
 }
-#factoid-file-input{
-
-    font-size:medium;
-}
 .instructions{
     font-size:medium;
     color: #2c3e50;
-}
-#factoid-input-container{
-
-    position: absolute;
-
-    width: 98%;
-    padding: 10px;
-    height: 99%;
-    /*margin: 5px;*/
-    word-wrap: break-word;
-    color: #444444;
-    background-color: #0B9BCD;
-    overflow: auto;
-    font-size:small;
-    font-family: Verdana;
-}
-#factoidBox{
-    width: 100%;
-    overflow: scroll;
-}
-
-.factoid-button{
-    margin: 5px;
 }
 
 

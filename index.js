@@ -13,10 +13,11 @@ const ONE_MINUTE = 1000 * 60;
 const BobId = "Bob123";
 
 
+
 let docReady = false;
 
 
-app.on('model', function (model) {
+app.on('model', (model) => {
 
     model.fn('biggerTime', function (item) {
         let duration = model.get('_page.durationId');
@@ -49,7 +50,7 @@ app.on('model', function (model) {
 /***
  * Load document and get a new docId if necessary
  */
-app.get('/', function (page, model, params) {
+app.get('/',  (page, model) => {
     function getId() {
         return model.id();
     }
@@ -72,17 +73,17 @@ app.get('/', function (page, model, params) {
 /***
  * Load document with docId
  */
-app.get('/:docId', function (page, model, arg, next) {
+app.get('/:docId',  (page, model, arg, next) => {
     let  room;
 
     room = arg.docId;
 
-    model.subscribe('documents', function () {
+    model.subscribe('documents',  () =>{
 
         let docPath = 'documents.' + arg.docId;
         model.ref('_page.doc', ('documents.' + arg.docId));
 
-        model.subscribe(docPath, function (err) {
+        model.subscribe(docPath,  (err) => {
             if (err) return next(err);
 
             model.createNull(docPath, { // create the empty new doc if it doesn't already exist
@@ -100,12 +101,13 @@ app.get('/:docId', function (page, model, arg, next) {
 
 
             // create a reference to the document
+
             let pysb = model.at((docPath + '.pysb'));
             let cy = model.at((docPath + '.cy'));
             let cellularLocations = model.at((docPath + '.cellularLocations'));
             let history = model.at((docPath + '.history'));
             let undoIndex = model.at((docPath + '.undoIndex'));
-            let context = model.at((docPath + '.context'));
+
             let images = model.at((docPath + '.images'));
 
             let users = model.at((docPath + '.users'));//user lists with names and color codes
@@ -133,8 +135,6 @@ app.get('/:docId', function (page, model, arg, next) {
             undoIndex.subscribe(() => {
             });
 
-            context.subscribe(() => {
-            });
 
             images.subscribe(() => {
             });
@@ -151,6 +151,8 @@ app.get('/:docId', function (page, model, arg, next) {
             biopaxMode.subscribe(()=>{
             });
 
+            wizardMode.subscribe(()=>{
+            });
 
             noTrips.subscribe(() => {
 
@@ -221,7 +223,7 @@ app.proto.create = function (model) {
 
 
     // Make modelManager instance accessible through window object as testModelManager to use it in Cypress tests
-    let ModelManager = require('./public/collaborative-app/modelManager.js');
+    let ModelManager = require('./public/collaborative-app/js/modelManager.js');
     this.modelManager = window.testModelManager = new ModelManager(model, model.get('_page.room'));
     this.docId = model.get('_page.doc.id');
     window.testApp = this;
@@ -240,16 +242,19 @@ app.proto.create = function (model) {
     //Notify server about the client connection
     this.socket.emit("subscribeHuman", { userName:userNameModel, room:  model.get('_page.room'), userId: id});
 
-    this.agentSocket = require('./public/collaborative-app/clientSideSocketListener')(this);
-    this.agentSocket.listen();
 
 
-    this.factoidHandler = require('./public/collaborative-app/factoid/factoid-handler')(this) ;
-    this.factoidHandler.initialize();
+    let ClientSideSocketListener = require('./public/collaborative-app/js/clientSideSocketListener');
+    this.clientSideSocketListener = new ClientSideSocketListener(this);
+    this.clientSideSocketListener.listen();
+
+    // this.agentSocket = require('./public/collaborative-app/js/clientSideSocketListener')(this);
+    // this.agentSocket.listen();
 
 
-    this.oncoprintHandler = require('./public/collaborative-app/oncoprint/oncoprint-handler')(this) ;
-    this.oncoprintHandler.initialize($('#oncoprint-container').width());
+
+    let OncoprintHandler = require('./public/collaborative-app/js/oncoprint/oncoprint-handler') ;
+    this.oncoprintHandler = new OncoprintHandler($('#oncoprint-container').width());
 
 
     let oncoprintData = this.modelManager.getOncoprint();
@@ -270,11 +275,11 @@ app.proto.create = function (model) {
         if(parseInt(cyId) !== parseInt(appUtilities.getActiveNetworkId())) //tab 0: initial tab
             appUtilities.createNewNetwork(parseInt(cyId)); //opens a new tab
 
-        this.loadCyFromModel(cyId, function (isModelEmpty) {
-        });
+        this.loadCyFromModel(cyId);
+
 
         //To initialize the editor
-        this.editorListener = require('./public/collaborative-app/editor-listener.js')(this.modelManager,this.socket, id, this);
+        this.editorListener = require('./public/collaborative-app/js/newt-functions/editor-listener.js')(this.modelManager,this.socket, id, this);
 
         //HACK: This is normally called when a new network is created, but the initial network is created before editor-listener
         //Lets editor-listener subscribe to UI operations
@@ -289,7 +294,7 @@ app.proto.create = function (model) {
         this.modelManager.openCy(appUtilities.getActiveNetworkId(), "me");
 
         //To initialize the editor
-        this.editorListener = require('./public/collaborative-app/editor-listener.js')(this.modelManager,this.socket, id, this);
+        this.editorListener = require('./public/collaborative-app/js/newt-functions/editor-listener.js')(this.modelManager,this.socket, id, this);
 
         $(document).trigger('createNewNetwork', [appUtilities.getActiveCy(), appUtilities.getActiveNetworkId()]);
     }
@@ -331,11 +336,15 @@ app.proto.create = function (model) {
             this.connectTripsAgent();
 
             this.connectVisualizationHandler(this.modelManager);
+
+
         }
     }, 500); // wait a little while for the server to update user list and handle disconnections
 
 
-    return model.on('all', '_page.list', (function (_this) {
+
+
+    return model.on('all', '_page.list', ( (_this) => {
         return function () {
             if (!_this.atBottom)
                 return;
@@ -353,9 +362,6 @@ app.proto.create = function (model) {
  * @param model
  */
 app.proto.init = function (model) {
-
-
-
 
     this.listenToNodeOperations(model);
     this.listenToEdgeOperations(model);
@@ -382,12 +388,12 @@ app.proto.listenToUIOperations = function(model){
     self.lastMsgInd = -1; //increment in app.proto.app
 
     //start listening to keyboard events
-    $('#inputs-comment').keydown(function (e){
+    $('#inputs-comment').keydown( (e) =>{
         if(e.keyCode === 38 ||  e.keyCode === 40 ) { //up or down arrows
 
             //sorted list
             let filteredMsgs = model.filter('_page.doc.messages', 'myMessages').get();
-            let messages = filteredMsgs.sort(function(a, b){
+            let messages = filteredMsgs.sort((a, b)=>{
                 return b-a;
             });
 
@@ -410,7 +416,7 @@ app.proto.listenToUIOperations = function(model){
 
 
     //Listen to these after cy is loaded
-    $("#undo-last-action, #undo-icon").click(function () {
+    $("#undo-last-action, #undo-icon").click( () =>{
         if(self.modelManager.isUndoPossible()){
             self.modelManager.undoCommand();
             appUtilities.getActiveCy().forceRender();
@@ -419,7 +425,7 @@ app.proto.listenToUIOperations = function(model){
         }
     });
 
-    $("#redo-last-action, #redo-icon").click(function () {
+    $("#redo-last-action, #redo-icon").click( ()=> {
         if(self.modelManager.isRedoPossible()){
             self.modelManager.redoCommand();
             appUtilities.getActiveCy().forceRender();
@@ -428,6 +434,11 @@ app.proto.listenToUIOperations = function(model){
 
 };
 
+/**
+ * Init cy graph with data from the model
+ * @param {number} cyId
+ * @param {function} callback
+ */
 app.proto.loadCyFromModel = function(cyId, callback){
     let self = this;
     let jsonArr = self.modelManager.getJsonFromModel(cyId);
@@ -435,9 +446,9 @@ app.proto.loadCyFromModel = function(cyId, callback){
     if (jsonArr) {
 
         //Updates data fields and sets style fields to default
-        appUtilities.getChiseInstance(parseInt(cyId)).updateGraph({nodes: jsonArr.nodes, edges: jsonArr.edges}, function(){
+        appUtilities.getChiseInstance(parseInt(cyId)).updateGraph({nodes: jsonArr.nodes, edges: jsonArr.edges}, ()=>{
             //Update position fields separately
-            appUtilities.getCyInstance(parseInt(cyId)).nodes().forEach(function(node){
+            appUtilities.getCyInstance(parseInt(cyId)).nodes().forEach((node)=>{
 
                 let position = self.modelManager.getModelNodeAttribute('position',node.id(), cyId);
 
@@ -445,24 +456,14 @@ app.proto.loadCyFromModel = function(cyId, callback){
 
             });
 
-            let container = $('#canvas-tab-area');
-
-            // console.log("Panzoom updated");
-            // appUtilities.getCyInstance(parseInt(cyId)).zoom(1); //was 2 before
-            // appUtilities.getCyInstance(parseInt(cyId)).pan({x:container.width()/2, y:container.height()/2});
-            //
-
-             // appUtilities.getCyInstance(parseInt(cyId)).panzoom().reset();
 
             appUtilities.getCyInstance(parseInt(cyId)).panzoom().fit();
 
             if(callback) callback(false);
 
         }, true);
-
-
-
     }
+
     if(callback) callback(true); //model is empty
 };
 
@@ -478,7 +479,7 @@ app.proto.convertToBiopax = function(){
         //get rid of ports
         chiseInst.setPortsOrdering(chiseInst.getCy().nodes(), 'none');
 
-        chiseInst.getCy().nodes().forEach(function (node) {
+        chiseInst.getCy().nodes().forEach( (node) => {
             chiseInst.elementUtilities.removePorts(node);
         });
 
@@ -489,7 +490,7 @@ app.proto.convertToBiopax = function(){
         sbgn = sbgn.replace("libsbgn/0.3", "libsbgn/0.2");
 
 
-        self.socket.emit('BioPAXRequest', sbgn, "biopax", function (biopax) {
+        self.socket.emit('BioPAXRequest', sbgn, "biopax",  (biopax)=> {
 
             console.log("sending biopax req");
             self.model.set('_page.doc.pysb.' + cyId + '.biopax', biopax.graph);
@@ -508,6 +509,7 @@ app.proto.listenToNodeOperations = function(model){
     //Update inspector
 
     // model.on('all', '_page.doc.cy.*.nodes.**', function(cyId, id, op, val, prev, passed){
+
     //     //TODO: Open later
     // //     inspectorUtilities.handleSBGNInspector();
     //
@@ -525,7 +527,7 @@ app.proto.listenToNodeOperations = function(model){
 
 
 
-    model.on('all', '_page.doc.cy.*.nodes.*', function(cyId, id, op, val, prev, passed){
+    model.on('all', '_page.doc.cy.*.nodes.*', (cyId, id, op, val, prev, passed) =>{
 
 
         if(docReady &&  !passed.user) {
@@ -552,7 +554,7 @@ app.proto.listenToNodeOperations = function(model){
     });
 
 
-    model.on('all', '_page.doc.cy.*.nodes.*.addedLater', function(cyId, id, op, idName, prev, passed){ //this property must be something that is only changed during insertion
+    model.on('all', '_page.doc.cy.*.nodes.*.addedLater', (cyId, id, op, idName, prev, passed) => { //this property must be something that is only changed during insertion
 
 
         if(docReady && !passed.user) {
@@ -562,7 +564,8 @@ app.proto.listenToNodeOperations = function(model){
             let parent = model.get('_page.doc.cy.'+ cyId +'.nodes.'+ id + '.data.parent');
 
             if(parent === undefined) parent = null;
-            let newNode = appUtilities.getChiseInstance(parseInt(cyId)).elementUtilities.addNode(pos.x, pos.y, sbgnclass, id, parent, visibility);
+            let chiseInstance = appUtilities.getChiseInstance(parseInt(cyId));
+            let newNode = chiseInstance.elementUtilities.addNode(pos.x, pos.y, sbgnclass, id, parent, visibility);
 
             self.modelManager.initModelNode(newNode,cyId, "me", true);
 
@@ -578,7 +581,7 @@ app.proto.listenToNodeOperations = function(model){
         }
     });
 
-    model.on('all', '_page.doc.cy.*.nodes.*.position', function(cyId, id, op, pos,prev, passed){
+    model.on('all', '_page.doc.cy.*.nodes.*.position', (cyId, id, op, pos,prev, passed)=> {
 
 
         if(docReady && !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0) {
@@ -595,9 +598,8 @@ app.proto.listenToNodeOperations = function(model){
         }
     });
 
-    model.on('all', '_page.doc.cy.*.nodes.*.highlightColor', function(cyId, id, op, val,prev, passed){
-        //call it here so that everyone can highlight their own textbox
-        self.factoidHandler.highlightSentenceInText(id, val);
+    model.on('all', '_page.doc.cy.*.nodes.*.highlightColor', (cyId, id, op, val,prev, passed)=> {
+
 
         if(docReady && !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0) {
             if(!val){
@@ -620,7 +622,7 @@ app.proto.listenToNodeOperations = function(model){
     });
 
     //Called by agents to change bbox
-    model.on('all', '_page.doc.cy.*.nodes.*.data.bbox.*', function(cyId, id, att, op, val,prev, passed){
+    model.on('all', '_page.doc.cy.*.nodes.*.data.bbox.*', (cyId, id, att, op, val,prev, passed) => {
         if(docReady && !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0) {
             let newAtt = appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).data("bbox");
             newAtt[att] = val;
@@ -632,19 +634,22 @@ app.proto.listenToNodeOperations = function(model){
 
 
     //Called by agents to change specific properties of data
-    model.on('all', '_page.doc.cy.*.nodes.*.data.*', function(cyId, id, att, op, val,prev, passed){
+    model.on('all', '_page.doc.cy.*.nodes.*.data.*', (cyId, id, att, op, val,prev, passed) =>  {
         if(docReady && !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0) {
             appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).data(att, val);
             if(att === "parent")
                 appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).move({"parent":val});
 
-
+            let chiseInstance = appUtilities.getChiseInstance(parseInt(cyId));
+            //    get the sif version and send it to INDRA:
+            let sif = chiseInstance.getCurrentSif();
+            console.log(sif);
 
         }
     });
 
 
-    model.on('all', '_page.doc.cy.*.nodes.*.data', function(cyId, id,  op, data,prev, passed){
+    model.on('all', '_page.doc.cy.*.nodes.*.data', (cyId, id,  op, data,prev, passed) => {
         if(docReady && !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0) {
             appUtilities.getCyInstance(parseInt(cyId)).getElementById(id)._private.data = data;
 
@@ -662,7 +667,7 @@ app.proto.listenToNodeOperations = function(model){
 
 
 
-    model.on('all', '_page.doc.cy.*.nodes.*.expandCollapseStatus', function(cyId, id, op, val,prev, passed){
+    model.on('all', '_page.doc.cy.*.nodes.*.expandCollapseStatus', (cyId, id, op, val,prev, passed) => {
         if(docReady && !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0) {
             let expandCollapse = appUtilities.getCyInstance(parseInt(cyId)).expandCollapse('get'); //we can't call chise.expand or collapse directly as it causes infinite calls
             if(val === "collapse")
@@ -673,7 +678,7 @@ app.proto.listenToNodeOperations = function(model){
     });
 
 
-    model.on('all', '_page.doc.cy.*.nodes.*.highlightStatus', function(cyId, id, op, highlightStatus, prev, passed){ //this property must be something that is only changed during insertion
+    model.on('all', '_page.doc.cy.*.nodes.*.highlightStatus', (cyId, id, op, highlightStatus, prev, passed) => { //this property must be something that is only changed during insertion
         if(docReady && !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0) {
             try{
                 let viewUtilities = appUtilities.getCyInstance(parseInt(cyId)).viewUtilities('get');
@@ -692,7 +697,7 @@ app.proto.listenToNodeOperations = function(model){
         }
     });
 
-    model.on('all', '_page.doc.cy.*.nodes.*.visibilityStatus', function(cyId, id, op, visibilityStatus, prev, passed){ //this property must be something that is only changed during insertion
+    model.on('all', '_page.doc.cy.*.nodes.*.visibilityStatus', (cyId, id, op, visibilityStatus, prev, passed)=> { //this property must be something that is only changed during insertion
         if(docReady && !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0) {
             try{
                 let viewUtilities = appUtilities.getCyInstance(parseInt(cyId)).viewUtilities('get');
@@ -724,7 +729,7 @@ app.proto.listenToEdgeOperations = function(model){
     //Update inspector
     //TODO: open later
 
-    // model.on('all', '_page.doc.cy.*.edges.**', function(cyId, id, op, val, prev, passed){
+    // model.on('all', '_page.doc.cy.*.edges.**', (cyId, id, op, val, prev, passed) => {
     //     //TODO: Open later
     //     //     inspectorUtilities.handleSBGNInspector();
     //
@@ -733,7 +738,7 @@ app.proto.listenToEdgeOperations = function(model){
     //     sbgn = sbgn.replace("unknown", "process description");
     //     sbgn = sbgn.replace("libsbgn/0.3", "libsbgn/0.2");
     //     //
-    //     self.socket.emit('BioPAXRequest', sbgn, "biopax", function(biopax) {
+    //     self.socket.emit('BioPAXRequest', sbgn, "biopax", (biopax) =>  {
     //         self.model.set('_page.doc.pysb.' + cyId + '.biopax', biopax.graph);
     //
     //     });
@@ -743,7 +748,7 @@ app.proto.listenToEdgeOperations = function(model){
 
 
 
-    model.on('all', '_page.doc.cy.*.edges.*.highlightColor', function(cyId, id, op, val,prev, passed){
+    model.on('all', '_page.doc.cy.*.edges.*.highlightColor', (cyId, id, op, val,prev, passed) => {
         if(docReady && !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0) {
             if(val == null){
                 appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).css({
@@ -762,7 +767,7 @@ app.proto.listenToEdgeOperations = function(model){
         }
     });
 
-    model.on('all', '_page.doc.cy.*.edges.*', function(cyId, id, op, val, prev, passed){
+    model.on('all', '_page.doc.cy.*.edges.*', (cyId, id, op, val, prev, passed) => {
         if(docReady &&  !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0) {
             let edge  = model.get('_page.doc.cy.' + cyId +'.edges.' + id); //check
 
@@ -780,7 +785,7 @@ app.proto.listenToEdgeOperations = function(model){
         }
     });
 
-    model.on('all', '_page.doc.cy.*.edges.*.addedLater', function(cyId, id,op, idName, prev, passed){//this property must be something that is only changed during insertion
+    model.on('all', '_page.doc.cy.*.edges.*.addedLater', (cyId, id,op, idName, prev, passed)=> {//this property must be something that is only changed during insertion
         if(docReady && !passed.user ){
             let source = model.get('_page.doc.cy.'+ cyId +'.edges.'+ id + '.data.source');
             let target = model.get('_page.doc.cy.'+ cyId +'.edges.'+ id + '.data.target');
@@ -796,7 +801,7 @@ app.proto.listenToEdgeOperations = function(model){
             self.convertToBiopax();
     });
 
-    model.on('all', '_page.doc.cy.*.edges.*.data', function(cyId, id, op, data,prev, passed){
+    model.on('all', '_page.doc.cy.*.edges.*.data', (cyId, id, op, data,prev, passed)=> {
         if(docReady && !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0) {
             //appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).data(data); //can't call this if cy element does not have a field called "data"
             appUtilities.getCyInstance(parseInt(cyId)).getElementById(id)._private.data = data;
@@ -804,12 +809,12 @@ app.proto.listenToEdgeOperations = function(model){
         }
     });
 
-    model.on('all', '_page.doc.cy.*.edges.*.data.*', function(cyId, id, att, op, val,prev, passed){
+    model.on('all', '_page.doc.cy.*.edges.*.data.*', (cyId, id, att, op, val,prev, passed)=> {
         if(docReady && !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0)
             appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).data(att, val);
     });
 
-    model.on('all', '_page.doc.cy.*.edges.*.bendPoints', function(cyId, id, op, bendPoints, prev, passed){ //this property must be something that is only changed during insertion
+    model.on('all', '_page.doc.cy.*.edges.*.bendPoints', (cyId, id, op, bendPoints, prev, passed)=> { //this property must be something that is only changed during insertion
         if(docReady && !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0) {
             try{
                 let edge = appUtilities.getCyInstance(parseInt(cyId)).getElementById(id);
@@ -835,7 +840,7 @@ app.proto.listenToEdgeOperations = function(model){
         }
     });
 
-    model.on('all', '_page.doc.cy.*.edges.*.highlightStatus', function(cyId, id, op, highlightStatus, prev, passed){ //this property must be something that is only changed during insertion
+    model.on('all', '_page.doc.cy.*.edges.*.highlightStatus', (cyId, id, op, highlightStatus, prev, passed)=> { //this property must be something that is only changed during insertion
         if(docReady && !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0) {
             let viewUtilities = appUtilities.getCyInstance(parseInt(cyId)).viewUtilities('get');
             try{
@@ -850,7 +855,7 @@ app.proto.listenToEdgeOperations = function(model){
         }
     });
 
-    model.on('all', '_page.doc.cy.*.edges.*.visibilityStatus', function(cyId, id, op, visibilityStatus, prev, passed){ //this property must be something that is only changed during insertion
+    model.on('all', '_page.doc.cy.*.edges.*.visibilityStatus', (cyId, id, op, visibilityStatus, prev, passed)=> { //this property must be something that is only changed during insertion
         if(docReady && !passed.user && appUtilities.getCyInstance(parseInt(cyId)).getElementById(id).length>0) {
             let viewUtilities = appUtilities.getCyInstance(parseInt(cyId)).viewUtilities('get');
             try{
@@ -875,7 +880,7 @@ app.proto.listenToModelOperations = function(model){
 
 
 
-    model.on('all', '_page.doc.users.*.isTyping', function( id, op, mode, prev, passed){
+    model.on('all', '_page.doc.users.*.isTyping', ( id, op, mode, prev, passed)=> {
 
 
         if(docReady &&  !passed.user) { //another user made the update
@@ -907,7 +912,7 @@ app.proto.listenToModelOperations = function(model){
     });
 
 
-    model.on('all', '_page.doc.wizardMode', function(op, mode, prev, passed){
+    model.on('all', '_page.doc.wizardMode', (op, mode, prev, passed)=> {
 
         if(docReady &&  !passed.user) {
             if(!mode)
@@ -919,7 +924,7 @@ app.proto.listenToModelOperations = function(model){
     });
 
 
-    model.on('all', '_page.doc.oncoprint', function(op, data, prev, passed){
+    model.on('all', '_page.doc.oncoprint', (op, data, prev, passed)=> {
 
         //once defined, keep it open
         if(docReady &&  !passed.user) {
@@ -932,7 +937,7 @@ app.proto.listenToModelOperations = function(model){
 
 
 
-    model.on('all', '_page.doc.cellularLocations.*', function(location, op, names, prev, passed){
+    model.on('all', '_page.doc.cellularLocations.*', (location, op, names, prev, passed)=> {
 
 
         if(docReady &&  !passed.user) {
@@ -940,16 +945,10 @@ app.proto.listenToModelOperations = function(model){
         }
     });
 
-    //Listen to other model operations
-    model.on('all', '_page.doc.factoid.*', function(id, op, val, prev, passed){
-        if(docReady &&  !passed.user) {
-            self.factoidHandler.setFactoidModel(val);
-        }
-    });
 
 
     //A new tab is open
-    model.on('all', '_page.doc.cy.**', function( val, op, cyId, prev, passed){
+    model.on('all', '_page.doc.cy.**', ( val, op, cyId, prev, passed)=> {
 
         if(docReady && !passed.user){
             if( op === 'insert')
@@ -958,7 +957,7 @@ app.proto.listenToModelOperations = function(model){
         }
     });
 
-    model.on('all', '_page.doc.cy.*', function( cyId, op, val, prev, passed){
+    model.on('all', '_page.doc.cy.*', ( cyId, op, val, prev, passed)=> {
 
         if(docReady && !passed.user){
                 self.loadCyFromModel(cyId);
@@ -967,7 +966,7 @@ app.proto.listenToModelOperations = function(model){
 
 
     //Tab is closed by another client
-    model.on('all', '_page.doc.closedCy', function(  op, cyId, prev, passed){
+    model.on('all', '_page.doc.closedCy', (  op, cyId, prev, passed)=> {
 
         if(docReady) {
             if(docReady && !passed.user) {
@@ -984,7 +983,7 @@ app.proto.listenToModelOperations = function(model){
 
 
     //Cy updated by other clients
-    model.on('all', '_page.doc.cy.*.initTime', function( cyId, op, val, prev, passed){
+    model.on('all', '_page.doc.cy.*.initTime', ( cyId, op, val, prev, passed)=> {
 
         if(docReady) {
             if(docReady && !passed.user) {
@@ -994,13 +993,13 @@ app.proto.listenToModelOperations = function(model){
         }
     });
 
-    model.on('change', '_page.doc.pcQuery.*.graph', function(ind, data){
+    model.on('change', '_page.doc.pcQuery.*.graph', (ind, data)=> {
         let chiseInst = appUtilities.createNewNetwork();
 
         let jsonObj = chiseInst.convertSbgnmlTextToJson(data);
 
-            chiseInst.updateGraph(jsonObj, function() {
-                self.modelManager.initModel(chiseInst.getCy().nodes(), chiseInst.getCy().edges(), chiseInst.cyId, appUtilities, "me");
+            chiseInst.updateGraph(jsonObj, () => {
+                self.modelManager.initModel(chiseInst.getCy().nodes(), chiseInst.getCy().edges(), chiseInst.cyId,  "me");
                 // $("#perform-layout").trigger('click');
                 self.callLayout(chiseInst.cyId);
 
@@ -1011,20 +1010,20 @@ app.proto.listenToModelOperations = function(model){
 
 
     //Sometimes works
-    model.on('all', '_page.doc.images', function() {
+    model.on('all', '_page.doc.images', ()=>  {
         if (docReady) {
             triggerContentChange('static-image-container');
             triggerContentChange('receivedImages');
         }
     });
 
-    model.on('all', '_page.doc.history', function(){
+    model.on('all', '_page.doc.history', ()=> {
         if(docReady){
             triggerContentChange('command-history-area');
         }
     });
 
-    model.on('insert', '_page.list', function () {
+    model.on('insert', '_page.list',  ()=>  {
         let com = model.get('_page.list');
         let myId = model.get('_session.userId');
 
@@ -1041,7 +1040,7 @@ app.proto.listenToModelOperations = function(model){
 
     });
 
-    model.on('change', '_page.doc.messages.*', function ( id, msg, prev,passed) {
+    model.on('change', '_page.doc.messages.*',  ( id, msg, prev,passed) => {
 
 
 
@@ -1127,8 +1126,7 @@ app.proto.addCellularLocation = function(genes, compartment, cyId) {
             }
         });
 
-        let nodes = cy.nodes(':selected');
-
+        // let nodes = cy.nodes(':selected');
         // let extendedNodes = chiseInst.elementUtilities.getNeighboursOfNodes(nodes);
         // // let extendedNodes = chiseInst.elementUtilities.extendNodeList(nodes); //processes
         // extendedNodes.forEach((el) => el.select());
@@ -1250,8 +1248,7 @@ app.proto.moveOutOfCellularLocation = function(genes, compartment, cyId){
             }
         });
 
-        let nodes = cy.nodes(':selected');
-
+        // let nodes = cy.nodes(':selected');
         // let extendedNodes = chiseInst.elementUtilities.getNeighboursOfNodes(nodes);
         // // let extendedNodes = chiseInst.elementUtilities.extendNodeList(nodes); //processes
         // extendedNodes.forEach((el) => el.select());
@@ -1314,14 +1311,7 @@ app.proto.removeCellularLocation = function(location) {
  */
 app.proto.updateCellularLocations = function() {
 
-    let cyId = appUtilities.getActiveNetworkId();
-
-    let cy = appUtilities.getCyInstance(cyId);
-    let chiseInst = appUtilities.getChiseInstance(cyId);
-
     let cellularLocations = this.model.get('_page.doc.cellularLocations');
-
-
 
     for(let loc in cellularLocations){
         if(cellularLocations.hasOwnProperty(loc))
@@ -1392,9 +1382,8 @@ app.proto.resetConversationOnTrips = function(){
 };
 
 app.proto.connectVisualizationHandler = function(modelManager){
-    let self = this;
 
-    let VisHandler = require('./public/collaborative-app/visual-manipulation/vis-handler.js');
+    let VisHandler = require('./public/collaborative-app/js/visual-manipulation/vis-handler.js');
     this.visHandler = new VisHandler(modelManager);
 
 };
@@ -1532,7 +1521,7 @@ app.proto.moveCompartment = function(){
 app.proto.connectTripsAgent = function(){
     let self = this;
 
-    let TripsGeneralInterfaceAgent = require("./agent-interaction/TripsGeneralInterfaceAgent.js");
+    let TripsGeneralInterfaceAgent = require("./public/agent-interaction/src/js/TripsGeneralInterfaceAgent.js");
     self.tripsAgent = new TripsGeneralInterfaceAgent("Bob", BobId);
 
     console.log("Bob connected");
@@ -1550,6 +1539,19 @@ app.proto.connectTripsAgent = function(){
 };
 
 
+
+app.proto.informTripsAboutModelChange = function(cyId){
+    let chiseInstance = appUtilities.getChiseInstance(cyId);
+
+    // remove pcIDSet and siteLocSet to send indra
+
+    let sif = chiseInstance.getCurrentSif();
+    console.log("sent trips request");
+    console.log(sif);
+    this.tripsAgent.sendTripsRequest({request:"update-sif", data:sif});
+
+
+}
 
 app.proto.enterMessage = function(event){
 
@@ -1652,11 +1654,6 @@ app.proto.add = function (event, model) {
 app.proto.clearHistory = function () {
     this.model.set('_page.clickTime', new Date);
 
-    //TODO: silllll
-    // appUtilities.getCyInstance(parseInt(cyId)).panzoom().fit();
-    // var $reset = $('<div class="cy-panzoom-reset cy-panzoom-zoom-button"></div>');
-    // $('#cy-panzoom-zoom-button').trigger('mousedown');
-    // appUtilities.getCyInstance(parseInt(cyId)).panzoom.reset();
     return this.model.filter('_page.doc.messages', 'biggerThanCurrentTime').ref('_page.list');
 };
 
@@ -1766,7 +1763,7 @@ app.proto.dynamicResize = function () {
         $("#network-panels-container").width(wCanvasTab);
 
         if(images) {
-            images.forEach(function (img) {
+            images.forEach( (img) =>  {
                 $("#static-image-container-" + img.tabIndex).width(wCanvasTab);
             });
         }
@@ -1778,7 +1775,7 @@ app.proto.dynamicResize = function () {
     }
     else {
         if(images) {
-            images.forEach(function (img) {
+            images.forEach( (img) => {
                 $("#static-image-container-" + img.tabIndex).width(800);
                 $("#static-image-container-" + img.tabIndex).height(680);
             });
@@ -1792,7 +1789,7 @@ app.proto.dynamicResize = function () {
         let hCanvasTab = $("#canvas-tab-area").height();
         $("#network-panels-container").height(hCanvasTab);
         if(images) {
-            images.forEach(function (img) {
+            images.forEach( (img)=>  {
                 $("#static-image-container-" + img.tabIndex).height(hCanvasTab);
             });
         }
@@ -1800,11 +1797,9 @@ app.proto.dynamicResize = function () {
         let hInspectorTab = $("#inspector-tab-area").height();
 
         $("#sbgn-inspector").height(hInspectorTab);
-        $("#factoid-area").height(hInspectorTab * 0.9);
-        $("#factoidBox").height(hInspectorTab * 0.6);
     }
 
-    // TODO it would be better if find a good place to move these resizable calls.
+    // TODO find a better place to move these resizable calls.
     
     // make canvas tab area resizable and resize some other components as it is resized
     $("#canvas-tab-area").resizable({
@@ -1852,7 +1847,7 @@ app.proto.testImageTab = function(){
         tabLabel: "test",
         fileName: "modelRXN"
     };
-    var status = this.modelManager.addImage(imgData);
+    this.modelManager.addImage(imgData);
     this.dynamicResize();
 }
 ////////////////////////////////////////////////////////////////////////////
