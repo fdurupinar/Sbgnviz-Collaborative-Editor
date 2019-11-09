@@ -12,6 +12,78 @@ const ONE_HOUR = 1000 * 60 * 60;
 const ONE_MINUTE = 1000 * 60;
 const BobId = "Bob123";
 
+// TODO: keep this function up-to-date with active version of jsonToSif.convert() of sbgnviz.js
+// it must have the cwc-changes at the top of the original function
+const getCurrentSif = chiseInstance => {
+  var lines = [];
+
+  var elementUtilities = chiseInstance.elementUtilities;
+  // cwc-change
+  var cy = chiseInstance.getCy();
+
+  var edges = cy.edges()
+    .filter( function( edge ) {
+    // cwc-change: any edge type could be possible for sif edges
+
+    // return elementUtilities.isSIFEdge( edge )
+    //   && elementUtilities.isSIFNode( edge.source() )
+    //   && elementUtilities.isSIFNode( edge.target() );
+
+    return elementUtilities.isSIFNode( edge.source() )
+      && elementUtilities.isSIFNode( edge.target() );
+  } );
+
+  var nodes = cy.nodes().filter( function( node ) {
+    return elementUtilities.isSIFNode( node );
+  } );
+
+  nodes = nodes.not( edges.connectedNodes() );
+
+  var setToStr = function(set) {
+    if (!set) {
+      return '';
+    }
+
+    return Object.keys(set).join(';');
+  };
+
+  var getLabel = function(node) {
+    return node.data('label');
+  };
+
+  edges.forEach( function( edge ) {
+    var srcName = getLabel( edge.source() );
+    var tgtName = getLabel( edge.target() );
+
+    if ( !srcName || !tgtName ) {
+      return;
+    }
+
+    var type = edge.data('class');
+    var pcIDSet = edge.data('pcIDSet');
+    var siteLocSet = edge.data('siteLocSet');
+    // cwc-change
+    // var pcIDs = setToStr( pcIDSet );
+    // var siteLocations = setToStr( siteLocSet );
+    var pcIDs = '';
+    var siteLocations = '';
+
+    var line = [ srcName, type, tgtName, pcIDs, siteLocations ].join( '\t' );
+    lines.push( line );
+  } );
+
+  nodes.forEach( function( node ) {
+    var label = getLabel( node );
+
+    if ( label ) {
+      lines.push( label );
+    }
+  } );
+
+  var text = lines.join( '\n' );
+  return text;
+};
+
 
 
 let docReady = false;
@@ -642,7 +714,7 @@ app.proto.listenToNodeOperations = function(model){
 
             let chiseInstance = appUtilities.getChiseInstance(parseInt(cyId));
             //    get the sif version and send it to INDRA:
-            let sif = chiseInstance.getCurrentSif();
+            let sif = getCurrentSif(chiseInstance);
             console.log(sif);
 
         }
@@ -1545,7 +1617,7 @@ app.proto.informTripsAboutModelChange = function(cyId){
 
     // remove pcIDSet and siteLocSet to send indra
 
-    let sif = chiseInstance.getCurrentSif();
+    let sif = getCurrentSif(chiseInstance);
     console.log("sent trips request");
     console.log(sif);
     this.tripsAgent.sendTripsRequest({request:"update-sif", data:sif});
