@@ -491,7 +491,6 @@ appUtilities.createNewNetwork = function (networkIdParam) {
 
   // cwc-change
   newInst.cyId = networkId;
-
   $(document).trigger('createNewNetwork', [newInst.getCy(), networkId]);
 
   // return the new instance
