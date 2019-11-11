@@ -403,16 +403,20 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
         let contentObj = KQML.keywordify(text.content);
         if (contentObj) {
 
-            let sifModel = contentObj.sif;
+            // the related document
+            // (https://docs.google.com/document/d/160PVa6SbhCEyC5Wj-dlmid7kAalT7nvW_Cbw4ZFmdwc/edit#heading=h.yy2qssi2d7s2)
+            // tells that the graph data must be included in 'sif' parameter. However, in the related feature branch
+            // ('sif_models' branch of 'bioagents') it is included in 'graph' parameter.
+            // let sifModel = contentObj.sif;
+            let sifModel = contentObj.graph;
 
 
             sifModel = this.trimDoubleQuotes(sifModel);
 
             sifModel = sifModel.replace(/(\\")/g, '"');
 
-
-            let cyId = this.trimDoubleQuotes(contentObj.cyid);
-            cyId = cyId.replace(/(\\")/g, '"');
+            let cyId = contentObj.cyid
+              && this.trimDoubleQuotes(contentObj.cyid).replace(/(\\")/g, '"');
 
 
             //The socket connection is between the interface and the agent, so we cannot directly emit messages
@@ -432,16 +436,20 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
         let contentObj = KQML.keywordify(text.content);
         if (contentObj) {
 
-            let sbgnModel = contentObj.sbgn;
+            // the related document
+            // (https://docs.google.com/document/d/160PVa6SbhCEyC5Wj-dlmid7kAalT7nvW_Cbw4ZFmdwc/edit#heading=h.7d75t5vxl65z)
+            // tells that the graph data must be included in 'sbgn' parameter but it actually
+            // is included in 'graph' parameter
+            // let sbgnModel = contentObj.sbgn;
+            let sbgnModel = contentObj.graph;
 
             sbgnModel = this.trimDoubleQuotes(sbgnModel);
 
             sbgnModel = sbgnModel.replace(/(\\")/g, '"');
             sbgnModel = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n" + sbgnModel;
 
-
-            let cyId = this.trimDoubleQuotes(contentObj.cyid);
-            cyId = cyId.replace(/(\\")/g, '"');
+            let cyId = contentObj.cyid
+              && this.trimDoubleQuotes(contentObj.cyid).replace(/(\\")/g, '"');
 
             //The socket connection is between the interface and the agent, so we cannot directly emit messages
             //we must ask the client with the browser to do it for us
