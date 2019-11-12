@@ -75,10 +75,11 @@ var PathsBetweenQueryView = Backbone.View.extend({
 
 
                     let jsonObj = chiseInst.convertSbgnmlTextToJson(data);
+                    let layoutOpts = {name: 'fcose'};
 
                     chiseInst.updateGraph(jsonObj, function() {
 
-                    }, true);
+                    }, layoutOpts);
 
                     // appUtilities.getChiseInstance(data.cyId).updateGraph(jsonObj, function(){
                     //     app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(),  "me");
