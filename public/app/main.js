@@ -15,7 +15,7 @@ var appMenu = require('./js/app-menu');
 // Get cy extension instances
 var cyPanzoom = require('cytoscape-panzoom');
 //var cyQtip = require('cytoscape-qtip');
-var cyCoseBilkent = require('cytoscape-cose-bilkent');
+var cyFcose = require('cytoscape-fcose');
 var cyUndoRedo = require('cytoscape-undo-redo');
 var cyClipboard = require('cytoscape-clipboard');
 var cyContextMenus = require('cytoscape-context-menus');
@@ -27,11 +27,12 @@ var cyGridGuide = require('cytoscape-grid-guide');
 var cyAutopanOnDrag = require('cytoscape-autopan-on-drag');
 var cyNodeResize = require('cytoscape-node-resize');
 var cyPopper = require('cytoscape-popper');
+var cyLayoutUtilities = require('cytoscape-layout-utilities');
 
 // Register cy extensions
 cyPanzoom( cytoscape, $ );
 //cyQtip( cytoscape, $ );
-cyCoseBilkent( cytoscape );
+cyFcose( cytoscape );
 cyUndoRedo( cytoscape );
 cyClipboard( cytoscape, $ );
 cyContextMenus( cytoscape, $ );
@@ -43,6 +44,7 @@ cyGridGuide( cytoscape, $ );
 cyAutopanOnDrag( cytoscape );
 cyNodeResize( cytoscape, $, konva );
 cyPopper( cytoscape );
+cyLayoutUtilities( cytoscape );
 
 // Libraries to pass sbgnviz
 var libs = {};
@@ -56,14 +58,14 @@ libs.tippy = tippy;
 
 $(document).ready(function () {
 
-    // Register chise with libs
-    chise.register(libs);
+  // Register chise with libs
+  chise.register(libs);
 
-    appMenu();
+  appMenu();
 
-    // create a new network and access the related chise.js instance
-    appUtilities.createNewNetwork();
+  // create a new network and access the related chise.js instance
+  appUtilities.createNewNetwork();
 
-    // launch with model file if exists
-    // appUtilities.launchWithModelFile(); //funda
+  // launch with model file if exists
+  // appUtilities.launchWithModelFile(); // cwc-change
 });

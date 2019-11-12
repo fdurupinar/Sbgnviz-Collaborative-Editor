@@ -6,179 +6,181 @@ var FileSaver = require('filesaverjs');
 
 var appUtilities = require('./app-utilities');
 var setFileContent = appUtilities.setFileContent.bind(appUtilities);
+const colorPickerUtils = require('./color-picker-utils');
 //var annotationsHandler = require('./annotations-handler');
 
-/**
- * Backbone view for the BioGene information.
- */
-var BioGeneView = Backbone.View.extend({
-  /*
-   * Copyright 2013 Memorial-Sloan Kettering Cancer Center.
-   *
-   * This file is part of PCViz.
-   *
-   * PCViz is free software: you can redistribute it and/or modify
-   * it under the terms of the GNU Lesser General Public License as published by
-   * the Free Software Foundation, either version 3 of the License, or
-   * (at your option) any later version.
-   *
-   * PCViz is distributed in the hope that it will be useful,
-   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   * GNU Lesser General Public License for more details.
-   *
-   * You should have received a copy of the GNU Lesser General Public License
-   * along with PCViz. If not, see <http://www.gnu.org/licenses/>.
-   */
-
-  render: function () {
-    // pass variables in using Underscore.js template
-    var variables = {
-      geneDescription: this.model.geneDescription,
-      geneAliases: this.parseDelimitedInfo(this.model.geneAliases, ":", ",", null),
-      geneDesignations: this.parseDelimitedInfo(this.model.geneDesignations, ":", ",", null),
-      geneLocation: this.model.geneLocation,
-      geneMim: this.model.geneMim,
-      geneId: this.model.geneId,
-      geneUniprotId: this.extractFirstUniprotId(this.model.geneUniprotMapping),
-      geneUniprotLinks: this.generateUniprotLinks(this.model.geneUniprotMapping),
-      geneSummary: this.model.geneSummary
-    };
-
-    // compile the template using underscore
-    var template = _.template($("#biogene-template").html());
-    template = template(variables);
-
-    // load the compiled HTML into the Backbone "el"
-    this.$el.html(template);
-
-    // format after loading
-    this.format(this.model);
-
-    return this;
-  },
-  format: function ()
-  {
-    // hide rows with undefined data
-    if (this.model.geneDescription == undefined)
-      this.$el.find(".biogene-description").hide();
-
-    if (this.model.geneAliases == undefined)
-      this.$el.find(".biogene-aliases").hide();
-
-    if (this.model.geneDesignations == undefined)
-      this.$el.find(".biogene-designations").hide();
-
-    if (this.model.geneChromosome == undefined)
-      this.$el.find(".biogene-chromosome").hide();
-
-    if (this.model.geneLocation == undefined)
-      this.$el.find(".biogene-location").hide();
-
-    if (this.model.geneMim == undefined)
-      this.$el.find(".biogene-mim").hide();
-
-    if (this.model.geneId == undefined)
-      this.$el.find(".biogene-id").hide();
-
-    if (this.model.geneUniprotMapping == undefined)
-      this.$el.find(".biogene-uniprot-links").hide();
-
-    if (this.model.geneSummary == undefined)
-      this.$el.find(".node-details-summary").hide();
-
-    var expanderOpts = {slicePoint: 150,
-      expandPrefix: ' ',
-      expandText: ' (...)',
-      userCollapseText: ' (show less)',
-      moreClass: 'expander-read-more',
-      lessClass: 'expander-read-less',
-      detailClass: 'expander-details',
-      // do not use default effects
-      // (see https://github.com/kswedberg/jquery-expander/issues/46)
-      expandEffect: 'fadeIn',
-      collapseEffect: 'fadeOut'};
-
-    $(".biogene-info .expandable").expander(expanderOpts);
-
-    expanderOpts.slicePoint = 2; // show comma and the space
-    expanderOpts.widow = 0; // hide everything else in any case
-  },
-  generateUniprotLinks: function (mapping) {
-    var formatter = function (id) {
-      return _.template($("#uniprot-link-template").html(), {id: id});
-    };
-
-    if (mapping == undefined || mapping == null)
-    {
-      return "";
-    }
-
-    // remove first id (assuming it is already processed)
-    if (mapping.indexOf(':') < 0)
-    {
-      return "";
-    }
-    else
-    {
-      mapping = mapping.substring(mapping.indexOf(':') + 1);
-      return ', ' + this.parseDelimitedInfo(mapping, ':', ',', formatter);
-    }
-  },
-  extractFirstUniprotId: function (mapping) {
-    if (mapping == undefined || mapping == null)
-    {
-      return "";
-    }
-
-    var parts = mapping.split(":");
-
-    if (parts.length > 0)
-    {
-      return parts[0];
-    }
-
-    return "";
-  },
-  parseDelimitedInfo: function (info, delimiter, separator, formatter) {
-    // do not process undefined or null values
-    if (info == undefined || info == null)
-    {
-      return info;
-    }
-
-    var text = "";
-    var parts = info.split(delimiter);
-
-    if (parts.length > 0)
-    {
-      if (formatter)
-      {
-        text = formatter(parts[0]);
-      }
-      else
-      {
-        text = parts[0];
-      }
-    }
-
-    for (var i = 1; i < parts.length; i++)
-    {
-      text += separator + " ";
-
-      if (formatter)
-      {
-        text += formatter(parts[i]);
-      }
-      else
-      {
-        text += parts[i];
-      }
-    }
-
-    return text;
-  }
-});
+// since biogene service from PC is not available any more, we now give link to gene properties in My Cancer Genome organization
+///**
+// * Backbone view for the BioGene information.
+// */
+//var BioGeneView = Backbone.View.extend({
+//  /*
+//   * Copyright 2013 Memorial-Sloan Kettering Cancer Center.
+//   *
+//   * This file is part of PCViz.
+//   *
+//   * PCViz is free software: you can redistribute it and/or modify
+//   * it under the terms of the GNU Lesser General Public License as published by
+//   * the Free Software Foundation, either version 3 of the License, or
+//   * (at your option) any later version.
+//   *
+//   * PCViz is distributed in the hope that it will be useful,
+//   * but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   * GNU Lesser General Public License for more details.
+//   *
+//   * You should have received a copy of the GNU Lesser General Public License
+//   * along with PCViz. If not, see <http://www.gnu.org/licenses/>.
+//   */
+//
+//  render: function () {
+//    // pass variables in using Underscore.js template
+//    var variables = {
+//      geneDescription: this.model.geneDescription,
+//      geneAliases: this.parseDelimitedInfo(this.model.geneAliases, ":", ",", null),
+//      geneDesignations: this.parseDelimitedInfo(this.model.geneDesignations, ":", ",", null),
+//      geneLocation: this.model.geneLocation,
+//      geneMim: this.model.geneMim,
+//      geneId: this.model.geneId,
+//      geneUniprotId: this.extractFirstUniprotId(this.model.geneUniprotMapping),
+//      geneUniprotLinks: this.generateUniprotLinks(this.model.geneUniprotMapping),
+//      geneSummary: this.model.geneSummary
+//    };
+//
+//    // compile the template using underscore
+//    var template = _.template($("#biogene-template").html());
+//    template = template(variables);
+//
+//    // load the compiled HTML into the Backbone "el"
+//    this.$el.html(template);
+//
+//    // format after loading
+//    this.format(this.model);
+//
+//    return this;
+//  },
+//  format: function ()
+//  {
+//    // hide rows with undefined data
+//    if (this.model.geneDescription == undefined)
+//      this.$el.find(".biogene-description").hide();
+//
+//    if (this.model.geneAliases == undefined)
+//      this.$el.find(".biogene-aliases").hide();
+//
+//    if (this.model.geneDesignations == undefined)
+//      this.$el.find(".biogene-designations").hide();
+//
+//    if (this.model.geneChromosome == undefined)
+//      this.$el.find(".biogene-chromosome").hide();
+//
+//    if (this.model.geneLocation == undefined)
+//      this.$el.find(".biogene-location").hide();
+//
+//    if (this.model.geneMim == undefined)
+//      this.$el.find(".biogene-mim").hide();
+//
+//    if (this.model.geneId == undefined)
+//      this.$el.find(".biogene-id").hide();
+//
+//    if (this.model.geneUniprotMapping == undefined)
+//      this.$el.find(".biogene-uniprot-links").hide();
+//
+//    if (this.model.geneSummary == undefined)
+//      this.$el.find(".node-details-summary").hide();
+//
+//    var expanderOpts = {slicePoint: 150,
+//      expandPrefix: ' ',
+//      expandText: ' (...)',
+//      userCollapseText: ' (show less)',
+//      moreClass: 'expander-read-more',
+//      lessClass: 'expander-read-less',
+//      detailClass: 'expander-details',
+//      // do not use default effects
+//      // (see https://github.com/kswedberg/jquery-expander/issues/46)
+//      expandEffect: 'fadeIn',
+//      collapseEffect: 'fadeOut'};
+//
+//    $(".biogene-info .expandable").expander(expanderOpts);
+//
+//    expanderOpts.slicePoint = 2; // show comma and the space
+//    expanderOpts.widow = 0; // hide everything else in any case
+//  },
+//  generateUniprotLinks: function (mapping) {
+//    var formatter = function (id) {
+//      return _.template($("#uniprot-link-template").html(), {id: id});
+//    };
+//
+//    if (mapping == undefined || mapping == null)
+//    {
+//      return "";
+//    }
+//
+//    // remove first id (assuming it is already processed)
+//    if (mapping.indexOf(':') < 0)
+//    {
+//      return "";
+//    }
+//    else
+//    {
+//      mapping = mapping.substring(mapping.indexOf(':') + 1);
+//      return ', ' + this.parseDelimitedInfo(mapping, ':', ',', formatter);
+//    }
+//  },
+//  extractFirstUniprotId: function (mapping) {
+//    if (mapping == undefined || mapping == null)
+//    {
+//      return "";
+//    }
+//
+//    var parts = mapping.split(":");
+//
+//    if (parts.length > 0)
+//    {
+//      return parts[0];
+//    }
+//
+//    return "";
+//  },
+//  parseDelimitedInfo: function (info, delimiter, separator, formatter) {
+//    // do not process undefined or null values
+//    if (info == undefined || info == null)
+//    {
+//      return info;
+//    }
+//
+//    var text = "";
+//    var parts = info.split(delimiter);
+//
+//    if (parts.length > 0)
+//    {
+//      if (formatter)
+//      {
+//        text = formatter(parts[0]);
+//      }
+//      else
+//      {
+//        text = parts[0];
+//      }
+//    }
+//
+//    for (var i = 1; i < parts.length; i++)
+//    {
+//      text += separator + " ";
+//
+//      if (formatter)
+//      {
+//        text += formatter(parts[i]);
+//      }
+//      else
+//      {
+//        text += parts[i];
+//      }
+//    }
+//
+//    return text;
+//  }
+//});
 
 /**
  * Backbone view for the Chemical information.
@@ -255,8 +257,7 @@ var LayoutPropertiesView = Backbone.View.extend({
     // return cloned props to make them accessible
     return clonedProp;
   },
-  applyLayout: function (preferences, notUndoable, _chiseInstance) {
-
+  getLayoutOptions: function (preferences, _chiseInstance) {
     // if chise instance param is not set use the recently active chise instance
     var chiseInstance = _chiseInstance || appUtilities.getActiveChiseInstance();
 
@@ -284,6 +285,13 @@ var LayoutPropertiesView = Backbone.View.extend({
       return chiseInstance.calculatePaddings(horizontalPaddingPercent);
     };
 
+    return options;
+  },
+  applyLayout: function (preferences, notUndoable, _chiseInstance) {
+
+    // if chise instance param is not set use the recently active chise instance
+    var chiseInstance = _chiseInstance || appUtilities.getActiveChiseInstance();
+    var options = this.getLayoutOptions(preferences, _chiseInstance);
     chiseInstance.performLayout(options, notUndoable);
   },
   render: function () {
@@ -316,13 +324,14 @@ var LayoutPropertiesView = Backbone.View.extend({
       currentLayoutProperties.gravity = Number(document.getElementById("gravity").value);
       currentLayoutProperties.numIter = Number(document.getElementById("num-iter").value);
       currentLayoutProperties.tile = document.getElementById("tile").checked;
-      currentLayoutProperties.animate = document.getElementById("animate").checked ? 'during' : 'end';
+      currentLayoutProperties.packComponents = document.getElementById("pack-components").checked ? true : false;
+      currentLayoutProperties.animate = document.getElementById("animate").checked ? true : false;
       currentLayoutProperties.randomize = !document.getElementById("incremental").checked;
       currentLayoutProperties.gravityRangeCompound = Number(document.getElementById("gravity-range-compound").value);
       currentLayoutProperties.gravityCompound = Number(document.getElementById("gravity-compound").value);
       currentLayoutProperties.gravityRange = Number(document.getElementById("gravity-range").value);
       currentLayoutProperties.tilingPaddingVertical = Number(document.getElementById("tiling-padding-vertical").value);
-      currentLayoutProperties.tilingPaddingHorizontal = Number(document.getElementById("tiling-padding-horizontal").value);
+      currentLayoutProperties.tilingPaddingHorizontal = Number(document.getElementById("tiling-padding-horizontal").value);    
       currentLayoutProperties.initialEnergyOnIncremental = Number(document.getElementById("incremental-cooling-factor").value);
       currentLayoutProperties.improveFlow = document.getElementById("improve-flow").checked;
 
@@ -484,7 +493,7 @@ var GeneralPropertiesParentView = Backbone.View.extend({
     var currentGeneralProperties = appUtilities.getScratch(cy, 'currentGeneralProperties');
 
     // get topologyGrouping instance for cy
-    var topologyGrouping = appUtilities.getScratch(cy, 'sifTopologyGrouping');
+    var topologyGrouping = chiseInstance.sifTopologyGrouping;
 
     chiseInstance.setShowComplexName(currentGeneralProperties.showComplexName);
     chiseInstance.refreshPaddings(); // Refresh/recalculate paddings
@@ -637,13 +646,30 @@ var MapTabGeneralPanel = GeneralPropertiesParentView.extend({
 
       // use active cy instance
       var cy = appUtilities.getActiveCy();
+      var chiseInstance = appUtilities.getActiveChiseInstance();
+      // get current general properties for cy
+      var currentGeneralProperties = appUtilities.getScratch(cy, 'currentGeneralProperties');
       var actions = [];
 
       self.params.enableSIFTopologyGrouping.value = $('#enable-sif-topology-grouping').prop('checked');
       var apply = self.params.enableSIFTopologyGrouping.value;
 
       actions.push({name: "changeMenu", param: self.params.enableSIFTopologyGrouping});
-      actions.push({name: "applySIFTopologyGrouping", param: { apply }});
+      if ( chiseInstance.elementUtilities.mapType === 'SIF' ) {
+        actions.push({name: "applySIFTopologyGrouping", param: { apply }});
+
+        if ( currentGeneralProperties.recalculateLayoutOnComplexityManagement ) {
+          var preferences = { randomize: false };
+          var layoutOptions = appUtilities.layoutPropertiesView.getLayoutOptions(preferences, chiseInstance);
+
+          var layoutParam = {
+            options: layoutOptions
+          };
+
+          actions.push({name: "layout", param: layoutParam});
+        }
+      }
+
       cy.undoRedo().do("batch", actions);
       // cy.undoRedo().do("changeMenu", self.params.enableSIFTopologyGrouping);
       $('#enable-sif-topology-grouping').blur();
@@ -712,7 +738,7 @@ var MapTabLabelPanel = GeneralPropertiesParentView.extend({
     self.params.showComplexName = {id: "show-complex-name", type: "checkbox",
       property: "currentGeneralProperties.showComplexName", update: self.applyUpdate};
 
-    self.params.adjustAutomatically = {id: "adjust-node-label-font-size-automatically", type: "checkbox",
+    self.params.adjustNodeLabelFontSizeAutomatically = {id: "adjust-node-label-font-size-automatically", type: "checkbox",
       property: "currentGeneralProperties.adjustNodeLabelFontSizeAutomatically"};
 
     self.params.fitLabelsToNodes = {id: "fit-labels-to-nodes", type: "checkbox",
@@ -747,8 +773,8 @@ var MapTabLabelPanel = GeneralPropertiesParentView.extend({
       // use active cy instance
       var cy = appUtilities.getActiveCy();
 
-      self.params.adjustAutomatically.value = $('#adjust-node-label-font-size-automatically').prop('checked');
-      cy.undoRedo().do("changeMenu", self.params.adjustAutomatically);
+      self.params.adjustNodeLabelFontSizeAutomatically.value = $('#adjust-node-label-font-size-automatically').prop('checked');
+      cy.undoRedo().do("changeMenu", self.params.adjustNodeLabelFontSizeAutomatically);
       $('#adjust-node-label-font-size-automatically').blur();
       self.applyUpdate();
     });
@@ -782,13 +808,13 @@ var MapTabLabelPanel = GeneralPropertiesParentView.extend({
       var ur = cy.undoRedo();
       var actions = [];
       self.params.dynamicLabelSize.value = appUtilities.defaultGeneralProperties.dynamicLabelSize;
-      self.params.adjustAutomatically.value = appUtilities.defaultGeneralProperties.adjustNodeLabelFontSizeAutomatically;
+      self.params.adjustNodeLabelFontSizeAutomatically.value = appUtilities.defaultGeneralProperties.adjustNodeLabelFontSizeAutomatically;
       self.params.fitLabelsToNodes.value = appUtilities.defaultGeneralProperties.fitLabelsToNodes;
       self.params.fitLabelsToInfoboxes.value = appUtilities.defaultGeneralProperties.fitLabelsToInfoboxes;
       self.params.showComplexName.value = appUtilities.defaultGeneralProperties.showComplexName;
 
       actions.push({name: "changeMenu", param: self.params.dynamicLabelSize});
-      actions.push({name: "changeMenu", param: self.params.adjustAutomatically});
+      actions.push({name: "changeMenu", param: self.params.adjustNodeLabelFontSizeAutomatically});
       actions.push({name: "changeMenu", param: self.params.fitLabelsToNodes});
       actions.push({name: "changeMenu", param: self.params.fitLabelsToInfoboxes});
       actions.push({name: "changeMenu", param: self.params.showComplexName});
@@ -1025,7 +1051,7 @@ var NeighborhoodQueryView = Backbone.View.extend({
             filename = filename + '_' + currentGeneSymbol;
         }
       }
-      filename = filename + '_NEIGHBORHOOD.sbgnml';
+      filename = filename + '_NEIGHBORHOOD.nwt';
       queryURL = queryURL + sources;
 
       if(cy.nodes().length == 0){
@@ -1033,7 +1059,8 @@ var NeighborhoodQueryView = Backbone.View.extend({
         chiseInstance.startSpinner('neighborhood-spinner');
         var currentGeneralProperties = appUtilities.getScratch(cy, 'currentGeneralProperties');
         var currentInferNestingOnLoad = currentGeneralProperties.inferNestingOnLoad;
-
+        var currentLayoutProperties = appUtilities.getScratch(cy, 'currentLayoutProperties');
+        
         $.ajax({
           type: 'get',
           url: "/utilities/testURL",
@@ -1043,7 +1070,7 @@ var NeighborhoodQueryView = Backbone.View.extend({
               var xml = $.parseXML(data.response.body);
               $(document).trigger('sbgnvizLoadFile', [ filename, cy ]);
               currentGeneralProperties.inferNestingOnLoad = false;
-              chiseInstance.updateGraph(chiseInstance.convertSbgnmlToJson(xml), undefined, true);
+              chiseInstance.updateGraph(chiseInstance.convertSbgnmlToJson(xml), undefined, currentLayoutProperties);
               currentGeneralProperties.inferNestingOnLoad = currentInferNestingOnLoad;
               chiseInstance.endSpinner('neighborhood-spinner');
               $(document).trigger('sbgnvizLoadFileEnd', [ filename, cy ]);
@@ -1069,6 +1096,7 @@ var NeighborhoodQueryView = Backbone.View.extend({
           chiseInstance.startSpinner('neighborhood-spinner');
           var currentGeneralProperties = appUtilities.getScratch(cy, 'currentGeneralProperties');
           var currentInferNestingOnLoad = currentGeneralProperties.inferNestingOnLoad;
+          var currentLayoutProperties = appUtilities.getScratch(cy, 'currentLayoutProperties');        
 
           $.ajax({
             type: 'get',
@@ -1079,7 +1107,7 @@ var NeighborhoodQueryView = Backbone.View.extend({
                 var xml = $.parseXML(data.response.body);
                 $(document).trigger('sbgnvizLoadFile', [ filename, cy ]);
                 currentGeneralProperties.inferNestingOnLoad = false;
-                chiseInstance.updateGraph(chiseInstance.convertSbgnmlToJson(xml), undefined, true);
+                chiseInstance.updateGraph(chiseInstance.convertSbgnmlToJson(xml), undefined, currentLayoutProperties);
                 currentGeneralProperties.inferNestingOnLoad = currentInferNestingOnLoad;
                 chiseInstance.endSpinner('neighborhood-spinner');
                 $(document).trigger('sbgnvizLoadFileEnd', [ filename, cy ]);
@@ -1189,7 +1217,7 @@ var PathsBetweenQueryView = Backbone.View.extend({
                     filename = filename + '_' + currentGeneSymbol;
                 }
             }
-            filename = filename + '_PATHSBETWEEN.sbgnml';
+            filename = filename + '_PATHSBETWEEN.nwt';
             queryURL = queryURL + sources;
 
             if(cy.nodes().length == 0){
@@ -1197,6 +1225,7 @@ var PathsBetweenQueryView = Backbone.View.extend({
               chiseInstance.startSpinner('paths-between-spinner');
               var currentGeneralProperties = appUtilities.getScratch(cy, 'currentGeneralProperties');
               var currentInferNestingOnLoad = currentGeneralProperties.inferNestingOnLoad;
+              var currentLayoutProperties = appUtilities.getScratch(cy, 'currentLayoutProperties');   
 
               $.ajax({
                 type: 'get',
@@ -1207,7 +1236,7 @@ var PathsBetweenQueryView = Backbone.View.extend({
                     var xml = $.parseXML(data.response.body);
                     $(document).trigger('sbgnvizLoadFile', [ filename, cy ]);
                     currentGeneralProperties.inferNestingOnLoad = false;
-                    chiseInstance.updateGraph(chiseInstance.convertSbgnmlToJson(xml), undefined, true);
+                    chiseInstance.updateGraph(chiseInstance.convertSbgnmlToJson(xml), undefined, currentLayoutProperties);
                     currentGeneralProperties.inferNestingOnLoad = currentInferNestingOnLoad;
                     chiseInstance.endSpinner('paths-between-spinner');
                     $(document).trigger('sbgnvizLoadFileEnd', [ filename, cy ]);
@@ -1233,6 +1262,7 @@ var PathsBetweenQueryView = Backbone.View.extend({
                 chiseInstance.startSpinner('paths-between-spinner');
                 var currentGeneralProperties = appUtilities.getScratch(cy, 'currentGeneralProperties');
                 var currentInferNestingOnLoad = currentGeneralProperties.inferNestingOnLoad;
+                var currentLayoutProperties = appUtilities.getScratch(cy, 'currentLayoutProperties'); 
 
                 $.ajax({
                   type: 'get',
@@ -1243,7 +1273,7 @@ var PathsBetweenQueryView = Backbone.View.extend({
                       var xml = $.parseXML(data.response.body);
                       $(document).trigger('sbgnvizLoadFile', [ filename, cy ]);
                       currentGeneralProperties.inferNestingOnLoad = false;
-                      chiseInstance.updateGraph(chiseInstance.convertSbgnmlToJson(xml), undefined, true);
+                      chiseInstance.updateGraph(chiseInstance.convertSbgnmlToJson(xml), undefined, currentLayoutProperties);
                       currentGeneralProperties.inferNestingOnLoad = currentInferNestingOnLoad;
                       chiseInstance.endSpinner('paths-between-spinner');
                       $(document).trigger('sbgnvizLoadFileEnd', [ filename, cy ]);
@@ -1385,7 +1415,7 @@ var PathsFromToQueryView = Backbone.View.extend({
                     filename = filename + '_' + currentGeneSymbol;
                 }
             }
-            filename = filename + '_PATHSFROMTO.sbgnml';
+            filename = filename + '_PATHSFROMTO.nwt';
             queryURL = queryURL + sources + targets;
 
             if(cy.nodes().length == 0){
@@ -1393,6 +1423,7 @@ var PathsFromToQueryView = Backbone.View.extend({
               chiseInstance.startSpinner('paths-fromto-spinner');
               var currentGeneralProperties = appUtilities.getScratch(cy, 'currentGeneralProperties');
               var currentInferNestingOnLoad = currentGeneralProperties.inferNestingOnLoad;
+              var currentLayoutProperties = appUtilities.getScratch(cy, 'currentLayoutProperties'); 
 
               $.ajax({
                 type: 'get',
@@ -1403,7 +1434,7 @@ var PathsFromToQueryView = Backbone.View.extend({
                     var xml = $.parseXML(data.response.body);
                     $(document).trigger('sbgnvizLoadFile', [ filename, cy ]);
                     currentGeneralProperties.inferNestingOnLoad = false;
-                    chiseInstance.updateGraph(chiseInstance.convertSbgnmlToJson(xml), undefined, true);
+                    chiseInstance.updateGraph(chiseInstance.convertSbgnmlToJson(xml), undefined, currentLayoutProperties);
                     currentGeneralProperties.inferNestingOnLoad = currentInferNestingOnLoad;
                     chiseInstance.endSpinner('paths-fromto-spinner');
                     $(document).trigger('sbgnvizLoadFileEnd', [ filename, cy ]);
@@ -1429,6 +1460,7 @@ var PathsFromToQueryView = Backbone.View.extend({
                 chiseInstance.startSpinner('paths-fromto-spinner');
                 var currentGeneralProperties = appUtilities.getScratch(cy, 'currentGeneralProperties');
                 var currentInferNestingOnLoad = currentGeneralProperties.inferNestingOnLoad;
+                var currentLayoutProperties = appUtilities.getScratch(cy, 'currentLayoutProperties');
 
                 $.ajax({
                   type: 'get',
@@ -1439,7 +1471,7 @@ var PathsFromToQueryView = Backbone.View.extend({
                       var xml = $.parseXML(data.response.body);
                       $(document).trigger('sbgnvizLoadFile', [ filename, cy ]);
                       currentGeneralProperties.inferNestingOnLoad = false;
-                      chiseInstance.updateGraph(chiseInstance.convertSbgnmlToJson(xml), undefined, true);
+                      chiseInstance.updateGraph(chiseInstance.convertSbgnmlToJson(xml), undefined, currentLayoutProperties);
                       currentGeneralProperties.inferNestingOnLoad = currentInferNestingOnLoad;
                       chiseInstance.endSpinner('paths-fromto-spinner');
                       $(document).trigger('sbgnvizLoadFileEnd', [ filename, cy ]);
@@ -1551,7 +1583,7 @@ var CommonStreamQueryView = Backbone.View.extend({
                     filename = filename + '_' + currentGeneSymbol;
                 }
             }
-            filename = filename + '_COMMONSTREAM.sbgnml';
+            filename = filename + '_COMMONSTREAM.nwt';
             queryURL = queryURL + sources;
 
             if(cy.nodes().length == 0){
@@ -1559,6 +1591,7 @@ var CommonStreamQueryView = Backbone.View.extend({
               chiseInstance.startSpinner('common-stream-spinner');
               var currentGeneralProperties = appUtilities.getScratch(cy, 'currentGeneralProperties');
               var currentInferNestingOnLoad = currentGeneralProperties.inferNestingOnLoad;
+              var currentLayoutProperties = appUtilities.getScratch(cy, 'currentLayoutProperties');             
 
               $.ajax({
                 type: 'get',
@@ -1569,7 +1602,7 @@ var CommonStreamQueryView = Backbone.View.extend({
                     var xml = $.parseXML(data.response.body);
                     $(document).trigger('sbgnvizLoadFile', [ filename, cy ]);
                     currentGeneralProperties.inferNestingOnLoad = false;
-                    chiseInstance.updateGraph(chiseInstance.convertSbgnmlToJson(xml), undefined, true);
+                    chiseInstance.updateGraph(chiseInstance.convertSbgnmlToJson(xml), undefined, currentLayoutProperties);
                     currentGeneralProperties.inferNestingOnLoad = currentInferNestingOnLoad;
                     chiseInstance.endSpinner('common-stream-spinner');
                     $(document).trigger('sbgnvizLoadFileEnd', [ filename, cy ]);
@@ -1595,6 +1628,7 @@ var CommonStreamQueryView = Backbone.View.extend({
                 chiseInstance.startSpinner('common-stream-spinner');
                 var currentGeneralProperties = appUtilities.getScratch(cy, 'currentGeneralProperties');
                 var currentInferNestingOnLoad = currentGeneralProperties.inferNestingOnLoad;
+                var currentLayoutProperties = appUtilities.getScratch(cy, 'currentLayoutProperties');                
 
                 $.ajax({
                   type: 'get',
@@ -1605,7 +1639,7 @@ var CommonStreamQueryView = Backbone.View.extend({
                       var xml = $.parseXML(data.response.body);
                       $(document).trigger('sbgnvizLoadFile', [ filename, cy ]);
                       currentGeneralProperties.inferNestingOnLoad = false;
-                      chiseInstance.updateGraph(chiseInstance.convertSbgnmlToJson(xml), undefined, true);
+                      chiseInstance.updateGraph(chiseInstance.convertSbgnmlToJson(xml), undefined, currentLayoutProperties);
                       currentGeneralProperties.inferNestingOnLoad = currentInferNestingOnLoad;
                       chiseInstance.endSpinner('common-stream-spinner');
                       $(document).trigger('sbgnvizLoadFileEnd', [ filename, cy ]);
@@ -1635,7 +1669,6 @@ var CommonStreamQueryView = Backbone.View.extend({
         return this;
     }
 });
-
 /**
  * Paths By URI Query view for the Sample Application.
  */
@@ -1697,13 +1730,14 @@ var PathsByURIQueryView = Backbone.View.extend({
           filename = filename + '_' + uri;
       }
 
-      filename = filename + '_URI.sbgnml';
+      filename = filename + '_URI.nwt';
 
       if(cy.nodes().length == 0){
 
         chiseInstance.startSpinner('paths-byURI-spinner');
         var currentGeneralProperties = appUtilities.getScratch(cy, 'currentGeneralProperties');
         var currentInferNestingOnLoad = currentGeneralProperties.inferNestingOnLoad;
+        var currentLayoutProperties = appUtilities.getScratch(cy, 'currentLayoutProperties');        
 
         $.ajax({
           type: 'get',
@@ -1714,7 +1748,7 @@ var PathsByURIQueryView = Backbone.View.extend({
               var xml = $.parseXML(data.response.body);
               $(document).trigger('sbgnvizLoadFile', [ filename, cy ]);
               currentGeneralProperties.inferNestingOnLoad = false;
-              chiseInstance.updateGraph(chiseInstance.convertSbgnmlToJson(xml), undefined, true);
+              chiseInstance.updateGraph(chiseInstance.convertSbgnmlToJson(xml), undefined, currentLayoutProperties);
               currentGeneralProperties.inferNestingOnLoad = currentInferNestingOnLoad;
               chiseInstance.endSpinner('paths-byURI-spinner');
               $(document).trigger('sbgnvizLoadFileEnd', [ filename, cy ]);
@@ -1740,6 +1774,7 @@ var PathsByURIQueryView = Backbone.View.extend({
           chiseInstance.startSpinner('paths-byURI-spinner');
           var currentGeneralProperties = appUtilities.getScratch(cy, 'currentGeneralProperties');
           var currentInferNestingOnLoad = currentGeneralProperties.inferNestingOnLoad;
+          var currentLayoutProperties = appUtilities.getScratch(cy, 'currentLayoutProperties');          
 
           $.ajax({
             type: 'get',
@@ -1750,7 +1785,7 @@ var PathsByURIQueryView = Backbone.View.extend({
                 var xml = $.parseXML(data.response.body);
                 $(document).trigger('sbgnvizLoadFile', [ filename, cy ]);
                 currentGeneralProperties.inferNestingOnLoad = false;
-                chiseInstance.updateGraph(chiseInstance.convertSbgnmlToJson(xml), undefined, true);
+                chiseInstance.updateGraph(chiseInstance.convertSbgnmlToJson(xml), undefined, currentLayoutProperties);
                 currentGeneralProperties.inferNestingOnLoad = currentInferNestingOnLoad;
                 chiseInstance.endSpinner('paths-byURI-spinner');
                 $(document).trigger('sbgnvizLoadFileEnd', [ filename, cy ]);
@@ -1853,8 +1888,11 @@ var FileSaveView = Backbone.View.extend({
       case 'nwt':
         fExt = 'nwt';
         break;
-      case 'sbgnml':
-        fExt = 'sbgnml'
+      case 'sbgn':
+        fExt = 'sbgn'
+        break;
+      case 'sbml':
+        fExt = 'sbml'
         break;
       case 'celldesigner':
       default:
@@ -1879,19 +1917,19 @@ var FileSaveView = Backbone.View.extend({
       filename = $("#file-save-filename").val();
       appUtilities.setFileContent(filename);
 
-      if(fileformat === "sbgnml" || fileformat === "nwt") {
+      if(fileformat === "sbgn" || fileformat === "nwt") {
         var renderInfo;
         var properties = jquery.extend(true, {}, currentGeneralProperties);
         delete properties.mapType; // already stored in sbgn file, no need to store in extension as property
 
         var saveAsFcn = chiseInstance.saveAsNwt;
-        if ( fileformat === "sbgnml" ) {
+        if ( fileformat === "sbgn" ) {
           saveAsFcn = chiseInstance.saveAsSbgnml;
         }
 
         var nodes, edges;
 
-        if ( fileformat === "sbgnml" ) {
+        if ( fileformat === "sbgn" ) {
           if (chiseInstance.elementUtilities.mapType === 'SIF') {
             properties.mapType = 'Unknown';
           }
@@ -1908,7 +1946,7 @@ var FileSaveView = Backbone.View.extend({
         }
         else if ( chiseInstance.elementUtilities.mapType === 'SIF' && properties.enableSIFTopologyGrouping ) {
           // get topologyGrouping instance for cy
-          var topologyGrouping = appUtilities.getScratch(cy, 'sifTopologyGrouping');
+          var topologyGrouping = chiseInstance.sifTopologyGrouping;
           var compoundGroups = topologyGrouping.getGroupCompounds();
           var metaEdges = topologyGrouping.getMetaEdges();
 
@@ -1924,7 +1962,7 @@ var FileSaveView = Backbone.View.extend({
 
         // Exclude extensions if the version is plain
         if (version === "plain") {
-          saveAsFcn(filename, version, null, null, nodes, edges);
+          saveAsFcn(filename, version, undefined, undefined, nodes, edges);
         }
         else {
           saveAsFcn(filename, version, renderInfo, properties, nodes, edges);
@@ -1935,6 +1973,13 @@ var FileSaveView = Backbone.View.extend({
             type: "text/plain;charset=utf-8;",
         });
         FileSaver.saveAs(blob, filename);
+      }
+      else if(fileformat === "sbml")
+      {
+        var blob = new Blob([text], {
+          type: "text/plain;charset=utf-8;",
+      });
+      FileSaver.saveAs(blob, filename);
       }
       else { // invalid file format provided
         console.error("FileSaveView received unsupported file format: "+fileformat);
@@ -1947,6 +1992,363 @@ var FileSaveView = Backbone.View.extend({
       $(self.el).modal('toggle');
     });
 
+    return this;
+  }
+});
+
+/*
+  User Preferences View (Style, Map Properties, Layout etc)
+*/
+var SaveUserPreferencesView = Backbone.View.extend({
+  initialize: function () {
+    var self = this;
+    self.template = _.template($("#save-user-preferences-template").html());
+  },
+  
+  render: function () {
+    var self = this;
+    self.template = _.template($("#save-user-preferences-template").html());
+    var param ={};
+    var stagedObjects = [];
+    if (typeof appUtilities.stagedElementStyles !== 'undefined') {
+      appUtilities.stagedElementStyles.forEach(function(item, index){
+        stagedObjects.push(item["element"]); 
+      });
+    }    
+    param.stagedObjects = stagedObjects;
+    self.template = self.template(param);
+    $(self.el).html(self.template);
+    $(self.el).modal('show');
+
+    $("#user-preferences-save-table").keyup(function(e){
+      if (e.which == 13 && $(self.el).data('bs.modal').isShown && !$("#save-user-preferences-accept").is(":focus") && !$("#save-user-preferences-cancel").is(":focus")){
+        $("#save-user-preferences-accept").click();
+      }
+    });
+
+    var filename = document.getElementById('file-name').innerHTML; 
+    if(filename.lastIndexOf('.') != -1){
+      filename = filename.substring(0, filename.lastIndexOf('.'));    
+    }    
+    filename = filename.concat(".newtp");
+
+    $("#save-user-preferences-filename").val(filename);
+    $("#save-user-prefrences-object-check").off('change').on("change", function(){
+      if(document.getElementById("save-user-prefrences-object-check").checked){
+          $(".save-preferences-object-styles").prop("checked", true);
+          $(".save-preferences-object-styles").attr('disabled','disabled');
+      }else{
+        $(".save-preferences-object-styles").prop("checked", false);
+   
+        $(".save-preferences-object-styles").removeAttr('disabled');
+      }
+
+
+    });
+
+    $(document).off("click", "#save-user-preferences-accept").on("click", "#save-user-preferences-accept", function (evt) {
+
+       // use active chise instance
+      var chiseInstance = appUtilities.getActiveChiseInstance();
+
+      // use the associated cy instance
+      var cy = appUtilities.getActiveCy();
+      var preferences = {};
+      //get grid properties
+      if(document.getElementById("user-prefrences-grid-check").checked){
+        var currentGridProperties = appUtilities.getScratch(cy, 'currentGridProperties');        
+        preferences.currentGridProperties = currentGridProperties;
+      }
+
+      // get currentGeneralProperties for cy
+      if(document.getElementById("user-prefrences-map-check").checked){
+        preferences.currentGeneralProperties = {}
+        var currentGeneralProperties = appUtilities.getScratch(cy, 'currentGeneralProperties');
+      
+        Object.keys(currentGeneralProperties).forEach(function(key,index) {
+          if(currentGeneralProperties[key] !== appUtilities.defaultGeneralProperties[key]){
+            preferences.currentGeneralProperties[key] = currentGeneralProperties[key];
+          }          
+      });
+
+      delete preferences.currentGeneralProperties.mapName;
+      delete preferences.currentGeneralProperties.mapDescription;
+       
+      }
+
+      if(document.getElementById("user-prefrences-layout-check").checked){
+        preferences.currentLayoutProperties = {}
+        var currentLayoutProperties = appUtilities.getScratch(cy, 'currentLayoutProperties');
+       
+        Object.keys(currentLayoutProperties).forEach(function(key,index) {
+         
+            preferences.currentLayoutProperties[key] = currentLayoutProperties[key];
+                  
+      });
+       
+   
+      }
+
+      preferences.elementsStyles = [];
+      if (typeof appUtilities.stagedElementStyles !== 'undefined') {
+        
+        appUtilities.stagedElementStyles.forEach(function(element){
+          if(document.getElementById("user-prefrences-object-"+element['element']+"-check").checked){
+            preferences.elementsStyles.push(element);
+          }        
+        });
+      }     
+     
+      var blob = new Blob([JSON.stringify(preferences, null, 2)], {type: "application/json"});
+      filename = $("#save-user-preferences-filename").val(); 
+      FileSaver.saveAs(blob, filename);    
+      $(self.el).modal('toggle');
+    });
+
+    $(document).off("click", "#save-user-preferences-cancel").on("click", "#save-user-preferences-cancel", function (evt) {
+      $(self.el).modal('toggle');
+    });
+    return this;
+  }
+});
+
+var LoadUserPreferencesView = Backbone.View.extend({
+  initialize: function () {
+    var self = this;
+    self.template = _.template($("#load-user-preferences-template").html());
+  },  
+  render: function (param) {
+    var self = this;
+    self.template = _.template($("#load-user-preferences-template").html());   
+    self.template = self.template(param);
+    $(self.el).html(self.template);
+    $(self.el).modal('show');
+
+    $("#user-preferences-load-table").keyup(function(e){
+      if (e.which == 13 && $(self.el).data('bs.modal').isShown && !$("#load-user-preferences-accept").is(":focus") && !$("#load-user-preferences-cancel").is(":focus")){
+        $("#load-user-preferences-accept").click();
+      }
+    });   
+    $("#load-user-prefrences-object-check").off('change').on("change", function(){
+      if(document.getElementById("load-user-prefrences-object-check").checked){
+          $(".load-preferences-object-styles").prop("checked", true);
+          $(".load-preferences-object-styles").attr('disabled','disabled');
+      }else{
+        $(".load-preferences-object-styles").prop("checked", false);
+   
+        $(".load-preferences-object-styles").removeAttr('disabled');
+      }
+    });
+    $(document).off("click", "#load-user-preferences-accept").on("click", "#load-user-preferences-accept", function (evt) {
+      var preferences = appUtilities.loadedUserPreferences;
+      var cy = appUtilities.getActiveCy();
+      var chiseInstance = appUtilities.getActiveChiseInstance();
+
+      //apply grid properties if check
+      if(document.getElementById("load-user-prefrences-grid-check").checked){
+        if(typeof preferences.currentGridProperties !== 'undefined'){
+          var currentGridProperties = appUtilities.getScratch(cy, 'currentGridProperties');    
+          $.extend( currentGridProperties, preferences.currentGridProperties);         
+          appUtilities.setScratch(cy, currentGridProperties, 'currentGridProperties');    
+
+          cy.gridGuide({
+            drawGrid: currentGridProperties.showGrid,
+            gridColor: currentGridProperties.gridColor,
+            snapToGridOnRelease: currentGridProperties.snapToGridOnRelease,
+            snapToGridDuringDrag: currentGridProperties.snapToGridDuringDrag,
+            snapToAlignmentLocationOnRelease: currentGridProperties.snapToAlignmentLocationOnRelease,
+            snapToAlignmentLocationDuringDrag: currentGridProperties.snapToAlignmentLocationDuringDrag,
+            gridSpacing: currentGridProperties.gridSize,
+            resize: currentGridProperties.autoResizeNodes,
+            geometricGuideline: currentGridProperties.showGeometricGuidelines,
+            distributionGuidelines: currentGridProperties.showDistributionGuidelines,
+            initPosAlignment: currentGridProperties.showInitPosAlignment,
+            guidelinesTolerance: currentGridProperties.guidelineTolerance,
+            guidelinesStyle: {
+              initPosAlignmentLine: currentGridProperties.initPosAlignmentLine,
+              lineDash: currentGridProperties.lineDash,
+              horizontalDistLine: currentGridProperties.horizontalDistLine,
+              verticalDistLine: currentGridProperties.verticalDistLine,
+              strokeStyle: currentGridProperties.guidelineColor,
+              horizontalDistColor: currentGridProperties.horizontalGuidelineColor,
+              verticalDistColor: currentGridProperties.verticalGuidelineColor,
+              initPosAlignmentColor: currentGridProperties.initPosAlignmentColor,
+              geometricGuidelineRange: currentGridProperties.geometricAlignmentRange,
+              range: currentGridProperties.distributionAlignmentRange
+            }
+          });         
+        }
+      }           
+      //apply layout properties if checked by user
+      if(document.getElementById("load-user-prefrences-layout-check").checked){
+        if(typeof preferences.currentLayoutProperties !== 'undefined'){
+          var currentLayoutProperties = appUtilities.getScratch(cy, 'currentLayoutProperties');    
+          $.extend( currentLayoutProperties, preferences.currentLayoutProperties);         
+          appUtilities.setScratch(cy, currentLayoutProperties, 'currentLayoutProperties');    
+          $(document).trigger('saveLayout', cy);
+        }
+      }      
+      //apply map properties if checked by user
+      if(document.getElementById("load-user-prefrences-map-check").checked){
+        if(typeof preferences.currentGeneralProperties !== 'undefined'){
+          var ur = cy.undoRedo();
+          var actions = [];  
+
+          Object.keys( mapTabGeneralPanel.params).forEach(function(key,index) {
+            if(typeof preferences.currentGeneralProperties[key] !== 'undefined'){
+              mapTabGeneralPanel.params[key].value = preferences.currentGeneralProperties[key];
+              actions.push({name: "changeMenu", param: mapTabGeneralPanel.params[key]});
+
+              if(key == "arrowScale"){              
+                actions.push({name: "changeCss", param: { eles: cy.edges(), name: "arrow-scale", valueMap: mapTabGeneralPanel.params.arrowScale.value}});
+              }
+            }          
+        });         
+  
+          Object.keys( mapTabLabelPanel.params).forEach(function(key,index) {
+            if(typeof preferences.currentGeneralProperties[key] !== 'undefined'){
+              mapTabLabelPanel.params[key].value = preferences.currentGeneralProperties[key];              
+                actions.push({name: "changeMenu", param: mapTabLabelPanel.params[key]});            
+            }          
+        });
+        
+ 
+          Object.keys( mapTabRearrangementPanel.params).forEach(function(key,index) {
+            if(typeof preferences.currentGeneralProperties[key] !== 'undefined'){
+              mapTabRearrangementPanel.params[key].value = preferences.currentGeneralProperties[key];              
+                actions.push({name: "changeMenu", param: mapTabRearrangementPanel.params[key]});            
+            }          
+        });
+          
+          var applyColorScheme = false;
+          var defaultColorScheme = appUtilities.defaultGeneralProperties.mapColorScheme;
+          var defaultColorSchemeStyle = appUtilities.defaultGeneralProperties.mapColorSchemeStyle;
+          if(typeof preferences.currentGeneralProperties.mapColorScheme !== 'undefined'){
+            applyColorScheme = true;
+           defaultColorScheme = preferences.currentGeneralProperties.mapColorScheme;          
+          }
+
+          if(typeof preferences.currentGeneralProperties.mapColorSchemeStyle !== 'undefined'){
+            applyColorScheme = true;
+            defaultColorSchemeStyle = preferences.currentGeneralProperties.mapColorSchemeStyle;          
+          }
+          if(applyColorScheme){
+            appUtilities.applyMapColorScheme(defaultColorScheme, defaultColorSchemeStyle, colorSchemeInspectorView); // default color scheme
+          }
+          ur.do("batch", actions);  
+        }  
+      }        
+      
+      
+      if(typeof preferences.elementsStyles !== 'undefined'){        
+        preferences.elementsStyles.forEach(function(item, index){
+          var sbgnClass = item["element"];
+          if(document.getElementById("load-user-prefrences-object-"+sbgnClass+"-check").checked){
+            var targetNodes =cy.elements('[class="' + sbgnClass + '"]')
+            if(item.styles.length > 0){
+              var nameToValue = {};
+              item.styles.forEach(function(style, index){
+                nameToValue[style.name] = style.value;
+              });
+  
+              //apply changes to exisiting elements only if user check the option and there are elements on canvas of this sbgn class type
+              //else just set the styles as default values 
+              if(targetNodes.length > 0 && document.getElementById("load-user-prefrences-apply-changes").checked)
+              {
+  
+                if(item['type'] == 'node')
+                {
+                   // apply node width and height change to existing elements              
+                  targetNodes.forEach(function(node) {
+                    cy.trigger('noderesize.resizestart', [null, node]);
+                    chiseInstance.resizeNodes(node, nameToValue["width"], nameToValue["height"], false);
+                    cy.trigger('noderesize.resizeend', [null, node]);
+                  });
+                  
+                  chiseInstance.changeData(targetNodes, "border-color", nameToValue["border-color"]);
+                  chiseInstance.changeData(targetNodes, "border-width", nameToValue["border-width"]);
+                  chiseInstance.changeData(targetNodes, "background-color",  nameToValue["background-color"]);
+  
+                  //hande opacity
+                  chiseInstance.changeData(targetNodes, "background-opacity",  nameToValue["background-opacity"]);
+                  chiseInstance.changeData(targetNodes, "background-image-opacity",  nameToValue["background-image-opacity"]);
+  
+                  //handel font
+                  var data = {};            
+                  data['font-size'] = nameToValue['font-size'] != '' ? nameToValue['font-size'] : undefined;
+                  data['font-family'] = nameToValue['font-sifamilyze'] != '' ? nameToValue['font-family'] : undefined;
+                  data['font-weight'] = nameToValue['font-weight'] != '' ? nameToValue['font-weight'] : undefined;
+                  data['font-style'] = nameToValue['font-style'] != '' ? nameToValue['font-style'] : undefined;
+                  data['color'] = nameToValue['color'] != '' ? nameToValue['color'] : undefined; 
+                  chiseInstance.changeFontProperties(targetNodes, data);
+  
+                  targetNodes.forEach(function(node) {
+                    node.data('background-image', nameToValue['background-image']);
+                    node.data('background-position-x', nameToValue['background-position-x']);
+                    node.data('background-position-y', nameToValue['background-position-y']);
+                    node.data('background-width', nameToValue['background-width']);
+                    node.data('background-height', nameToValue['background-height']);
+                    node.data('background-fit', nameToValue['background-fit']);
+                    node.data('background-image-opacity', nameToValue['background-image-opacity']);
+                  });
+  
+                  chiseInstance.setMultimerStatus(targetNodes,nameToValue['multimer'] );
+                  chiseInstance.setCloneMarkerStatus(targetNodes,nameToValue['clonemarker'] ); 
+                }
+                else
+                {
+                  //if type is edge only apply width and line-color
+                  chiseInstance.changeData(targetNodes, "width", nameToValue['width']);
+                  chiseInstance.changeData(targetNodes, "line-color", nameToValue['line-color']);
+                }             
+              }
+              //set the loaded styles as default values
+              chiseInstance.elementUtilities.setDefaultProperties( sbgnClass, nameToValue );
+  
+  
+            
+  
+            }
+
+            if(item.infoBoxStyles.length > 0){
+                //set info boxes styles 
+              var infoStyles =  item.infoBoxStyles;
+  
+             
+              infoStyles.forEach(function(infoStyle){
+  
+                var currentDefaults = chiseInstance.elementUtilities.getDefaultProperties( sbgnClass )[ infoStyle.clazz ];
+                var infoboxStyle = $.extend( {}, currentDefaults, infoStyle.styles );
+                chiseInstance.setDefaultProperty( sbgnClass, infoStyle.clazz, infoboxStyle );
+  
+                //statesandinfos
+
+                if(targetNodes.length > 0 && document.getElementById("load-user-prefrences-apply-changes").checked){
+                  targetNodes.forEach(function(node) {
+                    var infoboxesIndices = node.data("statesandinfos").length;
+                    for(var i = 0 ; i< infoboxesIndices ; i++){
+                      if(node.data('statesandinfos')[i].clazz == infoStyle.clazz){
+                        appUtilities.getActiveChiseInstance().updateInfoboxStyle(node, i, infoboxStyle);    
+                      }
+    
+                    }
+                  });
+                } 
+              });
+      
+            }  
+         
+        }
+        });
+      }
+    
+       
+      $(self.el).modal('toggle');
+    });
+
+    $(document).off("click", "#load-user-preferences-cancel").on("click", "#load-user-preferences-cancel", function (evt) {
+      $(self.el).modal('toggle');
+    });
     return this;
   }
 });
@@ -2043,7 +2445,7 @@ var PromptInvalidLengthLimitView = Backbone.View.extend({
 
         $(self.el).html(self.template);
         if (PCdialog == "Neighborhood")
-          document.getElementById("length-limit-constant").innerHTML = "Length limit can be at most 2.";
+          document.getElementById("length-limit-constant").innerHTML = "Length limit can be at most 2.";								  
         else
             document.getElementById("length-limit-constant").innerHTML = "Length limit can be at most 3.";
         $(self.el).modal('show');
@@ -2058,6 +2460,7 @@ var PromptInvalidLengthLimitView = Backbone.View.extend({
                 appUtilities.pathsFromToQueryView.render();
             else if (PCdialog == "CommonStream")
                 appUtilities.commonStreamQueryView.render();
+			     				  
         });
 
         return this;
@@ -2452,11 +2855,12 @@ var ReactionTemplateView = Backbone.View.extend({
       var complexName = params.templateReactionEnableComplexName ? params.templateReactionComplexName : undefined;
       var tilingPaddingVertical = chiseInstance.calculatePaddings(currentLayoutProperties.tilingPaddingVertical);
       var tilingPaddingHorizontal = chiseInstance.calculatePaddings(currentLayoutProperties.tilingPaddingHorizontal);
+      var layoutParam = {name: "fcose"};
       if(templateType == "reversible"){
         nodeList = params.reversibleInputNodeList;
         complexName = params.reversibleOutputNodeList;
       }
-      chiseInstance.createTemplateReaction(templateType, nodeList, complexName, undefined, tilingPaddingVertical, tilingPaddingHorizontal);
+      chiseInstance.createTemplateReaction(templateType, nodeList, complexName, undefined, tilingPaddingVertical, tilingPaddingHorizontal, undefined, layoutParam);
 
       //Update arrow-scale of newly added edges (newly added elements are selected so we just update selected edges)
       var currentArrowScale = Number($('#arrow-scale').val());
@@ -2512,7 +2916,7 @@ var GridPropertiesView = Backbone.View.extend({
     self.template = _.template($("#grid-properties-template").html());
     self.template = self.template(currentGridProperties);
     $(self.el).html(self.template);
-
+    bindColorPicker2GridColorInputs();
     $(self.el).modal('show');
 
     // The following functions give Snap Policy row a radio button functionality
@@ -2611,6 +3015,7 @@ var GridPropertiesView = Backbone.View.extend({
       self.template = _.template($("#grid-properties-template").html());
       self.template = self.template(currentGridProperties);
       $(self.el).html(self.template);
+      bindColorPicker2GridColorInputs();
     });
 
     return this;
@@ -2873,7 +3278,7 @@ var FontPropertiesView = Backbone.View.extend({
     self.template = _.template($("#font-properties-template").html());
     self.template = self.template(self.currentFontProperties);
     $(self.el).html(self.template);
-
+    colorPickerUtils.bindPicker2Input('#' + generateInputId('font-color', self.selectorPrefix), null);
     $(self.el).modal('show');
 
     $(document).off("click", "#set-font-properties").on("click", "#set-font-properties", function (evt) {
@@ -3054,6 +3459,9 @@ var InfoboxPropertiesView = Backbone.View.extend({
     self.template = _.template($("#infobox-properties-template").html());
     self.template = self.template(self.currentProperties);
     $(self.el).html(self.template);
+    colorPickerUtils.bindPicker2Input('#infobox-properties-border-color', null);
+    colorPickerUtils.bindPicker2Input('#infobox-properties-background-color', null);
+    colorPickerUtils.bindPicker2Input('#' + generateInputId('font-color', self.selectorPrefix), null);
 
     $(self.el).modal('show');
 
@@ -3086,15 +3494,41 @@ var InfoboxPropertiesView = Backbone.View.extend({
     });
 
     $(document).off("click", "#set-as-default-infobox-properties").on("click", "#set-as-default-infobox-properties", function( evt ) {
+
+      if (typeof appUtilities.stagedElementStyles === 'undefined') {
+        appUtilities.stagedElementStyles = [];
+      } 
+     
       var chiseInstance = appUtilities.getActiveChiseInstance();
       var cy = appUtilities.getActiveCy();
       var parent = chiseInstance.classes.getAuxUnitClass(infoboxObj).getParent(infoboxObj, cy);
       var parentClass = parent.data('class');
 
+     
       var updates = readInfoboxProps();
       var currentDefaults = chiseInstance.elementUtilities.getDefaultProperties( parentClass )[ infoboxObj.clazz ];
       var infoboxStyle = $.extend( {}, currentDefaults, updates );
       chiseInstance.setDefaultProperty( parentClass, infoboxObj.clazz, infoboxStyle );
+
+      var  stagedElement =  appUtilities.stagedElementStyles.find(b => b.element == parentClass);
+      if(stagedElement)
+      {
+        var stagedElementInfoboxStyles = stagedElement.infoBoxStyles.find(b=>b.clazz == infoboxObj.clazz);
+        if(stagedElementInfoboxStyles)
+        {
+          stagedElementInfoboxStyles.styles = infoboxStyle;
+        }
+        else
+        {
+          stagedElement.infoBoxStyles.push({clazz:infoboxObj.clazz,styles:infoboxStyle});
+        }
+      }
+      else
+      {
+            appUtilities.stagedElementStyles.push({element : parentClass, type:'node',styles:[], infoBoxStyles:[{clazz:infoboxObj.clazz,styles:infoboxStyle}]});
+      }
+
+     
     });
   }
 });
@@ -3274,8 +3708,15 @@ var AnnotationElementView = Backbone.View.extend({
   }
 });
 
+function bindColorPicker2GridColorInputs() {
+  const ids = ['#grid-color', '#init-Pos-Alignment-Color', '#geometric-guideline-color', '#horizontal-guideline-color', '#vertical-guideline-color'];
+  for (let i = 0; i < ids.length; i++) {
+    colorPickerUtils.bindPicker2Input(ids[i], null);
+  }
+}
+
 module.exports = {
-  BioGeneView: BioGeneView,
+//  BioGeneView: BioGeneView,
   ChemicalView: ChemicalView,
   LayoutPropertiesView: LayoutPropertiesView,
   ColorSchemeInspectorView: ColorSchemeInspectorView,
@@ -3290,6 +3731,8 @@ module.exports = {
   PathsByURIQueryView: PathsByURIQueryView,
   PromptSaveView: PromptSaveView,
   FileSaveView: FileSaveView,
+  SaveUserPreferencesView:SaveUserPreferencesView,
+  LoadUserPreferencesView:LoadUserPreferencesView,
   PromptConfirmationView: PromptConfirmationView,
   PromptMapTypeView: PromptMapTypeView,
   PromptInvalidFileView: PromptInvalidFileView,
@@ -3304,5 +3747,5 @@ module.exports = {
   PromptInvalidURIWarning: PromptInvalidURIWarning,
   PromptInvalidURLWarning: PromptInvalidURLWarning,
   PromptInvalidImageWarning: PromptInvalidImageWarning,
-  PromptInvalidEdgeWarning: PromptInvalidEdgeWarning,
+  PromptInvalidEdgeWarning: PromptInvalidEdgeWarning
 };

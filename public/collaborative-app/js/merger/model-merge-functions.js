@@ -35,6 +35,7 @@ class ModelMergeFunctions{
 
         //get another sbgncontainer and display the new SBGN model.
         modelManager.newModel(cyId, "me", true);
+        let currentLayoutProperties = appUtilities.getScratch(appUtilities.getCyInstance(cyId), 'currentLayoutProperties');
 
         //this takes a while so wait before initiating the model
         appUtilities.getChiseInstance(cyId).updateGraph(jsonObj, function () {
@@ -56,7 +57,7 @@ class ModelMergeFunctions{
                 if (callback) callback("success");
             }, 1000);
 
-        }, true);
+        }, currentLayoutProperties);
     }
 
 
@@ -78,7 +79,7 @@ class ModelMergeFunctions{
 
         modelManager.newModel(cyId, "me", true);
 
-
+        let currentLayoutProperties = appUtilities.getScratch(appUtilities.getCyInstance(cyId), 'currentLayoutProperties');
 
         appUtilities.getChiseInstance(cyId).updateGraph(jsonObj, function(){
 
@@ -95,7 +96,7 @@ class ModelMergeFunctions{
                 if (callback) callback();
             }, 1000);
 
-        }, true);
+        }, currentLayoutProperties);
 
         return {sentences: sentenceNodeMap, idxCards: idxCardNodeMap};
     }

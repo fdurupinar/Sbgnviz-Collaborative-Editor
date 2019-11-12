@@ -72,13 +72,15 @@ var PathsBetweenQueryView = Backbone.View.extend({
                 success: function (data) {
 
                     let chiseInst = appUtilities.createNewNetwork(); //opens a new tab
+                    let cy = chiseInst.getCy();
 
 
                     let jsonObj = chiseInst.convertSbgnmlTextToJson(data);
+                    let currentLayoutProperties = appUtilities.getScratch(cy, 'currentLayoutProperties');
 
                     chiseInst.updateGraph(jsonObj, function() {
 
-                    }, true);
+                    }, currentLayoutProperties);
 
                     // appUtilities.getChiseInstance(data.cyId).updateGraph(jsonObj, function(){
                     //     app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(),  "me");
@@ -168,13 +170,15 @@ var PathsByURIQueryView = Backbone.View.extend({
                 dataType: 'text',
                 success: function (data) {
                     let chiseInst = appUtilities.createNewNetwork(); //opens a new tab
+                    let cy = chiseInst.getCy();
 
 
                     let jsonObj = chiseInst.convertSbgnmlTextToJson(data);
+                    var currentLayoutProperties = appUtilities.getScratch(cy, 'currentLayoutProperties');
 
                     chiseInst.updateGraph(jsonObj, function() {
 
-                    }, true);
+                    }, currentLayoutProperties);
 
                     appUtilities.getActiveChiseInstance().endSpinner('paths-between-spinner');
 

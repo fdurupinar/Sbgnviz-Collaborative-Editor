@@ -1,0 +1,13 @@
+Compatible Newt commit
+https://github.com/iVis-at-Bilkent/newt/commit/e7e42c4b0368b65e4f83dcafabb2c513a95a6284
+
+How to Upgrade
+In public/app folder the required changes are marked by "cwc-change" comments. Search "cwc-change"
+in that folder and apply the same changes at the top of the app folder of original Newt.
+
+However, unfortunately in views/index.html and public/app/css/chise.css such changes are not noted
+(it is already not very feasible for index.html). For these files check the difference between
+the currently used Newt version and the new version to be upgraded to. Apply the same changes to
+the related file in collaborative editor.
+
+After making the upgrade do not forget to update the compatible Newt commit/version in this file.
