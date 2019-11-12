@@ -78,7 +78,6 @@ var PathsBetweenQueryView = Backbone.View.extend({
                     let jsonObj = chiseInst.convertSbgnmlTextToJson(data);
                     let currentLayoutProperties = appUtilities.getScratch(cy, 'currentLayoutProperties');
 
-                    // TODO: make the same change in other updateGraph() calls as well
                     chiseInst.updateGraph(jsonObj, function() {
 
                     }, currentLayoutProperties);

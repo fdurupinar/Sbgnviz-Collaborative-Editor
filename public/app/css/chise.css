@@ -403,7 +403,7 @@ sbgn-toolbar img:hover, .element-palette img:hover, #fix-errors-of-validation-ic
 }
 
 .menu-break-small {
-    /*TODO: should add this z-index?*/
+    /*TODO: shoul this z-index be added?*/
     /*z-index: 1000;*/
     min-width: 4px !important;
 }
