@@ -394,6 +394,7 @@ class ClientSideSocketListener{
     _openPCQueryWindow(data, callback){
         try {
             let chiseInst = appUtilities.createNewNetwork(); //opens a new tab
+            let cy = chiseInst.getCy();
 
             let jsonObj;
             if (data.type && data.type == 'sif')
@@ -401,8 +402,10 @@ class ClientSideSocketListener{
             else
                 jsonObj = chiseInst.convertSbgnmlTextToJson(data.graph);
 
+            let currentLayoutProperties = appUtilities.getScratch(cy, 'currentLayoutProperties');
+
             chiseInst.updateGraph(jsonObj,  () => {
-                this.app.modelManager.initModel(appUtilities.getCyInstance(chiseInst.cyId).nodes(), appUtilities.getCyInstance(chiseInst.cyId).edges(), chiseInst.cyId,  "me");
+                this.app.modelManager.initModel(cy.nodes(), cy.edges(), chiseInst.cyId,  "me");
 
                 appUtilities.setActiveNetwork(chiseInst.cyId);
                 //
@@ -410,7 +413,7 @@ class ClientSideSocketListener{
 
                 if (callback) callback("success");
 
-            }, true);
+            }, currentLayoutProperties);
         }
         catch (e) {
             console.log(e);
@@ -474,18 +477,20 @@ class ClientSideSocketListener{
 
             }
 
-            appUtilities.getCyInstance(data.cyId).remove(appUtilities.getCyInstance(data.cyId).elements());
+            let cy = chiseInst.getCy();
+
+            cy.remove(cy.elements());
 
 
             let jsonObj = chiseInst.convertSifTextToJson(data.sif);
-
+            let currentLayoutProperties = appUtilities.getScratch(cy, 'currentLayoutProperties');
 
             chiseInst.updateGraph(jsonObj, () => {
 
                 this.app.modelManager.newModel(appUtilities.getActiveNetworkId(), "me"); //delete the existing model first so that ids don't get mixed up
 
 
-                this.app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(), data.cyId,  "me");
+                this.app.modelManager.initModel(cy.nodes(), cy.edges(), data.cyId,  "me");
 
 
                 appUtilities.setActiveNetwork(data.cyId);
@@ -499,14 +504,14 @@ class ClientSideSocketListener{
                     $("#defaultOpen")[0].click();
 
                     this.app.dynamicResize();
-                    appUtilities.getCyInstance(data.cyId).panzoom().fit();
+                    cy.panzoom().fit();
 
 
                     if (callback) callback("success");
                 }, 1000);
 
 
-            }, true);
+            }, currentLayoutProperties);
         }
         catch (e) {
             console.log(e);
@@ -538,11 +543,14 @@ class ClientSideSocketListener{
 
             }
 
+            let cy = chiseInst.getCy();
 
-            appUtilities.getCyInstance(data.cyId).remove(appUtilities.getCyInstance(data.cyId).elements());
+
+            cy.remove(cy.elements());
 
 
             let jsonObj = chiseInst.convertSbgnmlTextToJson(data.sbgn);
+            let currentLayoutProperties = appUtilities.getScratch(cy, 'currentLayoutProperties');
 
 
             chiseInst.updateGraph(jsonObj, () => {
@@ -550,7 +558,7 @@ class ClientSideSocketListener{
                 this.app.modelManager.newModel(appUtilities.getActiveNetworkId(), "me"); //delete the existing model first so that ids don't get mixed up
 
 
-                this.app.modelManager.initModel(appUtilities.getCyInstance(data.cyId).nodes(), appUtilities.getCyInstance(data.cyId).edges(), data.cyId,  "me");
+                this.app.modelManager.initModel(cy.nodes(), cy.edges(), data.cyId,  "me");
 
 
                 appUtilities.setActiveNetwork(data.cyId);
@@ -564,14 +572,14 @@ class ClientSideSocketListener{
                     $("#defaultOpen")[0].click();
 
                     this.app.dynamicResize();
-                    appUtilities.getCyInstance(data.cyId).panzoom().fit();
+                    cy.panzoom().fit();
 
 
                     if (callback) callback("success");
                 }, 1000);
 
 
-            }, true);
+            }, currentLayoutProperties);
 
             //update cellular locations
             this.app.updateCellularLocations();
