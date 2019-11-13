@@ -189,6 +189,11 @@ body {
     /*float: left;*/
 }
 
+.tab-content > *, #network-panels-container > * {
+    width: inherit;
+    height: inherit;
+}
+
 .network-panel {
   height: 100%;
   width: 100%;
