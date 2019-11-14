@@ -653,7 +653,8 @@ menu:not([title]):before{
     font-family:'FontAwesome';
     content:"\f077";
     float: right;
-    padding-right: 4px;
+    /*cwc-change: increased to 20px*/
+    padding-right: 20px;
     color: inherit;
 }
 .panel-heading.collapsed .accordion-toggle:after {
