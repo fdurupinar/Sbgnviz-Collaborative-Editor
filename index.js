@@ -1821,8 +1821,6 @@ app.proto.dynamicResize = function () {
     let canvasWidth = 1200;
     let canvasHeight = 680;
 
-    let images = this.model.get('_page.doc.images');
-
 
     if (windowWidth > canvasWidth) {
 
@@ -1834,37 +1832,16 @@ app.proto.dynamicResize = function () {
 
         $("#network-panels-container").width(wCanvasTab);
 
-        if(images) {
-            images.forEach( (img) =>  {
-                $("#static-image-container-" + img.tabIndex).width(wCanvasTab);
-            });
-        }
-
 
         let wInspectorTab = $("#inspector-tab-area").width();
         $("#sbgn-inspector").width(wInspectorTab);
         $("#canvas-tabs").width( wCanvasTab);
-    }
-    else {
-        if(images) {
-            images.forEach( (img) => {
-                $("#static-image-container-" + img.tabIndex).width(800);
-                $("#static-image-container-" + img.tabIndex).height(680);
-            });
-        }
-
-
     }
 
     if (windowHeight > canvasHeight) {
 
         let hCanvasTab = $("#canvas-tab-area").height();
         $("#network-panels-container").height(hCanvasTab);
-        if(images) {
-            images.forEach( (img)=>  {
-                $("#static-image-container-" + img.tabIndex).height(hCanvasTab);
-            });
-        }
 
         let hInspectorTab = $("#inspector-tab-area").height();
 
@@ -1872,11 +1849,11 @@ app.proto.dynamicResize = function () {
     }
 
     // TODO find a better place to move these resizable calls.
-    
+
     // make canvas tab area resizable and resize some other components as it is resized
     $("#canvas-tab-area").resizable({
-            alsoResize: '#inspector-tab-area, #network-panels-container',
-            minWidth: 1000,
+            alsoResize: '#network-panels-container',
+            minWidth: 600,
             minHeight: 600
         }
     );
@@ -1888,7 +1865,9 @@ app.proto.dynamicResize = function () {
 
     // force each of the cytoscape.js
     // instance renderer to recalculate the viewport bounds
-    this.resizeCyCanvases();
+    // looks like no need for that
+    // TODO: reactivate if needed
+    // this.resizeCyCanvases();
 };
 
 // force each of the cytoscape.js

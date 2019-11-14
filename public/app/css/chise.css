@@ -189,6 +189,11 @@ body {
     /*float: left;*/
 }
 
+#canvas-tab-area-content > *, #network-panels-container > * {
+    width: inherit;
+    height: inherit;
+}
+
 .network-panel {
   height: 100%;
   width: 100%;
