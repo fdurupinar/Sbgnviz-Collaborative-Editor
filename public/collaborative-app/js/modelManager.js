@@ -1426,6 +1426,7 @@ class ModelManager{
 
             nodeData.annotationsView = null;
 
+            // nodeData.auxunitlayouts = null;
             // This line was causing the auxiliary units being
             // hidden, so not being rendered, when they come from
             // display sbgnviz (it was goning back to normal after page refresh)
