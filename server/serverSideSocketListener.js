@@ -518,6 +518,17 @@ class ServerSideSocketListener{
             });
 
 
+            socket.on('agentDisplayOncoprintRequest', function(data, callback){
+
+                let requestStr = "displayOncoprint";
+
+                askHuman(data.userId, data.room,  requestStr, data.data, function(val){
+
+                    if (callback) callback(val);
+                });
+            });
+
+
             socket.on('agentDisplaySbgnRequest', function(data, callback){
 
                 let requestStr = "displaySbgn";
