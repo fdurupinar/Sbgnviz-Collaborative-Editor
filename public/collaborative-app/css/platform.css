@@ -497,6 +497,10 @@ input[type="file"] {
   flex-wrap: nowrap;
 }
 
+#trips-feedback-area {
+  resize: vertical;
+}
+
 #reset-conversation, #prompt-trips-feedback{
 
     /*position: absolute;*/
