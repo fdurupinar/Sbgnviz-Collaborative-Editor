@@ -40,6 +40,11 @@ class TripsGeneralInterfaceModule extends TripsInterfaceModule {
 
         }, 2000);
 
+        socket.on('sendFeedbackToTrips', (data) => {
+          let quotedFb = '"' + data.fb + '"';
+          self.tm.sendMsg({ 0: 'tell', content: ['user-note', quotedFb] });
+        });
+
     }
 
     disconnect(){

@@ -1625,6 +1625,19 @@ app.proto.informTripsAboutModelChange = function(cyId){
 
 }
 
+app.proto.sendFeedbackToTrips = function(event, model){
+  let self = this;
+  if(!model)
+      model = self.model;
+  let fb = model.del('_page.tripsFeedback'); //to clear  the input box
+  // TODO: should throw error here?
+  if (!fb) return;
+  self.tripsAgent.sendRequest('sendFeedbackToTrips', {fb});
+
+  // toggle the visibility of dialog
+  $('#trips-feedback-table').modal('toggle')
+}
+
 app.proto.enterMessage = function(event){
 
     let userId = this.model.get('_session.userId');

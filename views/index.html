@@ -735,6 +735,24 @@
                 <!-- infobox properties table will be shown here -->
             </div>
 
+            <!-- cwc-change: added trips-feedback-table-->
+            <div id="trips-feedback-table" tabindex="-1" class="modal fade" role="dialog">
+              <div class="modal-dialog sbgn-modal-dialog">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal">&times;</button>
+                          <h4 class="modal-title">Trips Feedback</h4>
+                      </div>
+                      <div class="modal-body">
+                          <textarea id="trips-feedback-area" rows="4" cols="75">{{_page.tripsFeedback}}</textarea>
+                      </div>
+                      <div class="modal-footer" style="text-align: center">
+                          <button id="trips-feedback-submit" on-click="sendFeedbackToTrips($event)" class="btn btn-default">Submit</button>
+                      </div>
+                  </div>
+              </div>
+            </div>
+
             <div id="box">
             </div>
 
@@ -3120,10 +3138,17 @@
                                     </tr>
                                     <tr>
                                         <td>
-                                        <button id = "change-user-color" class = "btn btn-mini" on-click ="changeColorCode()">New user color</button>
+                                          <button id = "change-user-color" class = "btn btn-mini" on-click ="changeColorCode()">New user color</button>
                                         </td>
                                         <td style="float:right">
+                                        <div class="flex-no-wrap-container">
+                                          <div>
+                                            <button id = "prompt-trips-feedback" class="btn btn-info" data-toggle="modal" data-target="#trips-feedback-table">Write Feedback</button>
+                                          </div>
+                                          <div>
                                             <button id = "reset-conversation" class = "btn btn-info btn-mini" on-click = "resetConversationOnTrips()">Reset Conversation</button>
+                                          </div>
+                                        </div>
                                         </td>
                                     </tr>
 

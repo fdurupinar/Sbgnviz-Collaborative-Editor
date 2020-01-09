@@ -492,12 +492,16 @@ input[type="file"] {
 
 }
 
-#reset-conversation{
+.flex-no-wrap-container {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+#reset-conversation, #prompt-trips-feedback{
 
     /*position: absolute;*/
     right: 0px;
     margin: 5px;
-    margin-left: 60px;
     font-size: large;
 }
 
