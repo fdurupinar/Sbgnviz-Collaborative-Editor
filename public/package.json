@@ -19,7 +19,7 @@
     "a-color-picker": "^1.2.0",
     "backbone": "1.3.3",
     "body-parser": "^1.19.0",
-    "bootstrap": "3.3.7",
+    "bootstrap": "3.4.1",
     "chise": "^2.0.0",
     "chroma-js": "^1.3.4",
     "cytoscape": "github:iVis-at-Bilkent/cytoscape.js#master",
