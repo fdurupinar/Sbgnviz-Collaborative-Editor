@@ -67,14 +67,8 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
 
         pattern = {0: 'request', 1: '&key', content: ['put-into-compartment', '.', '*']};
         this.tm.addHandler(pattern, (text) => {
-
-            let genes;
-            let termStr =  text.content[2];
-
-            if(termStr.toLowerCase() === 'ont::all')
-                genes = "ont::all";
-            else
-                genes = this.extractGeneNamesFromEkb(termStr);
+            let genesContent =  text.content[2];
+            let genes = this.extractNamesFromGenesContent(genesContent);
 
             let compartment = this.trimDoubleQuotes(text.content[4]);
             this.askHuman(this.agentId, this.room, "addCellularLocation", {genes: genes, compartment:compartment},  () => {
@@ -86,14 +80,8 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
 
         pattern = {0: 'request', 1: '&key', content: ['put-out-of-compartment', '.', '*']};
         this.tm.addHandler(pattern, (text) => {
-
-            let genes;
-            let termStr =  text.content[2];
-
-            if(termStr.toLowerCase() === 'ont::all')
-                genes = "ont::all";
-            else
-                genes = this.extractGeneNamesFromEkb(termStr);
+            let genesContent =  text.content[2];
+            let genes = this.extractNamesFromGenesContent(genesContent);
 
             let compartment = this.trimDoubleQuotes(text.content[4]);
             this.askHuman(this.agentId, this.room, "moveOutOfCellularLocation", {genes: genes, compartment:compartment},  () => {
@@ -227,21 +215,19 @@ class TripsVisualizationInterfaceModule extends TripsInterfaceModule{
 
     /***
      * Finds the variables between <name></name> tags
-     * @param {string} termStr ekb string
+     * @param {Array} contentArr content array that includes genes information
      * @returns {Array} of gene names
      */
-    extractGeneNamesFromEkb(termStr){
+    extractNamesFromGenesContent(genesContent){
+        const ONT_ALL = 'ont::all';
+        const GENE_INDEX = 1;
 
-        var re = new RegExp(/<name>\s*(.*?)\s*<\/name>/g);
-
-        var genes = [];
-        let m = re.exec(termStr);
-        while (m) {
-            genes.push(m[1]);
-            m = re.exec(termStr);
+        if (typeof genesContent == 'string' && genesContent.toLowerCase() === ONT_ALL) {
+          return ONT_ALL;
         }
 
-        return genes;
+        let geneNames = genesContent.map( geneContent => this.trimDoubleQuotes( geneContent[GENE_INDEX] ) );
+        return geneNames;
     }
 
     /**

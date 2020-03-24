@@ -1213,12 +1213,9 @@ app.proto.addCellularLocation = function(genes, compartment, cyId) {
 
 
     //check if compartment already exists
-    let existingCompartment;
-    cy.nodes().forEach((node) => {
-        if (node.data("label") === compartmentLabel && node.isParent()) {
-            existingCompartment = node; //they should all be the same compartment as this process eliminates duplicates
-        }
-    });
+    let existingCompartment = cy.nodes().filter(
+      n => n.data('label') == compartmentLabel && n.data('class') == 'compartment'
+    )[0];
 
     if (existingCompartment) {
         let descs = existingCompartment.descendants();
