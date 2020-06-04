@@ -57,7 +57,7 @@ $(document).ready(function(){
     m.forEach(record => record.removedNodes.length & removedNodes.push(...record.removedNodes))
     // The addedNodes are messages plus a couple other "comments", which should be unaffected
     $.each(addedNodes, function( index, message ) {
-      makeItemListsCollapsible(node)
+      makeItemListsCollapsible(message)
     })
   })
 })
@@ -67,11 +67,8 @@ $(document).ready(function(){
 // in the element and makes it collapsible
 
 function makeItemListsCollapsible (element) {
-  // Create expandable lists for instances of the class 'item-list'
+  // Make instances of the class 'item-list' collapsible
   $('span.item-list', element)
-  // Make the whole thing selectable.
-    .wrap(function () { return '<span class="selectable" data-string="'+ this.innerHTML +'"></span>' })
-  // Make it collapsible
     .each(function () { makeCollapsible(this) })
 }
 
