@@ -323,6 +323,9 @@ app.proto.create = function (model) {
     // this.agentSocket = require('./public/collaborative-app/js/clientSideSocketListener')(this);
     // this.agentSocket.listen();
 
+    let collapsibleChatLists = require('./public/collaborative-app/js/collapsible-chat-lists');
+    collapsibleChatLists();
+
 
 
     let OncoprintHandler = require('./public/collaborative-app/js/oncoprint/oncoprint-handler') ;
