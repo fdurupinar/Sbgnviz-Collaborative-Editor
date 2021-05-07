@@ -50,7 +50,7 @@
     "request": "^2.81.0",
     "sbgnviz": "^5.0.0",
     "tippy.js": "^3.4.0",
-    "underscore": "1.8.3"
+    "underscore": "1.12.1"
   },
   "devDependencies": {
     "express": "4.14.0",
