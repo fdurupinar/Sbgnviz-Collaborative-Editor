@@ -51,7 +51,7 @@
     "sharedb-hooks": "^3.0.5",
     "sharedb-mongo": "^1.0.0-beta.8",
     "socket-io": "^1.0.0",
-    "socket.io": "^1.0.0",
+    "socket.io": "^4.5.4",
     "tippy.js": "^3.4.0",
     "underscore": "^1.9.1",
     "ws": "^3.3.3"
